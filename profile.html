@@ -15,25 +15,24 @@
         </header>
 
         <div class="space-y-6">
-            
             <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-lg">
                 <h2 class="text-xl font-bold mb-4 text-indigo-600 dark:text-indigo-400 border-b pb-2">એકાઉન્ટ વિગતો</h2>
                 
                 <form id="profileUpdateForm" class="space-y-4">
                     <div class="relative">
                         <label for="profileName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">નામ</label>
-                        <input type="text" id="profileName" name="name"
+                        <input type="text" id="profileName" name="name" value="રોહિત પટેલ"
                             class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-gray-700 dark:text-white" required>
                     </div>
                     <div class="relative">
                         <label for="profileMobile" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">મોબાઈલ નંબર</label>
-                        <input type="tel" id="profileMobile" name="mobileNumber" 
+                        <input type="tel" id="profileMobile" name="mobileNumber" value="9876543210"
                             class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 cursor-not-allowed" readonly disabled>
                     </div>
                     <div class="relative">
                         <label for="profileAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">સરનામું</label>
-                        <textarea id="profileAddress" name="address" rows="3"
-                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-gray-700 dark:text-white"></textarea>
+                        <textarea id="profileAddress" name="address" rows="3" placeholder="તમારું સરનામું"
+                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-gray-700 dark:text-white">અમદાવાદ, ગુજરાત</textarea>
                     </div>
 
                     <button type="submit" id="updateProfileBtn" 
@@ -62,7 +61,6 @@
                     </div>
                     <span class="text-indigo-600 dark:text-indigo-400 font-bold text-lg">→</span>
                 </a>
-
                 <a href="/my-test-results" class="flex items-center justify-between bg-white dark:bg-gray-800 p-5 rounded-xl shadow-lg border-l-4 border-green-500 transition duration-300 hover:shadow-xl">
                     <div class="flex items-center space-x-3">
                         <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -74,5 +72,40 @@
         </div>
     </div>
 </section>
+
+<script>
+    // 1. પ્રોફાઇલ અપડેટ ફોર્મ સબમિશન
+    document.getElementById('profileUpdateForm').addEventListener('submit', function(event) {
+        event.preventDefault(); 
+        
+        const name = document.getElementById('profileName').value;
+        const address = document.getElementById('profileAddress').value;
+        
+        // **Dummy Logic:** Replace this with actual API call to save data to Supabase/Server
+        
+        alert(`પ્રોફાઇલ અપડેટ થઈ ગઈ છે!\nનામ: ${name}\nસરનામું: ${address}\n\nનોંધ: આ ડમી અપડેટ છે, વાસ્તવિક કોડ અહીં ઉમેરો.`);
+        
+        // UI Feedback
+        document.getElementById('updateProfileBtn').innerText = '✅ અપડેટ થયું!';
+        setTimeout(() => {
+            document.getElementById('updateProfileBtn').innerText = 'વિગતો અપડેટ કરો';
+        }, 3000);
+    });
+
+    // 2. પાસવર્ડ બદલો બટન
+    document.getElementById('changePasswordBtn').addEventListener('click', function() {
+        // **Dummy Logic:** In a real app, this would open a modal/new page
+        alert('પાસવર્ડ બદલવાની વિન્ડો ખોલો.\n\nનોંધ: આ ડમી એક્શન છે.');
+    });
+
+    // 3. લોગઆઉટ બટન
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        if (confirm('શું તમે ખરેખર લોગઆઉટ કરવા માંગો છો?')) {
+            // **Dummy Logic:** Clear local session storage and redirect to login
+            alert('લોગઆઉટ સફળ. લૉગિન પેજ પર રીડાયરેક્ટ કરી રહ્યાં છીએ.');
+            // window.location.href = 'login.html'; // જો લૉગિન પેજ હોય તો
+        }
+    });
+</script>
 </body>
 </html>
