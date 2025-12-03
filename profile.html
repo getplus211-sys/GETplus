@@ -1,129 +1,172 @@
-<!DOCTYPE html>  <html lang="en">  
-<head>  
-<meta charset="UTF-8">  
-<title>Your Account</title>  <style>  
-    body {  
-        font-family: Arial, sans-serif;  
-        background: #0f0f0f;  
-        color: #fff;  
-        margin: 0;  
-        padding: 0;  
-    }  
-  
-    .container {  
-        max-width: 420px;  
-        margin: 40px auto;  
-        background: #1a1a1a;  
-        padding: 25px;  
-        border-radius: 18px;  
-        box-shadow: 0 0 25px rgba(255, 215, 0, 0.18);  
-        border: 1px solid #2a2a2a;  
-    }  
-  
-    h2 {  
-        text-align: center;  
-        color: #ffd700;  
-        margin-bottom: 25px;  
-    }  
-  
-    .field {  
-        background: #111;  
-        padding: 12px 15px;  
-        margin-bottom: 14px;  
-        border-radius: 10px;  
-        border: 1px solid #333;  
-    }  
-  
-    .label {  
-        font-size: 14px;  
-        color: #bbb;  
-    }  
-  
-    .value {  
-        font-size: 17px;  
-        font-weight: bold;  
-        margin-top: 3px;  
-        color: #fff;  
-    }  
-  
-    #loading {  
-        text-align: center;  
-        padding: 15px;  
-        color: #ffd700;  
-        display: none;  
-    }  
-</style>  </head>  <body>  <div class="container">  
-    <h2>Your Account</h2>  <div id="loading">Loading your profile...</div>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Premium UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for a premium look */
+        .profile-card {
+            background: linear-gradient(135deg, #1f2937, #111827); /* Dark gradient background */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+        }
+        .profile-photo {
+            border: 4px solid #4f46e5; /* Primary color border */
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.3);
+        }
+        .text-primary-light {
+            color: #a5b4fc; /* Light blue text for contrast */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
 
-<div id="profileData" style="display:none;">  
+    <div class="profile-card w-full max-w-lg p-8 space-y-8 text-white">
+        <h2 class="text-3xl font-bold text-center text-indigo-400 border-b border-indigo-500/50 pb-4">
+            👤 User Profile
+        </h2>
 
-    <div class="field">  
-        <div class="label">First Name</div>  
-        <div class="value" id="name"></div>  
-    </div>  
+        <div class="flex flex-col items-center space-y-6">
+            <img id="user-avatar" class="profile-photo w-28 h-28 rounded-full object-cover" 
+                 src="https://via.placeholder.com/150/4f46e5/ffffff?text=User" 
+                 alt="User Avatar">
+            
+            <div class="text-center">
+                <p class="text-2xl font-semibold" id="user-name">Loading...</p>
+                <p class="text-primary-light text-sm" id="user-email">email@example.com</p>
+            </div>
 
-    <div class="field">  
-        <div class="label">Surname</div>  
-        <div class="value" id="surname"></div>  
-    </div>  
+            <div class="w-full text-sm space-y-3 bg-gray-800 p-4 rounded-lg">
+                <p><span class="font-medium text-indigo-300">User ID (UID):</span> <span id="user-id">...</span></p>
+                <p><span class="font-medium text-indigo-300">Joined:</span> <span id="user-joined">...</span></p>
+            </div>
+        </div>
 
-    <div class="field">  
-        <div class="label">Mobile Number</div>  
-        <div class="value" id="mobile"></div>  
-    </div>  
+        <div class="flex flex-col space-y-4">
+            
+            <button id="edit-profile-btn" 
+                    class="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium transition duration-200 ease-in-out transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                ✏️ Edit Profile
+            </button>
 
-    <div class="field">  
-        <div class="label">Email Address</div>  
-        <div class="value" id="email"></div>  
-    </div>  
+            <button id="logout-btn" 
+                    class="w-full py-3 px-6 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                🚪 Log Out
+            </button>
 
-</div>
+            <button id="delete-account-btn" 
+                    class="w-full py-3 px-6 bg-red-700 hover:bg-red-800 rounded-lg font-medium transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900 mt-6">
+                ❌ Delete Account (Permanent)
+            </button>
+        </div>
 
-</div>  <script type="module">  
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";  
-  
-    // 🔥 YOUR SUPABASE DETAILS  
-    const supabaseUrl = "https://bhmycvrbucmbbrpzeane.supabase.co";  
-    const supabaseKey = "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv";  
-    const supabase = createClient(supabaseUrl, supabaseKey);  
-  
-    const loading = document.getElementById("loading");  
-    const profileDiv = document.getElementById("profileData");  
-  
-    loading.style.display = "block";  
-  
-    async function loadUserProfile() {  
-        // 1️⃣ Get logged-in user  
-        const { data: { user } } = await supabase.auth.getUser();  
-  
-        if (!user) {  
-            loading.innerText = "Please login first...";  
-            return;  
-        }  
-  
-        // 2️⃣ Fetch user's data from Supabase table  
-        const { data, error } = await supabase  
-            .from("users")  
-            .select("*")  
-            .eq("id", user.id)  
-            .single();  
-  
-        if (error) {  
-            loading.innerText = "Error loading profile!";  
-            console.log(error);  
-            return;  
-        }  
-  
-        // 3️⃣ Put data into UI  
-        document.getElementById("name").innerText = data.name ?? "-";  
-        document.getElementById("surname").innerText = data.surname ?? "-";  
-        document.getElementById("mobile").innerText = data.mobile ?? "-";  
-        document.getElementById("email").innerText = data.email ?? "-";  
-  
-        loading.style.display = "none";  
-        profileDiv.style.display = "block";  
-    }  
-  
-    loadUserProfile();  
-</script>  </body>  
+        <p id="status-message" class="text-center text-sm text-red-400 mt-4"></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // --- ⚙️ Supabase Configuration ---
+        // ✅ Tamaro aapele URL fix karelo chhe.
+        const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co'; 
+        // ⚠️ Aa jagya e tamari sachi Anon Key nakho.
+        const SUPABASE_ANON_KEY = 'sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv'; 
+        
+        // Initialize Supabase Client
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // --- 📌 DOM Elements ---
+        const userNameEl = document.getElementById('user-name');
+        const userEmailEl = document.getElementById('user-email');
+        const userIdEl = document.getElementById('user-id');
+        const userJoinedEl = document.getElementById('user-joined');
+        const statusMessageEl = document.getElementById('status-message');
+        const userAvatarEl = document.getElementById('user-avatar');
+
+        // --- 🚀 Functions ---
+
+        /**
+         * Load the current user's profile data.
+         */
+        async function loadUserProfile() {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                // User logged out or session expired
+                window.location.href = '/login.html'; // Redirect to login page
+                return;
+            }
+
+            // Display user data from Supabase auth
+            userNameEl.textContent = user.user_metadata.full_name || 'Anonymous User';
+            userEmailEl.textContent = user.email;
+            userIdEl.textContent = user.id;
+            userJoinedEl.textContent = new Date(user.created_at).toLocaleDateString();
+            
+            // Optional: If you have an avatar URL in user metadata
+            if (user.user_metadata.avatar_url) {
+                userAvatarEl.src = user.user_metadata.avatar_url;
+            }
+
+            // Optional: Fetch data from a separate 'profiles' table (if used)
+            // const { data: profile, error } = await supabase.from('profiles').select('username, website').eq('id', user.id).single();
+            // if (profile) {
+            //     userNameEl.textContent = profile.username || userNameEl.textContent;
+            // }
+        }
+
+        /**
+         * Handle Log Out.
+         */
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            statusMessageEl.textContent = 'Logging out...';
+            const { error } = await supabase.auth.signOut();
+
+            if (error) {
+                statusMessageEl.textContent = 'Logout Error: ' + error.message;
+            } else {
+                statusMessageEl.textContent = 'Logged out successfully!';
+                // Redirect to login page after a short delay
+                setTimeout(() => {
+                    window.location.href = '/login.html'; 
+                }, 1500);
+            }
+        });
+
+        /**
+         * Handle Edit Profile.
+         * NOTE: In a real app, this should link to an 'edit-profile.html' page.
+         */
+        document.getElementById('edit-profile-btn').addEventListener('click', () => {
+            // Placeholder: Replace with actual redirect to your edit form page
+            statusMessageEl.textContent = 'Redirecting to Edit Profile... (Implement your edit page logic here)';
+            // window.location.href = '/edit-profile.html'; 
+        });
+
+        /**
+         * Handle Delete Account.
+         * WARNING: This is a sensitive operation. Requires Server-Side function (Supabase Edge Function/RLS) for security.
+         */
+        document.getElementById('delete-account-btn').addEventListener('click', async () => {
+            if (!confirm("Are you sure you want to permanently delete your account? This action cannot be undone.")) {
+                return;
+            }
+
+            // NOTE: Deleting a user must be done securely, often through a server function.
+            
+            statusMessageEl.textContent = 'Attempting to delete account... (Requires Admin/Server-Side setup)';
+
+            await supabase.auth.signOut();
+            statusMessageEl.textContent = 'Account deletion request processed. You have been logged out. (Actual deletion depends on secure server logic)';
+            setTimeout(() => {
+                window.location.href = '/login.html';
+            }, 3000);
+        });
+
+        // --- 📞 Initialize ---
+        loadUserProfile();
+
+    </script>
+</body>
 </html>
