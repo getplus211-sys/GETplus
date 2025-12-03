@@ -3,66 +3,437 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>હોમ પેજ</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>GETplus - સફળતાનું કેન્દ્ર</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #e9ebee; display: flex; justify-content: center; align-items: flex-start; padding-top: 50px; min-height: 100vh; margin: 0; }
-        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
-        h2 { color: #1877f2; margin-bottom: 20px; }
-        #user-info { margin-bottom: 20px; padding: 10px; border: 1px dashed #ccc; border-radius: 4px; }
-        #logout-btn { padding: 10px 20px; background-color: #fa383e; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: background-color 0.3s; }
-        #logout-btn:hover { background-color: #e53238; }
+        /* ==================== સામાન્ય સ્ટાઇલ ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* બેકગ્રાઉન્ડ ગ્રેડિયન્ટ જાળવી રાખ્યો */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* ==================== હેડર (બ્રાન્ડિંગ) ==================== */
+        .header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            /* બ્રાન્ડ કલર */
+            color: #764ba2; 
+            font-size: 22px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .header p {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* ==================== સર્ચ બોક્સ ==================== */
+        .search-box {
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 45px 15px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .search-box::after {
+            content: "🔍";
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+
+        /* ==================== સેક્શન ટાઇટલ ==================== */
+        .section-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 25px 0 15px 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ==================== પરીક્ષા કાર્ડ્સ ==================== */
+        .exam-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .exam-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exam-card::before {
+            /* ગ્રેડિયન્ટ લાઇન જાળવી રાખી */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .exam-card:active {
+            transform: scale(0.95);
+        }
+
+        .exam-card h3 {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .exam-card .subjects {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .exam-card .badge {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1967d2;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        /* ==================== ફીચર કાર્ડ્સ ==================== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:active {
+            transform: scale(0.95);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .feature-card h4 {
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 11px;
+        }
+
+        /* ==================== બોટમ નેવિગેશન ==================== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px 15px;
+            border-radius: 10px;
+        }
+
+        .nav-item.active {
+            background: #f0f4ff;
+        }
+
+        .nav-item .icon {
+            font-size: 22px;
+        }
+
+        .nav-item.active .icon {
+            /* એક્ટિવ આઇકોન કલર મેચ કરવા માટે */
+            color: #667eea; 
+        }
+        .nav-item.active .icon {
+             /* filter: hue-rotate(220deg) saturate(2); આનાથી આઇકોન કલર બદલાશે નહીં, સીધો કલર આપીએ */
+            color: #667eea; 
+        }
+
+
+        .nav-item span {
+            font-size: 11px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .nav-item.active span {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #f44336;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* ==================== મીડિયા ક્વેરીઝ ==================== */
+        @media (max-width: 400px) {
+            .exam-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>👋 સ્વાગત છે!</h2>
-        <p>તમે સફળતાપૂર્વક લોગિન કર્યું છે.</p>
-        
-        <div id="user-info">લોડિંગ યુઝર માહિતી...</div>
+    <div class="header">
+        <h1>🌟 GETplus</h1>
+        <p>તમારી સફળતા માટે સંપૂર્ણ માર્ગદર્શન</p>
+    </div>
 
-        <button id="logout-btn">લોગઆઉટ</button>
+    <div class="container">
+        <div class="search-box">
+            <input type="text" placeholder="પરીક્ષા અથવા વિષય શોધો...">
+        </div>
+
+        <div class="section-title">🎯 મુખ્ય પરીક્ષાઓ</div>
+        <div class="exam-grid">
+            <div class="exam-card" onclick="openExam('gpsc1-2')">
+                <h3>GPSC Class 1/2</h3>
+                <div class="subjects">
+                    Gujarati • English • Maths • Reasoning • GK • Current Affairs • Science • History • Geography • Polity • Economy
+                </div>
+                <span class="badge">11 વિષયો</span>
+            </div>
+
+            <div class="exam-card" onclick="openExam('dyso')">
+                <h3>GPSC DySO</h3>
+                <div class="subjects">
+                    Gujarati • English • Maths • Reasoning • GK • Current Affairs • History • Geography • Polity • Economy
+                </div>
+                <span class="badge">10 વિષયો</span>
+            </div>
+
+            <div class="exam-card" onclick="openExam('talati')">
+                <h3>Talati</h3>
+                <div class="subjects">
+                    Gujarati • English • Maths • Reasoning • GK • Current Affairs • Computer • Science
+                </div>
+                <span class="badge">8 વિષયો</span>
+            </div>
+
+            <div class="exam-card" onclick="openExam('clerk')">
+                <h3>Junior Clerk</h3>
+                <div class="subjects">
+                    Gujarati • English • Maths • Reasoning • GK • Current Affairs • Computer
+                </div>
+                <span class="badge">7 વિષયો</span>
+            </div>
+
+            <div class="exam-card" onclick="openExam('forest')">
+                <h3>Forest Guard</h3>
+                <div class="subjects">
+                    Gujarati • English • Maths • Reasoning • GK • Science • Geography
+                </div>
+                <span class="badge">7 વિષયો</span>
+            </div>
+
+            <div class="exam-card" onclick="openExam('police')">
+                <h3>Police Constable</h3>
+                <div class="subjects">
+                    Gujarati • English • Maths • Reasoning • GK • Current Affairs
+                </div>
+                <span class="badge">6 વિષયો</span>
+            </div>
+
+            <div class="exam-card" onclick="openExam('tet1')">
+                <h3>TET-1</h3>
+                <div class="subjects">
+                    Gujarati • English • Maths • Science • Social Science • Pedagogy
+                </div>
+                <span class="badge">6 વિષયો</span>
+            </div>
+
+            <div class="exam-card" onclick="openExam('tet2')">
+                <h3>TET-2</h3>
+                <div class="subjects">
+                    Gujarati • English • Maths • EVS • Pedagogy
+                </div>
+                <span class="badge">5 વિષયો</span>
+            </div>
+
+            <div class="exam-card" onclick="openExam('htat')">
+                <h3>HTAT</h3>
+                <div class="subjects">
+                    Gujarati • English • Subject Knowledge • Pedagogy • GK
+                </div>
+                <span class="badge">5 વિષયો</span>
+            </div>
+
+            <div class="exam-card" onclick="openExam('cce')">
+                <h3>CCE</h3>
+                <div class="subjects">
+                    Gujarati • English • Maths • Reasoning • GK • Computer
+                </div>
+                <span class="badge">6 વિષયો</span>
+            </div>
+
+            <div class="exam-card" onclick="openExam('ssc')">
+                <h3>SSC / Railway</h3>
+                <div class="subjects">
+                    English • Maths • Reasoning • GK • Current Affairs
+                </div>
+                <span class="badge">5 વિષયો</span>
+            </div>
+        </div>
+
+        <div class="section-title">✨ અભ્યાસ સાધનો</div>
+        <div class="features-grid">
+            <div class="feature-card" onclick="openFeature('videos')">
+                <div class="feature-icon">🎥</div>
+                <h4>Video Lectures</h4>
+                <p>વિષય પ્રમાણે વિડિયો</p>
+            </div>
+
+            <div class="feature-card" onclick="openFeature('pdf')">
+                <div class="feature-icon">📄</div>
+                <h4>PDF Materials</h4>
+                <p>ડાઉનલોડ નોટ્સ</p>
+            </div>
+
+            <div class="feature-card" onclick="openFeature('tests')">
+                <div class="feature-icon">📝</div>
+                <h4>Test Series</h4>
+                <p>પ્રેક્ટિસ ટેસ્ટ</p>
+            </div>
+
+            <div class="feature-card" onclick="openFeature('syllabus')">
+                <div class="feature-icon">📋</div>
+                <h4>Syllabus</h4>
+                <p>સંપૂર્ણ અભ્યાસક્રમ</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <div class="icon">🏠</div>
+            <span>હોમ</span>
+        </div>
+        <div class="nav-item">
+            <div class="icon">📚</div>
+            <span>અભ્યાસ</span>
+        </div>
+        <div class="nav-item">
+            <div class="icon">🔔</div>
+            <span>સૂચનાઓ</span>
+            <div class="notification-badge">3</div>
+        </div>
+        <div class="nav-item">
+            <div class="icon">📊</div>
+            <span>પરિણામ</span>
+        </div>
+        <div class="nav-item">
+            <div class="icon">👤</div>
+            <span>પ્રોફાઇલ</span>
+        </div>
     </div>
 
     <script>
-        // Supabase Client Initialization (તમારી કીઝ સાથે)
-        const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const userInfoDiv = document.getElementById('user-info');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        // યુઝર સત્ર (Session) ચકાસો
-        async function checkSession() {
-            const { data: { user }, error } = await supabase.auth.getUser();
-
-            if (error || !user) {
-                // યુઝર લોગિન નથી, લોગિન પેજ પર રીડાયરેક્ટ કરો
-                userInfoDiv.innerHTML = 'તમે લોગિન નથી. રીડાયરેક્ટ કરી રહ્યાં છીએ...';
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 1000);
-            } else {
-                // યુઝર લોગિન છે, તેની માહિતી દર્શાવો
-                userInfoDiv.innerHTML = `**યુઝર ID:** ${user.id}<br>**ઇમેઇલ:** ${user.email}`;
-            }
+        function openExam(examId) {
+            alert('ખુલી રહ્યું છે: ' + examId + ' પરીક્ષાનું વિગતવાર પેજ');
+            // અહીં Supabase સાથેનું વાસ્તવિક નેવિગેશન લોજિક ઉમેરી શકાય.
         }
 
-        // લોગઆઉટ ફંક્શન
-        logoutBtn.addEventListener('click', async () => {
-            const { error } = await supabase.auth.signOut();
+        function openFeature(featureId) {
+            alert('ખુલી રહ્યું છે: ' + featureId);
+            // અહીં Supabase સાથેનું વાસ્તવિક નેવિગેશન લોજિક ઉમેરી શકાય.
+        }
 
-            if (error) {
-                alert('લોગઆઉટમાં ભૂલ થઈ: ' + error.message);
-            } else {
-                alert('તમે સફળતાપૂર્વક લોગઆઉટ કર્યું છે.');
-                window.location.href = 'login.html';
-            }
+        // નેવિગેશન બાર એક્ટિવ સ્ટેટ લોજિક
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
         });
-
-        // પેજ લોડ થતાની સાથે સત્ર ચકાસો
-        checkSession();
+        
+        // જો તમે Supabase લોજિક ઉમેરવા માંગતા હો, તો app.js ને અહીં લિંક કરી શકાય:
+        // <script src="app.js"></script>
     </script>
 </body>
 </html>
