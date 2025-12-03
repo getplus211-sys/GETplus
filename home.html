@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>હોમ પેજ</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #e9ebee; display: flex; justify-content: center; align-items: flex-start; padding-top: 50px; min-height: 100vh; margin: 0; }
+        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; max-width: 500px; text-align: center; }
+        h2 { color: #1877f2; margin-bottom: 20px; }
+        #user-info { margin-bottom: 20px; padding: 10px; border: 1px dashed #ccc; border-radius: 4px; }
+        #logout-btn { padding: 10px 20px; background-color: #fa383e; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: background-color 0.3s; }
+        #logout-btn:hover { background-color: #e53238; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>👋 સ્વાગત છે!</h2>
+        <p>તમે સફળતાપૂર્વક લોગિન કર્યું છે.</p>
+        
+        <div id="user-info">લોડિંગ યુઝર માહિતી...</div>
+
+        <button id="logout-btn">લોગઆઉટ</button>
+    </div>
+
+    <script>
+        // Supabase Client Initialization (તમારી કીઝ સાથે)
+        const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const userInfoDiv = document.getElementById('user-info');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // યુઝર સત્ર (Session) ચકાસો
+        async function checkSession() {
+            const { data: { user }, error } = await supabase.auth.getUser();
+
+            if (error || !user) {
+                // યુઝર લોગિન નથી, લોગિન પેજ પર રીડાયરેક્ટ કરો
+                userInfoDiv.innerHTML = 'તમે લોગિન નથી. રીડાયરેક્ટ કરી રહ્યાં છીએ...';
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1000);
+            } else {
+                // યુઝર લોગિન છે, તેની માહિતી દર્શાવો
+                userInfoDiv.innerHTML = `**યુઝર ID:** ${user.id}<br>**ઇમેઇલ:** ${user.email}`;
+            }
+        }
+
+        // લોગઆઉટ ફંક્શન
+        logoutBtn.addEventListener('click', async () => {
+            const { error } = await supabase.auth.signOut();
+
+            if (error) {
+                alert('લોગઆઉટમાં ભૂલ થઈ: ' + error.message);
+            } else {
+                alert('તમે સફળતાપૂર્વક લોગઆઉટ કર્યું છે.');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // પેજ લોડ થતાની સાથે સત્ર ચકાસો
+        checkSession();
+    </script>
+</body>
+</html>
