@@ -68,10 +68,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // --- ⚙️ Supabase Configuration ---
-        // ✅ Tamaro aapele URL fix karelo chhe.
+        // ⚠️ Aa details tamari sachi hovi farajiyat chhe
         const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co'; 
-        // ⚠️ Aa jagya e tamari sachi Anon Key nakho.
-        const SUPABASE_ANON_KEY = 'sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv'; 
+        const SUPABASE_ANON_KEY = 'sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv'; // Tamari sachi key ahiya mukavi joiye
         
         // Initialize Supabase Client
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -83,89 +82,108 @@
         const userJoinedEl = document.getElementById('user-joined');
         const statusMessageEl = document.getElementById('status-message');
         const userAvatarEl = document.getElementById('user-avatar');
+        const logoutBtn = document.getElementById('logout-btn');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const deleteAccountBtn = document.getElementById('delete-account-btn');
+
 
         // --- 🚀 Functions ---
 
         /**
-         * Load the current user's profile data.
+         * Load the current user's profile data and session check.
          */
         async function loadUserProfile() {
-            const { data: { user } } = await supabase.auth.getUser();
+            try {
+                // Get the current session
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-            if (!user) {
-                // User logged out or session expired
-                window.location.href = '/login.html'; // Redirect to login page
-                return;
+                if (sessionError) throw sessionError;
+
+                if (!session) {
+                    // User logged out or session expired. Show error and redirect.
+                    statusMessageEl.textContent = 'Error: No active session found. Redirecting to login...';
+                    setTimeout(() => { window.location.href = '/login.html'; }, 1000);
+                    return;
+                }
+                
+                const user = session.user;
+                
+                // Display user data from Supabase auth
+                userNameEl.textContent = user.user_metadata.full_name || user.email.split('@')[0] || 'User Name';
+                userEmailEl.textContent = user.email;
+                userIdEl.textContent = user.id;
+                userJoinedEl.textContent = new Date(user.created_at).toLocaleDateString();
+                
+                if (user.user_metadata.avatar_url) {
+                    userAvatarEl.src = user.user_metadata.avatar_url;
+                }
+                
+                // Clear any previous error status
+                statusMessageEl.textContent = ''; 
+
+            } catch (error) {
+                // General error during profile load (e.g., network, key issue)
+                console.error("Profile Load Error:", error);
+                statusMessageEl.textContent = `CRITICAL ERROR: Could not load profile. Check Console/Keys. Details: ${error.message}`;
+                
+                // If the error is serious, we should log out the user.
+                supabase.auth.signOut();
             }
-
-            // Display user data from Supabase auth
-            userNameEl.textContent = user.user_metadata.full_name || 'Anonymous User';
-            userEmailEl.textContent = user.email;
-            userIdEl.textContent = user.id;
-            userJoinedEl.textContent = new Date(user.created_at).toLocaleDateString();
-            
-            // Optional: If you have an avatar URL in user metadata
-            if (user.user_metadata.avatar_url) {
-                userAvatarEl.src = user.user_metadata.avatar_url;
-            }
-
-            // Optional: Fetch data from a separate 'profiles' table (if used)
-            // const { data: profile, error } = await supabase.from('profiles').select('username, website').eq('id', user.id).single();
-            // if (profile) {
-            //     userNameEl.textContent = profile.username || userNameEl.textContent;
-            // }
         }
 
         /**
-         * Handle Log Out.
+         * Handle Log Out (Working function)
          */
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            statusMessageEl.textContent = 'Logging out...';
+        logoutBtn.addEventListener('click', async () => {
+            statusMessageEl.textContent = 'Logging out... Please wait.';
+            logoutBtn.disabled = true; // Disable button to prevent double-click
+
             const { error } = await supabase.auth.signOut();
 
             if (error) {
                 statusMessageEl.textContent = 'Logout Error: ' + error.message;
+                logoutBtn.disabled = false;
             } else {
-                statusMessageEl.textContent = 'Logged out successfully!';
-                // Redirect to login page after a short delay
+                statusMessageEl.textContent = 'Logged out successfully! Redirecting...';
+                // Redirect to login page
                 setTimeout(() => {
                     window.location.href = '/login.html'; 
-                }, 1500);
+                }, 1000);
             }
         });
 
         /**
-         * Handle Edit Profile.
-         * NOTE: In a real app, this should link to an 'edit-profile.html' page.
+         * Handle Edit Profile (Placeholder for redirection)
          */
-        document.getElementById('edit-profile-btn').addEventListener('click', () => {
-            // Placeholder: Replace with actual redirect to your edit form page
-            statusMessageEl.textContent = 'Redirecting to Edit Profile... (Implement your edit page logic here)';
+        editProfileBtn.addEventListener('click', () => {
+            // Tamare ahiya ek 'edit-profile.html' page banavvo padshe
+            statusMessageEl.textContent = 'Redirecting to Edit Profile... (Implement your edit form)';
             // window.location.href = '/edit-profile.html'; 
         });
 
         /**
-         * Handle Delete Account.
-         * WARNING: This is a sensitive operation. Requires Server-Side function (Supabase Edge Function/RLS) for security.
+         * Handle Delete Account (Security warning)
          */
-        document.getElementById('delete-account-btn').addEventListener('click', async () => {
+        deleteAccountBtn.addEventListener('click', async () => {
             if (!confirm("Are you sure you want to permanently delete your account? This action cannot be undone.")) {
                 return;
             }
 
-            // NOTE: Deleting a user must be done securely, often through a server function.
+            // WARNING: For security, full user deletion should be done via a Supabase Edge Function or a backend API 
+            // where the service_role key can be used securely. Client-side deletion is blocked by default.
             
-            statusMessageEl.textContent = 'Attempting to delete account... (Requires Admin/Server-Side setup)';
+            statusMessageEl.textContent = 'Account deletion request received. Logging out.';
 
+            // Log out the user and redirect immediately.
             await supabase.auth.signOut();
-            statusMessageEl.textContent = 'Account deletion request processed. You have been logged out. (Actual deletion depends on secure server logic)';
             setTimeout(() => {
                 window.location.href = '/login.html';
-            }, 3000);
+            }, 1000);
         });
 
         // --- 📞 Initialize ---
-        loadUserProfile();
+        // Page load thata j profile load karvani koshish karo
+        document.addEventListener('DOMContentLoaded', loadUserProfile);
 
     </script>
 </body>
