@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Account</title>
+
+<!-- Correct Supabase v2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -14,7 +16,6 @@
         font-family: Arial, sans-serif;
         color: #fff;
     }
-
     .container {
         max-width: 450px;
         background: #1a1a1a;
@@ -23,25 +24,17 @@
         border-radius: 16px;
         box-shadow: 0 0 12px rgba(255,255,255,0.08);
     }
-
     h2 {
         text-align: center;
         color: #ffd369;
         margin-bottom: 20px;
     }
-
     .info-box {
         background: #222;
         padding: 18px;
         border-radius: 12px;
         margin-bottom: 16px;
     }
-
-    .info-box p {
-        margin: 6px 0;
-        font-size: 15px;
-    }
-
     button {
         width: 100%;
         padding: 14px;
@@ -52,21 +45,11 @@
         cursor: pointer;
         margin-top: 10px;
     }
+    .edit-btn { background: #ffcc00; color:#000; }
+    .logout-btn { background:#ff4444; color:#fff; }
+    .delete-btn { background:#b30000; color:#fff; }
 
-    .edit-btn {
-        background: #ffcc00;
-        color: #000;
-    }
-    .logout-btn {
-        background: #ff4444;
-        color: #fff;
-    }
-    .delete-btn {
-        background: #b30000;
-        color: #fff;
-    }
-
-    /* Popup modal */
+    /* Popup */
     .modal {
         position: fixed;
         top: 0; left: 0;
@@ -84,15 +67,6 @@
         width: 100%;
         max-width: 400px;
     }
-    .modal-content h3 {
-        text-align: center;
-        color: #ffd369;
-    }
-    label {
-        font-size: 14px;
-        margin-top: 10px;
-        display: block;
-    }
     input {
         width: 100%;
         padding: 12px;
@@ -101,20 +75,11 @@
         border: none;
         background: #2a2a2a;
         color: #fff;
-        font-size: 15px;
     }
-    .save-btn {
-        background: #00e676;
-        color: #000;
-    }
-    .close-btn {
-        background: #555;
-        color: #fff;
-        margin-top: 8px;
-    }
+    .save-btn { background: #00e676; color:#000; }
+    .close-btn { background:#555; color:#fff; }
 </style>
 </head>
-
 <body>
 
 <div class="container">
@@ -132,22 +97,24 @@
     <button class="delete-btn" onclick="deleteUser()">Delete Account</button>
 </div>
 
-<!-- EDIT POPUP -->
+
+<!-- POPUP -->
 <div class="modal" id="editModal">
     <div class="modal-content">
+
         <h3>Edit Profile</h3>
 
         <label>Name</label>
-        <input type="text" id="edit_name">
+        <input id="edit_name">
 
         <label>Surname</label>
-        <input type="text" id="edit_surname">
+        <input id="edit_surname">
 
         <label>Mobile</label>
-        <input type="text" id="edit_mobile">
+        <input id="edit_mobile">
 
-        <label>Email (Not Editable)</label>
-        <input type="text" id="edit_email" disabled>
+        <label>Email</label>
+        <input id="edit_email" disabled>
 
         <button class="save-btn" onclick="saveProfile()">Save Changes</button>
         <button class="close-btn" onclick="closeEdit()">Close</button>
@@ -155,20 +122,20 @@
 </div>
 
 <script>
-const supabase = supabasejs.createClient(
+const { createClient } = supabase;
+const supabaseClient = createClient(
     "https://bhmycvrbucmbbrpzeane.supabase.co",
     "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv"
 );
 
-// Load user profile
 async function loadProfile() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) {
         window.location.href = "login.html";
         return;
     }
 
-    const { data } = await supabase
+    const { data } = await supabaseClient
         .from("users")
         .select("*")
         .eq("email", user.email)
@@ -182,33 +149,22 @@ async function loadProfile() {
 
 loadProfile();
 
-// Open Edit Popup
 function openEdit() {
+    document.getElementById("edit_name").value = document.getElementById("name").textContent;
+    document.getElementById("edit_surname").value = document.getElementById("surname").textContent;
+    document.getElementById("edit_mobile").value = document.getElementById("mobile").textContent;
+    document.getElementById("edit_email").value = document.getElementById("email").textContent;
+
     document.getElementById("editModal").style.display = "flex";
-
-    document.getElementById("edit_name").value =
-        document.getElementById("name").textContent;
-
-    document.getElementById("edit_surname").value =
-        document.getElementById("surname").textContent;
-
-    document.getElementById("edit_mobile").value =
-        document.getElementById("mobile").textContent;
-
-    document.getElementById("edit_email").value =
-        document.getElementById("email").textContent;
 }
-
-// Close Popup
 function closeEdit() {
     document.getElementById("editModal").style.display = "none";
 }
 
-// Save Changes
 async function saveProfile() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
 
-    await supabase
+    await supabaseClient
         .from("users")
         .update({
             name: document.getElementById("edit_name").value,
@@ -221,26 +177,20 @@ async function saveProfile() {
     loadProfile();
 }
 
-// Logout
 async function logoutUser() {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     window.location.href = "login.html";
 }
 
-// Delete Account
 async function deleteUser() {
-    if (!confirm("Are you sure you want to delete your account permanently?"))
-        return;
+    if (!confirm("Delete account permanently?")) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
 
-    // Delete from table
-    await supabase.from("users").delete().eq("email", user.email);
+    await supabaseClient.from("users").delete().eq("email", user.email);
+    await supabaseClient.auth.admin.deleteUser(user.id);
 
-    // Delete authentication account
-    await supabase.auth.admin.deleteUser(user.id);
-
-    alert("Account deleted");
+    alert("Account Deleted");
     window.location.href = "register.html";
 }
 </script>
