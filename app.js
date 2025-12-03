@@ -2,8 +2,9 @@
 // 1. Supabase Client Initialization
 // ==========================================================
 // IMPORTANT: Please replace these with your actual Supabase credentials!
-const SUPABASE_URL = 'https://your-supabase-url.supabase.co'; // Replace with your project URL
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'; // Replace with your project anon key
+// Failure to replace these placeholders will cause the application to fail.
+const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co'; // REPLACE THIS
+const SUPABASE_ANON_KEY = 'sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv'; // REPLACE THIS
 
 // Initialize Supabase Client
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
