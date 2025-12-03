@@ -147,47 +147,44 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================================
 // 1. Supabase Client Initialization
 // ==========================================================
-// કૃપા કરીને તમારા વાસ્તવિક ક્રેડેન્શિયલ્સનો ઉપયોગ કરો
+// Please use your actual Supabase credentials
 const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_YKcxL1wwxPBLtnUZZzIAA_BwsFqgYv';
 
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// નેવિગેશન ફંક્શન
+// Navigation Function
 function navigateTo(page) {
     window.location.href = `${page}.html`;
 }
 
 // ==========================================================
-// 2. રજીસ્ટ્રેશન લોજિક (Registration Logic)
+// 2. Registration Logic
 // ==========================================================
 
 async function handleRegistration(e) {
     e.preventDefault();
     
-    // તમારા નવા ફોર્મમાંથી માત્ર જરૂરી ફીલ્ડ્સ (ઈમેલ અને પાસવર્ડ) મેળવો.
+    // Get required fields from the new form
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    
-    // T&C ચેકબોક્સ તપાસો (જો જરૂરી હોય તો)
     const tncChecked = document.getElementById('tnc').checked;
     
     const messageDiv = document.getElementById('message');
     
     if (!tncChecked) {
-         messageDiv.textContent = 'કૃપા કરીને T&C સ્વીકારો.';
+         messageDiv.textContent = 'Please accept the T&C to register.';
          messageDiv.style.color = 'red';
          return;
     }
 
-    messageDiv.textContent = 'રજીસ્ટર થઈ રહ્યું છે...';
+    messageDiv.textContent = 'Registering user...';
     messageDiv.style.color = '#000';
 
-    // Supabase રજીસ્ટ્રેશન API કોલ
+    // Supabase Registration API Call
     const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
-        // જો તમે નામ અને અટક (Name, Surname) Supabase માં સ્ટોર કરવા માંગો છો
         options: {
             data: {
                 full_name: document.getElementById('name').value + ' ' + document.getElementById('surname').value,
@@ -196,38 +193,34 @@ async function handleRegistration(e) {
     });
 
     if (error) {
-        messageDiv.textContent = `ભૂલ: ${error.message}`;
+        messageDiv.textContent = `Error: ${error.message}`;
         messageDiv.style.color = 'red';
     } else if (data.user) {
-        // રજીસ્ટ્રેશન સફળ - home.html પર રીડાયરેક્ટ કરો
-        messageDiv.textContent = 'રજીસ્ટ્રેશન સફળ! home page પર રીડાયરેક્ટ થઈ રહ્યું છે...';
-        messageDiv.style.color = 'green';
         
-        // Supabase સામાન્ય રીતે ઈમેલ કન્ફર્મેશન મોકલે છે.
-        // જો તમે ઈમેલ કન્ફર્મેશન બંધ કર્યું હોય, તો સીધું રીડાયરેક્ટ કરો.
-        // જો ચાલુ હોય, તો નીચેનો કોડ વાપરો:
         if (data.session) {
-            // જો સત્ર તરત જ બને (કોઈ ઈમેલ કન્ફર્મેશન નહીં)
+            // Registration successful with immediate sign-in
+            messageDiv.textContent = 'Registration successful! Redirecting to home page...';
+            messageDiv.style.color = 'green';
             setTimeout(() => {
-                navigateTo('home');
+                navigateTo('home'); // Redirect to home.html
             }, 1000);
         } else {
-             // ઈમેલ કન્ફર્મેશન જરૂરી છે
-             messageDiv.textContent = 'રજીસ્ટ્રેશન સફળ! કૃપા કરીને તમારા ઇમેઇલની પુષ્ટિ કરો અને પછી લોગિન કરો.';
+             // Email confirmation is required
+             messageDiv.textContent = 'Registration successful! Please confirm your email and then log in.';
              messageDiv.style.color = '#ff8c00'; // Orange
              setTimeout(() => {
                 navigateTo('login');
             }, 3000);
         }
     } else {
-         messageDiv.textContent = 'રજીસ્ટ્રેશન પ્રક્રિયા પૂર્ણ. ઇમેઇલ ચકાસો.';
+         messageDiv.textContent = 'Registration process complete. Please check your email for verification.';
          messageDiv.style.color = '#ff8c00'; 
     }
 }
 
 
 // ==========================================================
-// 3. લોગિન લોજિક (Login Logic) - (કોઈ ફેરફાર નથી)
+// 3. Login Logic
 // ==========================================================
 
 async function handleLogin(e) {
@@ -236,7 +229,7 @@ async function handleLogin(e) {
     const password = document.getElementById('password').value;
     const messageDiv = document.getElementById('message');
 
-    messageDiv.textContent = 'લોગિન થઈ રહ્યું છે...';
+    messageDiv.textContent = 'Logging in...';
     messageDiv.style.color = '#000';
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -245,10 +238,10 @@ async function handleLogin(e) {
     });
 
     if (error) {
-        messageDiv.textContent = `ભૂલ: ${error.message}`;
+        messageDiv.textContent = `Error: ${error.message}`;
         messageDiv.style.color = 'red';
     } else {
-        messageDiv.textContent = 'લોગિન સફળ! હોમ પેજ પર રીડાયરેક્ટ કરી રહ્યાં છીએ...';
+        messageDiv.textContent = 'Login successful! Redirecting to home page...';
         messageDiv.style.color = 'green';
         setTimeout(() => {
             navigateTo('home');
@@ -256,30 +249,106 @@ async function handleLogin(e) {
     }
 }
 
+// ==========================================================
+// 4. Forgot Password Logic (For Modal/Popup)
+// ==========================================================
+
+async function handleForgotPassword(e) {
+    e.preventDefault();
+    const email = document.getElementById('forgot-email').value;
+    const popupMessage = document.getElementById('forgot-popup-message');
+    const popupForm = document.getElementById('forgot-password-form');
+    const popupContent = document.getElementById('forgot-password-content');
+    
+    popupMessage.textContent = 'Sending reset link...';
+    popupMessage.style.color = '#000';
+
+    // Supabase API call to send reset email
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'http://localhost:5500/reset-password.html', // Update your actual reset URL
+    });
+
+    if (error) {
+        popupMessage.textContent = `Error: ${error.message}`;
+        popupMessage.style.color = 'red';
+    } else {
+        // Success message and 30-second timer
+        popupForm.style.display = 'none'; // Hide the form
+        
+        popupContent.innerHTML = `
+            <div style="text-align:center;">
+                <i class="fas fa-check-circle" style="color:green; font-size:3em; margin-bottom:15px;"></i>
+                <h3 style="color:#764ba2;">Email Sent</h3>
+                <p>Please check your email inbox for the password reset link.</p>
+                <p>Email sent to: <strong>${email}</strong></p>
+                <p style="margin-top:10px;">This message will close in 30 seconds.</p>
+                <button id="forgot-popup-back-btn" style="width:auto; margin-top:20px; padding:10px 20px;">
+                   Back
+                </button>
+            </div>
+        `;
+
+        const backBtn = document.getElementById('forgot-popup-back-btn');
+        if (backBtn) backBtn.addEventListener('click', closeForgotPasswordPopup);
+        
+        // Close the popup after 30 seconds
+        setTimeout(closeForgotPasswordPopup, 30000); 
+    }
+}
+
+function closeForgotPasswordPopup() {
+    const modal = document.getElementById('forgot-password-modal');
+    if (modal) modal.style.display = 'none';
+    
+    // Reset the form to its original state
+    const popupContent = document.getElementById('forgot-password-content');
+    if (popupContent) {
+        popupContent.innerHTML = `
+            <h3>Forgot Password?</h3>
+            <p>Enter the email address associated with your account.</p>
+            <form id="forgot-password-form">
+                <input type="email" id="forgot-email" placeholder="Email" required>
+                <div id="forgot-popup-message" style="margin-bottom:15px; font-weight:bold;"></div>
+                <button type="submit" id="send-link-btn">Send Link</button>
+            </form>
+        `;
+    }
+
+    // Re-attach the form submission listener
+    const newForm = document.getElementById('forgot-password-form');
+    if (newForm) newForm.addEventListener('submit', handleForgotPassword);
+}
+
+function openForgotPasswordPopup() {
+    const modal = document.getElementById('forgot-password-modal');
+    if (modal) modal.style.display = 'flex';
+}
+
 
 // ==========================================================
-// 4. હોમ પેજ લોજિક (Home Page Logic) - (કોઈ ફેરફાર નથી)
+// 5. Home Page Logic (Session Check and Logout)
 // ==========================================================
 
 async function checkSession() {
-    // આ કોડ હોમ પેજમાં યુઝર લોગિન છે કે નહીં તે તપાસે છે.
+    // This checks if the user is logged in on the home page.
     const userInfoDiv = document.getElementById('user-info');
     
     const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error || !user) {
         if (userInfoDiv) {
-            userInfoDiv.innerHTML = 'તમે લોગિન નથી. રીડાયરેક્ટ કરી રહ્યાં છીએ...';
+            userInfoDiv.innerHTML = 'You are not logged in. Redirecting...';
         }
+        // Redirect to login page if no active session
         setTimeout(() => {
             navigateTo('login');
         }, 1000);
         return null;
     } else {
         if (userInfoDiv) {
-            // જો user_metadata માં full_name હોય તો તે દર્શાવો
+            // Display user name/email
             const userName = user.user_metadata?.full_name || user.email;
-            userInfoDiv.innerHTML = `👋 સ્વાગત છે, **${userName}**!<br>તમે સફળતાપૂર્વક લોગિન કર્યું છે.`;
+            userInfoDiv.innerHTML = `👋 Welcome, **${userName}**!<br>You are successfully logged in.`;
         }
         return user;
     }
@@ -289,31 +358,42 @@ async function handleLogout() {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-        alert('લોગઆઉટમાં ભૂલ થઈ: ' + error.message);
+        alert('Error during logout: ' + error.message);
     } else {
-        alert('તમે સફળતાપૂર્વક લોગઆઉટ કર્યું છે.');
+        alert('You have been successfully logged out.');
         navigateTo('login');
     }
 }
 
 
 // ==========================================================
-// 5. ઇવેન્ટ લિસનર્સ (Page Initialization)
+// 6. Event Listeners (Page Initialization)
 // ==========================================================
 
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
     
+    // Registration Form Listener
     if (path.includes('registration.html')) {
         const form = document.getElementById('registration-form');
-        if (form) form.addEventListener('submit', handleRegistration);
+        if (form) form.addEventListener('submit', handleRegistration); 
     } 
     
+    // Login Form Listener
     else if (path.includes('login.html')) {
-        const form = document.getElementById('login-form');
-        if (form) form.addEventListener('submit', handleLogin);
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) loginForm.addEventListener('submit', handleLogin);
+        
+        // Forgot Password Link Listener
+        const forgotLink = document.getElementById('forgot-password-link');
+        if (forgotLink) forgotLink.addEventListener('click', openForgotPasswordPopup);
+        
+        // Forgot Password Popup Form Listener (for initial state)
+        const forgotForm = document.getElementById('forgot-password-form');
+        if (forgotForm) forgotForm.addEventListener('submit', handleForgotPassword);
     } 
     
+    // Home Page Listeners
     else if (path.includes('home.html')) {
         checkSession();
         const logoutBtn = document.getElementById('logout-btn');
