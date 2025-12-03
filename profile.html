@@ -6,144 +6,123 @@
 <title>Your Account</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: "Poppins", Arial, sans-serif;
-    background: linear-gradient(135deg, #1a73e8, #6a11cb);
-    min-height: 100vh;
-    padding: 25px 0;
-    display: flex;
-    justify-content: center;
-  }
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #f4f6fa;
+}
 
-  .card {
-    width: 92%;
-    max-width: 420px;
-    background: white;
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0px 10px 20px #00000025;
-    text-align: center;
-  }
+.container {
+  max-width: 450px;
+  margin: 28px auto;
+  padding: 20px;
+}
 
-  h2 {
-    margin: 0;
-    font-size: 24px;
-    color: #222;
-    font-weight: 600;
-  }
+.card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+  animation: fadeIn 0.35s ease;
+}
 
-  p {
-    color: #444;
-    margin: 3px 0;
-    font-size: 15px;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-  .info-box {
-    text-align: left;
-    margin-top: 20px;
-  }
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-  .info-box div {
-    background: #f5f7ff;
-    padding: 12px;
-    border-radius: 12px;
-    margin: 10px 0;
-    font-size: 15px;
-    color: #111;
-    border-left: 4px solid #1a73e8;
-  }
+.row {
+  background: #f1f3f5;
+  padding: 14px;
+  margin: 10px 0;
+  border-radius: 12px;
+}
 
-  .label {
-    font-weight: bold;
-    color: #000;
-  }
+.label {
+  font-size: 13px;
+  color: #666;
+}
 
-  .menu-btn {
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: white;
-    padding: 14px;
-    font-size: 16px;
-    border: none;
-    width: 100%;
-    border-radius: 12px;
-    margin-top: 18px;
-    cursor: pointer;
-    font-weight: bold;
-  }
+.value {
+  font-size: 17px;
+  font-weight: 600;
+  margin-top: 3px;
+}
 
-  .menu-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 15px;
-  }
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  background: #4c6ef5;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 16px;
+  margin-top: 20px;
+}
 
-  .menu-card {
-    background: #f5f7ff;
-    padding: 18px;
-    border-radius: 12px;
-    text-align: center;
-    font-size: 15px;
-    font-weight: bold;
-    color: #1a1a1a;
-    border: 1.5px solid #dce3ff;
-    cursor: pointer;
-  }
-
-  #logoutBtn {
-    margin-top: 20px;
-    padding: 12px;
-    width: 100%;
-    background: #ff3b30;
-    border: none;
-    color: white;
-    font-size: 16px;
-    border-radius: 10px;
-    cursor: pointer;
-  }
+.loading {
+  text-align: center;
+  padding: 25px;
+  font-size: 18px;
+}
 </style>
 </head>
 
 <body>
+<div class="container">
+  <div class="card">
+    <div id="loading" class="loading">Loading your profile…</div>
 
-<div class="card">
+    <div id="profileBox" style="display:none;">
+      <div class="title">Your Account</div>
 
-  <h2 id="fullName">Loading...</h2>
-  <p id="userEmail"></p>
+      <div class="row">
+        <div class="label">Name</div>
+        <div class="value" id="name"></div>
+      </div>
 
-  <div class="info-box">
-      <div><span class="label">First Name:</span> <span id="firstname">Loading...</span></div>
-      <div><span class="label">Last Name:</span> <span id="lastname">Loading...</span></div>
-      <div><span class="label">Mobile:</span> <span id="mobile">Loading...</span></div>
-      <div><span class="label">Account Created:</span> <span id="userCreated">Loading...</span></div>
-      <div><span class="label">Last Login:</span> <span id="lastLogin">Loading...</span></div>
+      <div class="row">
+        <div class="label">Surname</div>
+        <div class="value" id="surname"></div>
+      </div>
+
+      <div class="row">
+        <div class="label">Mobile</div>
+        <div class="value" id="mobile"></div>
+      </div>
+
+      <div class="row">
+        <div class="label">Email</div>
+        <div class="value" id="email"></div>
+      </div>
+
+      <div class="row">
+        <div class="label">Created At</div>
+        <div class="value" id="created"></div>
+      </div>
+
+      <button class="btn" id="logoutBtn">Logout</button>
+    </div>
   </div>
-
-  <button class="menu-btn" onclick="window.location.href='profile.html'">
-    ✏ Edit Profile
-  </button>
-
-  <div class="menu-grid">
-      <div class="menu-card">📘 My Quizzes</div>
-      <div class="menu-card">📊 Results</div>
-      <div class="menu-card">🧠 Mock Tests</div>
-      <div class="menu-card">⚡ Performance</div>
-  </div>
-
-  <button id="logoutBtn" onclick="logoutUser()">Logout</button>
 </div>
 
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-<script>
-const supabase = window.supabase.createClient(
+const supabase = createClient(
   "https://bhmycvrbucmbbrpzeane.supabase.co",
   "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv"
 );
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function loadProfile() {
+  // 🔹 Step 1: Check logged-in user
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -151,33 +130,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  document.getElementById("userEmail").textContent = user.email;
-  document.getElementById("userCreated").textContent = new Date(user.created_at).toDateString();
-  document.getElementById("lastLogin").textContent = user.last_sign_in_at 
-    ? new Date(user.last_sign_in_at).toDateString()
-    : "—";
-
-  const { data: profile } = await supabase
-    .from("profiles")
+  // 🔹 Step 2: Fetch from your USERS table
+  const { data, error } = await supabase
+    .from("users")
     .select("*")
     .eq("id", user.id)
     .single();
 
-  if (profile) {
-    document.getElementById("firstname").textContent = profile.firstname || "-";
-    document.getElementById("lastname").textContent = profile.lastname || "-";
-    document.getElementById("mobile").textContent = profile.mobile || "-";
-    document.getElementById("fullName").textContent =
-      `${profile.firstname || ""} ${profile.lastname || ""}`.trim();
-  } else {
-    document.getElementById("fullName").textContent = "User";
+  if (error) {
+    alert("Error loading profile");
+    return;
   }
-});
 
-async function logoutUser() {
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("profileBox").style.display = "block";
+
+  // 🔹 Step 3: Fill values
+  document.getElementById("name").textContent = data.name || "—";
+  document.getElementById("surname").textContent = data.surname || "—";
+  document.getElementById("mobile").textContent = data.mobile || "—";
+  document.getElementById("email").textContent = data.email || "—";
+  document.getElementById("created").textContent = data.created_at || "—";
+}
+
+// 🔹 Logout
+document.getElementById("logoutBtn").onclick = async () => {
   await supabase.auth.signOut();
   window.location.href = "login.html";
-}
+};
+
+loadProfile();
 </script>
 
 </body>
