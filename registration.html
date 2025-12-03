@@ -1,25 +1,28 @@
 <!DOCTYPE html>
-<html lang="gu">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GETplus | Create Account</title>
     
+    <!-- External Dependencies -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         /* ==================== Registration CSS Style ==================== */
+        
+        /* 1. Global Reset for Responsiveness */
+        * {
+            box-sizing: border-box; /* Ensures padding and border are included in the element's total width */
+        }
+        
         :root {
-            /* ઇમેજમાંથી લેવાયેલા મુખ્ય કલર્સ */
             --primary-purple: #5d35b9; 
             --secondary-purple: #764ba2;
-            --background-gradient: linear-gradient(135deg, #a797f1 0%, #764ba2 100%); /* ડાર્ક બેકગ્રાઉન્ડ */
+            --background-gradient: linear-gradient(135deg, #a797f1 0%, #764ba2 100%); 
             --card-bg: #fff;
             --text-dark: #333;
-            --text-light: #fff;
-            --input-bg: #f5f5f5;
-            --light-blue: #008080; /* Light Green ને બદલે Blue/Teal શેડ (ઇમેજ મુજબ) */
         }
         
         body { 
@@ -30,23 +33,24 @@
             align-items: center; 
             min-height: 100vh; 
             margin: 0; 
+            overflow-x: hidden; /* FIX: Prevents horizontal scrolling */
         }
 
         .main-wrapper {
             width: 100%;
             max-width: 450px;
-            padding: 20px 0;
+            padding: 20px; /* Added horizontal padding for small screens */
         }
 
         .container { 
             background: var(--card-bg); 
             padding: 30px 30px 40px; 
-            border-radius: 25px; /* ગોળાકાર કિનારીઓ */
+            border-radius: 25px; 
             box-shadow: 0 15px 30px rgba(0,0,0,0.2); 
             width: 100%;
         }
 
-        /* હેડર અને બ્રાન્ડિંગ */
+        /* Header and Branding */
         .header-section {
             text-align: left;
             margin-bottom: 30px;
@@ -58,32 +62,21 @@
             font-weight: 800;
             margin-bottom: 20px;
         }
-
-        .header-section .step-number {
-            color: var(--primary-purple);
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 5px;
-            display: inline-block;
-            margin-right: 10px;
-        }
-
+        
         .header-section h3 {
             color: var(--primary-purple);
             font-size: 1.5em;
             font-weight: bold;
             margin-bottom: 5px;
-            display: inline-block;
         }
         
         .header-section p {
             color: #666;
             font-size: 0.9em;
-            margin-top: 0;
-            margin-left: 35px;
+            margin-top: 5px;
         }
 
-        /* ફોર્મ ઇનપુટ સ્ટાઇલ */
+        /* Form Input Style */
         .input-group { 
             width: 100%; 
             margin-bottom: 12px; 
@@ -101,49 +94,15 @@
 
         input[type="text"], input[type="email"], input[type="password"] { 
             width: 100%; 
-            padding: 14px 15px 14px 45px; /* આઇકોન માટે જગ્યા */
+            padding: 14px 15px 14px 45px; 
             border: 1px solid #e0e0e0; 
             border-radius: 8px; 
             box-sizing: border-box; 
             font-size: 16px;
-            background: var(--card-bg); /* સફેદ બેકગ્રાઉન્ડ */
+            background: var(--card-bg); 
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
-        /* મોબાઈલ કોડ ફીલ્ડ (બે ઇનપુટ સાથે) */
-        .mobile-input-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            border: 1px solid #e0e0e0; 
-            border-radius: 8px; 
-            background: var(--card-bg);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .mobile-code-select {
-            display: flex;
-            align-items: center;
-            padding: 14px 10px;
-            font-size: 16px;
-            color: var(--text-dark);
-            cursor: pointer;
-            border-right: 1px solid #e0e0e0;
-        }
-        .mobile-code-select i {
-            margin-right: 5px;
-            font-size: 0.9em;
-            color: #764ba2;
-        }
-        .mobile-input-group input {
-            flex-grow: 1;
-            border: none;
-            padding: 14px 15px;
-            padding-left: 10px;
-            box-shadow: none;
-            border-radius: 0 8px 8px 0;
-        }
-
         /* Checkbox (T&C) */
         .checkbox-group {
             text-align: left;
@@ -161,11 +120,11 @@
             cursor: pointer;
         }
 
-        /* રજીસ્ટર બટન */
+        /* Register Button */
         button { 
             width: 100%; 
             padding: 16px; 
-            background: linear-gradient(90deg, #5d35b9, #a797f1); /* ઇમેજ મુજબ ગ્રેડિયન્ટ */
+            background: linear-gradient(90deg, #5d35b9, #a797f1); 
             color: white; 
             border: none; 
             border-radius: 10px; 
@@ -173,31 +132,31 @@
             font-weight: bold;
             cursor: pointer; 
             transition: box-shadow 0.3s, opacity 0.3s; 
-            box-shadow: 0 5px 15px rgba(93, 53, 185, 0.4); /* બટન શેડો */
+            box-shadow: 0 5px 15px rgba(93, 53, 185, 0.4); 
         }
         button:hover { 
             opacity: 0.95; 
         }
 
-        /* મેસેજ બોક્સ અને લિંક્સ */
+        /* Message Box and Links */
         .message-box { 
             margin-top: 25px; 
             padding: 15px;
             border-radius: 8px;
-            background: #fff8e1; /* હળવો પીળો બેકગ્રાઉન્ડ */
-            border-left: 4px solid orange;
+            background: #f0f0f0; 
+            border-left: 4px solid #764ba2;
             text-align: left;
             font-size: 0.9em;
         }
         
         .message-box .icon {
-            color: orange;
+            color: #764ba2;
             margin-right: 8px;
         }
 
         .login-link-container {
             margin-top: 10px;
-            text-align: center;
+            text-align: right;
             font-size: 0.9em;
         }
         .login-link-container a { 
@@ -206,40 +165,32 @@
             font-weight: bold;
             margin-left: 5px;
         }
-        .form-name-display {
-             color: #999;
-             font-size: 0.7em;
-             margin-top: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="main-wrapper">
         <div class="container">
+            <!-- Header and Branding -->
             <div class="header-section">
                 <div class="brand">GETplus</div>
-                <span class="step-number">2</span>
                 <h3>Create Your Account</h3>
-                <p>Join the future of learning</p>
+                <p>Join the future of learning.</p>
             </div>
             
+            <!-- Registration Form -->
             <form id="registration-form">
                 
                 <div class="input-group">
                     <i class="fas fa-id-badge"></i>
-                    <input type="text" id="name" placeholder="Name" required>
+                    <input type="text" id="name" placeholder="First Name" required>
                 </div>
 
                 <div class="input-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" id="surname" placeholder="Surname" required>
+                    <input type="text" id="surname" placeholder="Last Name" required>
                 </div>
 
-                <div class="input-group">
-                    <i class="fas fa-envelope-open-text"></i>
-                    <input type="text" id="email-input" placeholder="Email Input (Placeholder)" required>
-                </div>
-
+                <!-- Email Input -->
                 <div class="input-group">
                     <i class="fas fa-envelope"></i>
                     <input type="email" id="email" placeholder="Email" required>
@@ -250,36 +201,33 @@
                     <input type="password" id="password" placeholder="Password" required>
                 </div>
                 
-                <div class="mobile-input-group">
-                    <div class="mobile-code-select">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>Mobile code</span>
-                        <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 0.7em;"></i>
-                    </div>
+                <div class="input-group">
+                    <i class="fas fa-mobile-alt"></i>
                     <input type="text" id="mobile" placeholder="Mobile Number" required>
                 </div>
                 
+                <!-- T&C Checkbox -->
                 <div class="checkbox-group">
                     <input type="checkbox" id="tnc" required>
-                    <label for="tnc">I agree to the T&C.</label>
+                    <label for="tnc">I agree to the Terms & Conditions.</label>
                 </div>
 
                 <button type="submit">REGISTER NOW</button>
             </form>
 
-            <div class="form-name-display">Form registration-form</div>
-
+            <!-- Message Box (Used for status updates) -->
             <div class="message-box">
                 <i class="fas fa-info-circle icon"></i>
-                <span id="message">message</span>
+                <span id="message">Fill out the fields above to register.</span>
                 <div class="login-link-container">
-                    Already have a account? <a href="login.html">[Login Link]</a>
+                    Already have an account? <a href="login.html">Login Here</a>
                 </div>
             </div>
             
         </div>
     </div>
 
+    <!-- Link the JavaScript file -->
     <script src="app.js"></script>
 </body>
 </html>
