@@ -1,1 +1,129 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<title>Your Account</title>  <style>  
+    body {  
+        font-family: Arial, sans-serif;  
+        background: #0f0f0f;  
+        color: #fff;  
+        margin: 0;  
+        padding: 0;  
+    }  
+  
+    .container {  
+        max-width: 420px;  
+        margin: 40px auto;  
+        background: #1a1a1a;  
+        padding: 25px;  
+        border-radius: 18px;  
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.18);  
+        border: 1px solid #2a2a2a;  
+    }  
+  
+    h2 {  
+        text-align: center;  
+        color: #ffd700;  
+        margin-bottom: 25px;  
+    }  
+  
+    .field {  
+        background: #111;  
+        padding: 12px 15px;  
+        margin-bottom: 14px;  
+        border-radius: 10px;  
+        border: 1px solid #333;  
+    }  
+  
+    .label {  
+        font-size: 14px;  
+        color: #bbb;  
+    }  
+  
+    .value {  
+        font-size: 17px;  
+        font-weight: bold;  
+        margin-top: 3px;  
+        color: #fff;  
+    }  
+  
+    #loading {  
+        text-align: center;  
+        padding: 15px;  
+        color: #ffd700;  
+        display: none;  
+    }  
+</style>  </head>  <body>  <div class="container">  
+    <h2>Your Account</h2>  <div id="loading">Loading your profile...</div>  
 
+<div id="profileData" style="display:none;">  
+
+    <div class="field">  
+        <div class="label">First Name</div>  
+        <div class="value" id="name"></div>  
+    </div>  
+
+    <div class="field">  
+        <div class="label">Surname</div>  
+        <div class="value" id="surname"></div>  
+    </div>  
+
+    <div class="field">  
+        <div class="label">Mobile Number</div>  
+        <div class="value" id="mobile"></div>  
+    </div>  
+
+    <div class="field">  
+        <div class="label">Email Address</div>  
+        <div class="value" id="email"></div>  
+    </div>  
+
+</div>
+
+</div>  <script type="module">  
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";  
+  
+    // 🔥 YOUR SUPABASE DETAILS  
+    const supabaseUrl = "YOUR_SUPABASE_URL";  
+    const supabaseKey = "YOUR_SUPABASE_ANON_KEY";  
+    const supabase = createClient(supabaseUrl, supabaseKey);  
+  
+    const loading = document.getElementById("loading");  
+    const profileDiv = document.getElementById("profileData");  
+  
+    loading.style.display = "block";  
+  
+    async function loadUserProfile() {  
+        // 1️⃣ Get logged-in user  
+        const { data: { user } } = await supabase.auth.getUser();  
+  
+        if (!user) {  
+            loading.innerText = "Please login first...";  
+            return;  
+        }  
+  
+        // 2️⃣ Fetch user's data from Supabase table  
+        const { data, error } = await supabase  
+            .from("users")  
+            .select("*")  
+            .eq("id", user.id)  
+            .single();  
+  
+        if (error) {  
+            loading.innerText = "Error loading profile!";  
+            console.log(error);  
+            return;  
+        }  
+  
+        // 3️⃣ Put data into UI  
+        document.getElementById("name").innerText = data.name ?? "-";  
+        document.getElementById("surname").innerText = data.surname ?? "-";  
+        document.getElementById("mobile").innerText = data.mobile ?? "-";  
+        document.getElementById("email").innerText = data.email ?? "-";  
+  
+        loading.style.display = "none";  
+        profileDiv.style.display = "block";  
+    }  
+  
+    loadUserProfile();  
+</script>  </body>  
+</html>
