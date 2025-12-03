@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GETplus - ક્વિઝ સૂચિ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<section id="quizListing" class="min-h-screen bg-gray-50 dark:bg-gray-900 py-6 px-4">
+    <div class="container mx-auto max-w-lg">
+        <header class="mb-6">
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white border-b-4 border-purple-500 pb-2">ક્વિઝ મોડ્યુલ</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm">કરન્ટ અફેર્સ અને વિષયવાર ક્વિઝ.</p>
+        </header>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg mb-6 space-y-3">
+            <select id="quizFilterType" aria-label="Filter Quiz Type"
+                class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-purple-500 focus:border-purple-500">
+                <option value="all">બધા પ્રકારો</option>
+                <option value="current_affairs">કરન્ટ અફેર્સ</option>
+                <option value="subject_wise">વિષયવાર</option>
+                <option value="general">સામાન્ય</option>
+            </select>
+            <input type="text" id="quizSearch" placeholder="ક્વિઝ શોધો..." aria-label="Search Quizzes"
+                class="w-full p-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-purple-500 focus:border-purple-500">
+        </div>
+
+        <div id="quizListContainer" class="space-y-4">
+            
+            <div class="quiz-card bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border-l-4 border-indigo-500" data-quiz-id="quiz101">
+                <div class="p-4">
+                    <span class="badge-type text-xs font-semibold uppercase tracking-wider text-white bg-green-500 py-1 px-3 rounded-full">કરન્ટ અફેર્સ</span>
+                    <h3 class="text-lg font-bold mt-2 mb-2 text-gray-900 dark:text-white">મે 2024 - કરન્ટ અફેર્સ ક્વિઝ</h3>
+                    <div class="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+                        <span>પ્રશ્નો: 25 | સમય: 30 મિનિટ</span>
+                        <span class="text-xs font-semibold text-red-500 px-2 py-1 bg-red-100 dark:bg-red-800 dark:text-red-200 rounded-full" data-status="unattempted">નથી આપી</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-gray-100 dark:bg-gray-700 border-t flex justify-end">
+                    <a href="/quiz/start?id=quiz101" class="text-indigo-600 dark:text-indigo-400 font-semibold hover:text-indigo-800 transition duration-150 text-sm" data-action="start">
+                        ક્વિઝ શરૂ કરો →
+                    </a>
+                </div>
+            </div>
+            
+            <div class="quiz-card bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border-l-4 border-green-500" data-quiz-id="quiz102">
+                <div class="p-4">
+                    <span class="badge-type text-xs font-semibold uppercase tracking-wider text-white bg-purple-500 py-1 px-3 rounded-full">વિષયવાર: ગણિત</span>
+                    <h3 class="text-lg font-bold mt-2 mb-2 text-gray-900 dark:text-white">નંબર સિસ્ટમ (Chapter 3)</h3>
+                    <div class="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+                        <span>પ્રશ્નો: 15 | સમય: 20 મિનિટ</span>
+                        <span class="text-xs font-semibold text-green-600 px-2 py-1 bg-green-100 dark:bg-green-800 dark:text-green-200 rounded-full" data-status="attempted">આપેલી</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-gray-100 dark:bg-gray-700 border-t flex justify-end">
+                    <a href="/quiz/view-result?id=quiz102" class="text-green-600 dark:text-green-400 font-semibold hover:text-green-800 transition duration-150 text-sm" data-action="viewResult">
+                        પરિણામ જુઓ →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
