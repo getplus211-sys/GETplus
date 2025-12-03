@@ -255,6 +255,15 @@
             margin-bottom: 20px;
             font-size: 14px;
         }
+
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -263,15 +272,19 @@
             <div class="loading" id="loading">Loading your profile...</div>
             <div id="profileContent" style="display: none;">
                 <div class="profile-header">
-                    <div class="avatar" id="avatar"></div>
-                    <div class="profile-name" id="profileName"></div>
-                    <div class="profile-email" id="profileEmail"></div>
+                    <div class="avatar" id="avatar">U</div>
+                    <div class="profile-name" id="profileName">Loading...</div>
+                    <div class="profile-email" id="profileEmail">Loading...</div>
                 </div>
 
                 <div class="profile-info">
                     <div class="info-row">
+                        <span class="info-label">Phone Number</span>
+                        <span class="info-value" id="phoneNumber">Not provided</span>
+                    </div>
+                    <div class="info-row">
                         <span class="info-label">Member Since</span>
-                        <span class="info-value" id="memberSince"></span>
+                        <span class="info-value" id="memberSince">Loading...</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Account Status</span>
@@ -293,6 +306,7 @@
         <div class="modal-content">
             <h2 class="modal-title">Edit Profile</h2>
             <div id="editError" class="error-message" style="display: none;"></div>
+            <div id="editSuccess" class="success-message" style="display: none;"></div>
             <form id="editForm">
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
@@ -301,6 +315,10 @@
                 <div class="form-group">
                     <label class="form-label">Email</label>
                     <input type="email" class="form-input" id="editEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" id="editPhone" placeholder="+1234567890">
                 </div>
                 <div class="modal-buttons">
                     <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
@@ -324,62 +342,93 @@
 
     <script>
         const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzMjg0ODksImV4cCI6MjA0ODkwNDQ4OX0.sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzMjg0ODksImV4cCI6MjA0ODkwNDQ4OX0.YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let currentUser = null;
+        let userRecord = null;
 
         async function loadUserProfile() {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
+                console.log('Loading user profile...');
+                
+                // Get current session
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError) {
+                    console.error('Session error:', sessionError);
+                }
                 
                 if (!session) {
-                    window.location.href = 'login.html';
+                    console.log('No session found, redirecting to login');
+                    alert('Please log in first');
+                    // window.location.href = 'login.html';
                     return;
                 }
 
                 currentUser = session.user;
+                console.log('Current user:', currentUser);
 
-                const { data: userData, error } = await supabase
+                // Try to get user data from users table
+                const { data: userData, error: userError } = await supabase
                     .from('users')
                     .select('*')
-                    .eq('id', currentUser.id)
-                    .single();
+                    .eq('email', currentUser.email)
+                    .maybeSingle();
 
-                if (error) {
-                    console.error('Error fetching user data:', error);
+                if (userError) {
+                    console.error('Error fetching user data:', userError);
                 }
 
-                const name = userData?.name || currentUser.user_metadata?.name || 'User';
-                const email = currentUser.email;
-                const createdAt = new Date(currentUser.created_at).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric' 
-                });
+                console.log('User data from table:', userData);
+                userRecord = userData;
+
+                // Display user information
+                const name = userData?.name || userData?.full_name || currentUser.user_metadata?.name || currentUser.email?.split('@')[0] || 'User';
+                const email = userData?.email || currentUser.email;
+                const phone = userData?.phone || userData?.phone_number || 'Not provided';
+                
+                let createdAt = 'Unknown';
+                if (userData?.created_at) {
+                    createdAt = new Date(userData.created_at).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                } else if (currentUser.created_at) {
+                    createdAt = new Date(currentUser.created_at).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                }
 
                 document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
                 document.getElementById('profileName').textContent = name;
                 document.getElementById('profileEmail').textContent = email;
+                document.getElementById('phoneNumber').textContent = phone;
                 document.getElementById('memberSince').textContent = createdAt;
 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('profileContent').style.display = 'block';
 
             } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to load profile. Please try again.');
+                console.error('Error loading profile:', error);
+                document.getElementById('loading').textContent = 'Error loading profile. Check console for details.';
             }
         }
 
         function openEditModal() {
             const name = document.getElementById('profileName').textContent;
             const email = document.getElementById('profileEmail').textContent;
+            const phone = document.getElementById('phoneNumber').textContent;
             
-            document.getElementById('editName').value = name;
-            document.getElementById('editEmail').value = email;
+            document.getElementById('editName').value = name !== 'Loading...' ? name : '';
+            document.getElementById('editEmail').value = email !== 'Loading...' ? email : '';
+            document.getElementById('editPhone').value = phone !== 'Not provided' ? phone : '';
             document.getElementById('editModal').classList.add('active');
             document.getElementById('editError').style.display = 'none';
+            document.getElementById('editSuccess').style.display = 'none';
         }
 
         function closeEditModal() {
@@ -389,31 +438,81 @@
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const name = document.getElementById('editName').value;
-            const email = document.getElementById('editEmail').value;
+            const name = document.getElementById('editName').value.trim();
+            const email = document.getElementById('editEmail').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+
+            document.getElementById('editError').style.display = 'none';
+            document.getElementById('editSuccess').style.display = 'none';
 
             try {
-                const { error: updateError } = await supabase
-                    .from('users')
-                    .update({ name: name })
-                    .eq('id', currentUser.id);
+                console.log('Updating profile...', { name, email, phone });
 
-                if (updateError) throw updateError;
-
-                if (email !== currentUser.email) {
-                    const { error: emailError } = await supabase.auth.updateUser({
+                // Check if user record exists
+                if (userRecord && userRecord.id) {
+                    // Update existing record
+                    const updateData = { 
+                        name: name,
                         email: email
-                    });
+                    };
                     
-                    if (emailError) throw emailError;
+                    if (phone) {
+                        updateData.phone = phone;
+                    }
+
+                    const { data, error: updateError } = await supabase
+                        .from('users')
+                        .update(updateData)
+                        .eq('id', userRecord.id)
+                        .select();
+
+                    if (updateError) {
+                        console.error('Update error:', updateError);
+                        throw updateError;
+                    }
+                    
+                    console.log('Update successful:', data);
+                } else {
+                    // Insert new record if it doesn't exist
+                    const insertData = {
+                        email: email,
+                        name: name
+                    };
+                    
+                    if (phone) {
+                        insertData.phone = phone;
+                    }
+                    
+                    if (currentUser.id) {
+                        insertData.id = currentUser.id;
+                    }
+
+                    const { data, error: insertError } = await supabase
+                        .from('users')
+                        .insert([insertData])
+                        .select();
+
+                    if (insertError) {
+                        console.error('Insert error:', insertError);
+                        throw insertError;
+                    }
+                    
+                    console.log('Insert successful:', data);
+                    userRecord = data[0];
                 }
 
+                // Update UI
                 document.getElementById('profileName').textContent = name;
                 document.getElementById('profileEmail').textContent = email;
+                document.getElementById('phoneNumber').textContent = phone || 'Not provided';
                 document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
 
-                closeEditModal();
-                alert('Profile updated successfully!');
+                document.getElementById('editSuccess').textContent = 'Profile updated successfully!';
+                document.getElementById('editSuccess').style.display = 'block';
+
+                setTimeout(() => {
+                    closeEditModal();
+                }, 1500);
 
             } catch (error) {
                 console.error('Error updating profile:', error);
@@ -432,12 +531,17 @@
 
         async function handleDeleteAccount() {
             try {
-                const { error: deleteError } = await supabase
-                    .from('users')
-                    .delete()
-                    .eq('id', currentUser.id);
+                if (userRecord && userRecord.id) {
+                    const { error: deleteError } = await supabase
+                        .from('users')
+                        .delete()
+                        .eq('id', userRecord.id);
 
-                if (deleteError) throw deleteError;
+                    if (deleteError) {
+                        console.error('Delete error:', deleteError);
+                        throw deleteError;
+                    }
+                }
 
                 await supabase.auth.signOut();
                 
@@ -453,6 +557,7 @@
         async function handleLogout() {
             try {
                 await supabase.auth.signOut();
+                alert('Logged out successfully!');
                 window.location.href = 'index.html';
             } catch (error) {
                 console.error('Error logging out:', error);
@@ -460,6 +565,7 @@
             }
         }
 
+        // Load profile when page loads
         window.addEventListener('load', loadUserProfile);
     </script>
 </body>
