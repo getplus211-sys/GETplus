@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Edit Profile</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: #0f0f0f;
+        color: #fff;
+    }
+
+    .container {
+        max-width: 430px;
+        margin: 40px auto;
+        background: #1a1a1a;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #ffd369;
+    }
+
+    label {
+        display: block;
+        margin: 10px 0 4px;
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 10px;
+        background: #2a2a2a;
+        color: #fff;
+        font-size: 15px;
+    }
+
+    input:disabled {
+        opacity: 0.6;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        background: #ffcc00;
+        color: #000;
+        font-size: 16px;
+        border-radius: 10px;
+        font-weight: bold;
+        margin-top: 15px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #ffdd44;
+    }
+
+    #status {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 14px;
+        color: #00ff99;
+        display: none;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Edit Your Profile</h2>
+
+    <label>Name</label>
+    <input type="text" id="name">
+
+    <label>Surname</label>
+    <input type="text" id="surname">
+
+    <label>Mobile Number</label>
+    <input type="text" id="mobile">
+
+    <label>Email (Cannot Edit)</label>
+    <input type="text" id="email" disabled>
+
+    <button onclick="updateProfile()">Save Changes</button>
+
+    <p id="status">Saving...</p>
+</div>
+
+<script>
+const supabase = supabasejs.createClient(
+    "https://bhmycvrbucmbbrpzeane.supabase.co",
+    "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv"
+);
+
+// Load current user data
+async function loadData() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        alert("Login Required");
+        window.location.href = "login.html";
+        return;
+    }
+
+    let email = user.email;
+
+    const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email)
+        .single();
+
+    if (data) {
+        document.getElementById("name").value = data.name;
+        document.getElementById("surname").value = data.surname;
+        document.getElementById("mobile").value = data.mobile;
+        document.getElementById("email").value = data.email;
+    }
+}
+
+loadData();
+
+// Update Profile
+async function updateProfile() {
+    document.getElementById("status").style.display = "block";
+    document.getElementById("status").innerText = "Saving...";
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const updateData = {
+        name: document.getElementById("name").value,
+        surname: document.getElementById("surname").value,
+        mobile: document.getElementById("mobile").value
+    };
+
+    const { data, error } = await supabase
+        .from("users")
+        .update(updateData)
+        .eq("email", user.email);
+
+    if (error) {
+        document.getElementById("status").innerText = "Error saving!";
+        document.getElementById("status").style.color = "red";
+    } else {
+        document.getElementById("status").innerText = "Saved Successfully!";
+        document.getElementById("status").style.color = "#00ff99";
+    }
+
+    setTimeout(() => {
+        document.getElementById("status").style.display = "none";
+    }, 1500);
+}
+</script>
+
+</body>
+</html>
