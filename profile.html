@@ -37,7 +37,11 @@
         margin-bottom: 15px;
         font-size: 16px;
         border-left: 4px solid #4f46e5;
-        
+        display: block; /* FIXED → NOW ALWAYS VISIBLE */
+    }
+
+    #loadingText {
+        display: block;
     }
 
     /* Buttons */
@@ -52,21 +56,18 @@
         font-weight: 600;
     }
 
-    /* Edit button — already premium */
     .edit-btn { 
         background: #4f46e5; 
         color: white;
         box-shadow: 0 3px 12px rgba(79,70,229,0.3);
     }
 
-    /* Logout button — new premium look */
     .logout-btn { 
         background: linear-gradient(135deg, #ff5858, #d43535);
         color: white;
         box-shadow: 0 3px 10px rgba(255,88,88,0.4);
     }
 
-    /* Delete button — glossy premium black */
     .delete-btn { 
         background: linear-gradient(135deg, #000, #333);
         color: white;
@@ -119,7 +120,7 @@
 <div class="container">
     <h2>My Account</h2>
 
-    <div id="loadingText" class="info-box" style="display:block;">Loading your details...</div>
+    <div id="loadingText" class="info-box">Loading your details...</div>
 
     <div id="userName" class="info-box"></div>
     <div id="userSurname" class="info-box"></div>
@@ -130,7 +131,6 @@
     <button class="logout-btn" id="logoutBtn">Logout</button>
     <button class="delete-btn" id="deleteBtn">Delete Account</button>
 </div>
-
 
 <!-- EDIT MODAL -->
 <div class="modal-bg" id="editModal">
@@ -145,7 +145,6 @@
         <button class="close-btn" id="closeModal">Cancel</button>
     </div>
 </div>
-
 
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -171,46 +170,37 @@ async function loadUser() {
         .eq("email", email)
         .single();
 
-    // Fill fields
-    document.getElementById("userName").innerText = "Name: " + data.name;
-    document.getElementById("userSurname").innerText = "Surname: " + data.surname;
-    document.getElementById("userMobile").innerText = "Mobile: " + data.mobile;
-    document.getElementById("userEmail").innerText = "Email: " + data.email;
+    // Show Data
+    document.getElementById("userName").innerText = "Name: " + (data?.name || "");
+    document.getElementById("userSurname").innerText = "Surname: " + (data?.surname || "");
+    document.getElementById("userMobile").innerText = "Mobile: " + (data?.mobile || "");
+    document.getElementById("userEmail").innerText = "Email: " + (data?.email || "");
 
-    // Show boxes (hide loading)
+    // Hide loading
     document.getElementById("loadingText").style.display = "none";
-    document.querySelectorAll(".info-box").forEach(box => {
-        box.style.display = "block";
-    });
 
-    // Prefill modal
-    document.getElementById("editName").value = data.name;
-    document.getElementById("editSurname").value = data.surname;
-    document.getElementById("editMobile").value = data.mobile;
+    // Prefill edit modal
+    document.getElementById("editName").value = data?.name || "";
+    document.getElementById("editSurname").value = data?.surname || "";
+    document.getElementById("editMobile").value = data?.mobile || "";
 }
 loadUser();
-
 
 // ------------------- MODAL OPEN/CLOSE -------------------
 openEdit.onclick = () => { editModal.style.display = "flex"; };
 closeModal.onclick = () => { editModal.style.display = "none"; };
-
 
 // ------------------- SAVE CHANGES -------------------
 saveChanges.onclick = async () => {
     const { data: { user }} = await supabase.auth.getUser();
     const email = user.email;
 
-    const updatedName = editName.value;
-    const updatedSurname = editSurname.value;
-    const updatedMobile = editMobile.value;
-
     await supabase
         .from("users")
         .update({
-            name: updatedName,
-            surname: updatedSurname,
-            mobile: updatedMobile
+            name: editName.value,
+            surname: editSurname.value,
+            mobile: editMobile.value
         })
         .eq("email", email);
 
@@ -219,13 +209,11 @@ saveChanges.onclick = async () => {
     loadUser(); 
 };
 
-
 // ------------------- LOGOUT -------------------
 logoutBtn.onclick = async () => {
     await supabase.auth.signOut();
     window.location.href = "login.html";
 };
-
 
 // ------------------- DELETE ACCOUNT -------------------
 deleteBtn.onclick = async () => {
