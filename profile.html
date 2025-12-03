@@ -1,149 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Profile</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Account</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: "Poppins", Arial, sans-serif;
+    background: linear-gradient(135deg, #1a73e8, #6a11cb);
+    min-height: 100vh;
+    padding: 25px 0;
+    display: flex;
+    justify-content: center;
+  }
 
-    .container {
-      background: #fff;
-      padding: 25px;
-      width: 92%;
-      max-width: 400px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #00000015;
-    }
+  .card {
+    width: 92%;
+    max-width: 420px;
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0px 10px 20px #00000025;
+    text-align: center;
+  }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 25px;
-    }
+  .avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 5px solid #1a73e8;
+    margin-bottom: 15px;
+  }
 
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 7px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
+  h2 {
+    margin: 0;
+    font-size: 22px;
+    color: #222;
+  }
 
-    button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 15px;
-      background: #007bff;
-      border: none;
-      color: white;
-      font-size: 17px;
-      border-radius: 7px;
-      cursor: pointer;
-    }
+  p {
+    color: #555;
+    margin-top: 3px;
+  }
 
-    button:hover {
-      opacity: 0.9;
-    }
+  .info-box {
+    text-align: left;
+    margin-top: 20px;
+  }
 
-    #logoutBtn {
-      background: red;
-      margin-top: 10px;
-    }
-  </style>
+  .info-box div {
+    background: #f5f7ff;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 8px 0;
+    font-size: 15px;
+    color: #222;
+    border-left: 4px solid #1a73e8;
+  }
+
+  .section-title {
+    margin-top: 25px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #111;
+    text-align: left;
+  }
+
+  .menu-btn {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    padding: 14px;
+    font-size: 16px;
+    border: none;
+    width: 100%;
+    border-radius: 12px;
+    margin-top: 18px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 15px;
+  }
+
+  .menu-card {
+    background: #f5f7ff;
+    padding: 18px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: #1a1a1a;
+    border: 1.5px solid #dce3ff;
+    cursor: pointer;
+  }
+
+  #logoutBtn {
+    margin-top: 20px;
+    padding: 12px;
+    width: 100%;
+    background: #ff3b30;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+</style>
 </head>
 
 <body>
 
-  <div class="container">
-      <h2>User Profile</h2>
+<div class="card">
+  <img src="https://i.imgur.com/4ZQZ4Zy.png" class="avatar">
 
-      <label>Email (Read Only)</label>
-      <input type="email" id="email" disabled />
+  <h2 id="userName">Loading...</h2>
+  <p id="userEmail"></p>
 
-      <label>First Name</label>
-      <input type="text" id="firstname" placeholder="Enter first name" />
-
-      <label>Last Name</label>
-      <input type="text" id="lastname" placeholder="Enter last name" />
-
-      <label>Mobile Number</label>
-      <input type="text" id="mobile" placeholder="Enter 10-digit mobile" />
-
-      <button onclick="updateProfile()">Update Profile</button>
-      <button id="logoutBtn" onclick="logoutUser()">Logout</button>
+  <div class="info-box">
+      <div><b>Mobile:</b> <span id="userMobile">Loading...</span></div>
+      <div><b>Account Created:</b> <span id="userCreated">Loading...</span></div>
+      <div><b>Last Login:</b> <span id="lastLogin">Loading...</span></div>
   </div>
 
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <button class="menu-btn" onclick="window.location.href='profile.html'">
+    ✏ Edit Profile
+  </button>
 
-  <script>
-    const SUPABASE_URL = "https://bhmycvrbucmbbrpzeane.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv";
+  <div class="section-title">Your Sections</div>
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  <div class="menu-grid">
+      <div class="menu-card">📘 My Quizzes</div>
+      <div class="menu-card">📊 Results</div>
+      <div class="menu-card">🧠 Mock Tests</div>
+      <div class="menu-card">⚡ Performance</div>
+  </div>
 
-    // Load user data when opening page
-    document.addEventListener("DOMContentLoaded", async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
+  <button id="logoutBtn" onclick="logoutUser()">Logout</button>
+</div>
 
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-      document.getElementById("email").value = user.email;
+<script>
+const supabase = window.supabase.createClient(
+  "https://bhmycvrbucmbbrpzeane.supabase.co",
+  "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv"
+);
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+document.addEventListener("DOMContentLoaded", async () => {
+  const { data: { user } } = await supabase.auth.getUser();
 
-      if (profile) {
-        document.getElementById("firstname").value = profile.firstname || "";
-        document.getElementById("lastname").value = profile.lastname || "";
-        document.getElementById("mobile").value = profile.mobile || "";
-      }
-    });
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
 
-    // Update profile
-    async function updateProfile() {
-      const firstname = document.getElementById("firstname").value.trim();
-      const lastname = document.getElementById("lastname").value.trim();
-      const mobile = document.getElementById("mobile").value.trim();
+  document.getElementById("userEmail").textContent = user.email;
+  document.getElementById("userCreated").textContent = new Date(user.created_at).toDateString();
+  document.getElementById("lastLogin").textContent = user.last_sign_in_at
+    ? new Date(user.last_sign_in_at).toDateString()
+    : "—";
 
-      const { data: { user } } = await supabase.auth.getUser();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
 
-      const { error } = await supabase
-        .from("profiles")
-        .upsert({
-          id: user.id,
-          firstname,
-          lastname,
-          mobile
-        });
+  if (profile) {
+    document.getElementById("userName").textContent =
+      (profile.firstname || "") + " " + (profile.lastname || "");
+    document.getElementById("userMobile").textContent =
+      profile.mobile || "Not added";
+  } else {
+    document.getElementById("userName").textContent = "User";
+  }
+});
 
-      if (error) alert(error.message);
-      else alert("Profile updated successfully!");
-    }
-
-    // Logout
-    async function logoutUser() {
-      await supabase.auth.signOut();
-      window.location.href = "login.html";
-    }
-  </script>
+async function logoutUser() {
+  await supabase.auth.signOut();
+  window.location.href = "login.html";
+}
+</script>
 
 </body>
 </html>
