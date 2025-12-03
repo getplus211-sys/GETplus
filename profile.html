@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GETplus - પ્રોફાઇલ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<section id="userProfile" class="min-h-screen bg-gray-50 dark:bg-gray-900 py-6 px-4">
+    <div class="container mx-auto max-w-lg">
+        <header class="mb-6">
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white border-b-4 border-indigo-500 pb-2">મારી પ્રોફાઇલ</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm">તમારી અંગત માહિતીનું સંચાલન કરો.</p>
+        </header>
+
+        <div class="space-y-6">
+            
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-lg">
+                <h2 class="text-xl font-bold mb-4 text-indigo-600 dark:text-indigo-400 border-b pb-2">એકાઉન્ટ વિગતો</h2>
+                
+                <form id="profileUpdateForm" class="space-y-4">
+                    <div class="relative">
+                        <label for="profileName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">નામ</label>
+                        <input type="text" id="profileName" name="name"
+                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-gray-700 dark:text-white" required>
+                    </div>
+                    <div class="relative">
+                        <label for="profileMobile" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">મોબાઈલ નંબર</label>
+                        <input type="tel" id="profileMobile" name="mobileNumber" 
+                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 cursor-not-allowed" readonly disabled>
+                    </div>
+                    <div class="relative">
+                        <label for="profileAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">સરનામું</label>
+                        <textarea id="profileAddress" name="address" rows="3"
+                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-gray-700 dark:text-white"></textarea>
+                    </div>
+
+                    <button type="submit" id="updateProfileBtn" 
+                        class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300">
+                        વિગતો અપડેટ કરો
+                    </button>
+                </form>
+                
+                <hr class="my-6 border-gray-200 dark:border-gray-700">
+
+                <div class="flex flex-col space-y-3">
+                    <button id="changePasswordBtn" class="w-full bg-purple-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-purple-700 transition duration-300">
+                        પાસવર્ડ બદલો
+                    </button>
+                    <button id="logoutButton" class="w-full bg-red-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-red-600 transition duration-300">
+                        લોગઆઉટ
+                    </button>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <a href="/progress-board" class="flex items-center justify-between bg-white dark:bg-gray-800 p-5 rounded-xl shadow-lg border-l-4 border-yellow-500 transition duration-300 hover:shadow-xl">
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <span class="text-base font-semibold text-gray-900 dark:text-white">ક્વિઝ પ્રગતિ બોર્ડ</span>
+                    </div>
+                    <span class="text-indigo-600 dark:text-indigo-400 font-bold text-lg">→</span>
+                </a>
+
+                <a href="/my-test-results" class="flex items-center justify-between bg-white dark:bg-gray-800 p-5 rounded-xl shadow-lg border-l-4 border-green-500 transition duration-300 hover:shadow-xl">
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span class="text-base font-semibold text-gray-900 dark:text-white">મારા મોક ટેસ્ટ પરિણામો</span>
+                    </div>
+                    <span class="text-indigo-600 dark:text-indigo-400 font-bold text-lg">→</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
