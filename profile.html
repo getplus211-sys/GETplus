@@ -26,6 +26,8 @@
         text-align: center;
         margin-bottom: 25px;
         color: #2c3e50;
+        font-weight: 700;
+        letter-spacing: .5px;
     }
 
     .info-box {
@@ -35,24 +37,43 @@
         margin-bottom: 15px;
         font-size: 16px;
         border-left: 4px solid #4f46e5;
+        display: none;  /* HIDE UNTIL DATA LOAD */
     }
 
+    /* Buttons */
     button {
         width: 100%;
         padding: 14px;
         margin-top: 10px;
         border: none;
-        border-radius: 10px;
+        border-radius: 12px;
         font-size: 16px;
         cursor: pointer;
+        font-weight: 600;
     }
 
-    .edit-btn { background: #4f46e5; color: white; }
-    .logout-btn { background: #d9534f; color: white; }
-    .delete-btn { background: #000; color: white; }
+    /* Edit button — already premium */
+    .edit-btn { 
+        background: #4f46e5; 
+        color: white;
+        box-shadow: 0 3px 12px rgba(79,70,229,0.3);
+    }
 
-    /* --- Modal Style --- */
+    /* Logout button — new premium look */
+    .logout-btn { 
+        background: linear-gradient(135deg, #ff5858, #d43535);
+        color: white;
+        box-shadow: 0 3px 10px rgba(255,88,88,0.4);
+    }
 
+    /* Delete button — glossy premium black */
+    .delete-btn { 
+        background: linear-gradient(135deg, #000, #333);
+        color: white;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+    }
+
+    /* Modal */
     .modal-bg {
         position: fixed;
         top: 0;
@@ -98,10 +119,12 @@
 <div class="container">
     <h2>My Account</h2>
 
-    <div id="userName" class="info-box">Loading...</div>
-    <div id="userSurname" class="info-box">Loading...</div>
-    <div id="userMobile" class="info-box">Loading...</div>
-    <div id="userEmail" class="info-box">Loading...</div>
+    <div id="loadingText" class="info-box" style="display:block;">Loading your details...</div>
+
+    <div id="userName" class="info-box"></div>
+    <div id="userSurname" class="info-box"></div>
+    <div id="userMobile" class="info-box"></div>
+    <div id="userEmail" class="info-box"></div>
 
     <button class="edit-btn" id="openEdit">Edit Profile</button>
     <button class="logout-btn" id="logoutBtn">Logout</button>
@@ -136,30 +159,31 @@ const supabase = createClient(
 async function loadUser() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-        alert("Not logged in");
         window.location.href = "login.html";
         return;
     }
 
     const email = user.email;
 
-    const { data, error } = await supabase
+    const { data } = await supabase
         .from("users")
         .select("*")
         .eq("email", email)
         .single();
 
-    if (error) {
-        console.log(error);
-        return;
-    }
-
+    // Fill fields
     document.getElementById("userName").innerText = "Name: " + data.name;
     document.getElementById("userSurname").innerText = "Surname: " + data.surname;
     document.getElementById("userMobile").innerText = "Mobile: " + data.mobile;
     document.getElementById("userEmail").innerText = "Email: " + data.email;
 
-    // Prefill edit fields
+    // Show boxes (hide loading)
+    document.getElementById("loadingText").style.display = "none";
+    document.querySelectorAll(".info-box").forEach(box => {
+        box.style.display = "block";
+    });
+
+    // Prefill modal
     document.getElementById("editName").value = data.name;
     document.getElementById("editSurname").value = data.surname;
     document.getElementById("editMobile").value = data.mobile;
@@ -168,26 +192,20 @@ loadUser();
 
 
 // ------------------- MODAL OPEN/CLOSE -------------------
-document.getElementById("openEdit").onclick = () => {
-    document.getElementById("editModal").style.display = "flex";
-};
-
-document.getElementById("closeModal").onclick = () => {
-    document.getElementById("editModal").style.display = "none";
-};
+openEdit.onclick = () => { editModal.style.display = "flex"; };
+closeModal.onclick = () => { editModal.style.display = "none"; };
 
 
 // ------------------- SAVE CHANGES -------------------
-document.getElementById("saveChanges").onclick = async () => {
-
+saveChanges.onclick = async () => {
     const { data: { user }} = await supabase.auth.getUser();
     const email = user.email;
 
-    const updatedName = document.getElementById("editName").value;
-    const updatedSurname = document.getElementById("editSurname").value;
-    const updatedMobile = document.getElementById("editMobile").value;
+    const updatedName = editName.value;
+    const updatedSurname = editSurname.value;
+    const updatedMobile = editMobile.value;
 
-    const { error } = await supabase
+    await supabase
         .from("users")
         .update({
             name: updatedName,
@@ -196,32 +214,26 @@ document.getElementById("saveChanges").onclick = async () => {
         })
         .eq("email", email);
 
-    if (!error) {
-        alert("Profile updated!");
-        document.getElementById("editModal").style.display = "none";
-        loadUser(); // Refresh on page
-    }
+    alert("Profile updated!");
+    editModal.style.display = "none";
+    loadUser(); 
 };
 
 
-
 // ------------------- LOGOUT -------------------
-document.getElementById("logoutBtn").onclick = async () => {
+logoutBtn.onclick = async () => {
     await supabase.auth.signOut();
     window.location.href = "login.html";
 };
 
 
 // ------------------- DELETE ACCOUNT -------------------
-document.getElementById("deleteBtn").onclick = async () => {
+deleteBtn.onclick = async () => {
     if (!confirm("Are you sure? Your account will be permanently deleted.")) return;
 
     const { data: { user }} = await supabase.auth.getUser();
 
-    // Delete from Supabase users table
     await supabase.from("users").delete().eq("email", user.email);
-
-    // Delete auth user
     await supabase.auth.admin.deleteUser(user.id);
 
     alert("Account deleted.");
