@@ -1,259 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Your Account</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>User Account</title>
 
 <style>
     body {
-        font-family: Arial, sans-serif;
-        background: #0f0f0f;
-        color: #fff;
+        font-family: Arial;
+        background: #f2f4f7;
         margin: 0;
-        padding: 0;
+        padding: 20px;
     }
 
     .container {
         max-width: 420px;
-        margin: 40px auto;
-        background: #1a1a1a;
+        margin: auto;
+        background: white;
         padding: 25px;
-        border-radius: 18px;
-        box-shadow: 0 0 25px rgba(255, 215, 0, 0.18);
-        border: 1px solid #2a2a2a;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
 
     h2 {
         text-align: center;
-        color: #ffd700;
         margin-bottom: 25px;
+        color: #2c3e50;
     }
 
-    .field {
-        background: #111;
-        padding: 12px 15px;
-        margin-bottom: 14px;
-        border-radius: 10px;
-        border: 1px solid #333;
-    }
-
-    .label {
-        font-size: 14px;
-        color: #bbb;
-    }
-
-    .value {
-        font-size: 17px;
-        font-weight: bold;
-        margin-top: 3px;
-        color: #fff;
-    }
-
-    #loading {
-        text-align: center;
+    .info-box {
+        background: #eef2ff;
         padding: 15px;
-        color: #ffd700;
-        display: none;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        font-size: 16px;
+        border-left: 4px solid #4f46e5;
     }
 
-    /* Buttons */
-    .btn {
+    button {
         width: 100%;
         padding: 14px;
+        margin-top: 10px;
         border: none;
-        border-radius: 12px;
-        margin-top: 14px;
+        border-radius: 10px;
         font-size: 16px;
         cursor: pointer;
-        font-weight: bold;
     }
 
-    .edit-btn { background: #ffd700; color: #000; }
-    .logout-btn { background: #c62828; color: white; }
-    .delete-btn { background: #000; color: white; border: 1px solid #444; }
+    .edit-btn { background: #4f46e5; color: white; }
+    .logout-btn { background: #d9534f; color: white; }
+    .delete-btn { background: #000; color: white; }
 
-    /* MODAL */
+    /* --- Modal Style --- */
+
     .modal-bg {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0,0,0,0.5);
         display: none;
         justify-content: center;
         align-items: center;
     }
 
     .modal {
-        background: #1a1a1a;
-        padding: 20px;
+        background: white;
         width: 90%;
-        max-width: 420px;
+        max-width: 400px;
+        padding: 20px;
         border-radius: 15px;
-        border: 1px solid #333;
-        box-shadow: 0 0 25px rgba(255, 215, 0, 0.18);
+        box-shadow: 0 4px 25px rgba(0,0,0,0.2);
+        animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+        from { transform: scale(0.7); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
     }
 
     input {
         width: 100%;
-        padding: 13px;
+        padding: 12px;
+        margin-top: 10px;
         border-radius: 10px;
-        margin-top: 12px;
-        background: #111;
-        border: 1px solid #333;
-        color: #fff;
+        border: 1px solid #ccc;
     }
 
-    .save-btn { background: #ffd700; color: #000; }
-    .cancel-btn { background: #444; color: #fff; margin-top: 10px; }
+    .save-btn { background: #4f46e5; color: white; margin-top: 15px; }
+    .close-btn { background: gray; color: white; margin-top: 10px; }
 
 </style>
 </head>
-
 <body>
 
 <div class="container">
-    <h2>Your Account</h2>
+    <h2>My Account</h2>
 
-    <div id="loading">Loading your profile...</div>
+    <div id="userName" class="info-box">Loading...</div>
+    <div id="userSurname" class="info-box">Loading...</div>
+    <div id="userMobile" class="info-box">Loading...</div>
+    <div id="userEmail" class="info-box">Loading...</div>
 
-    <div id="profileData" style="display:none;">
-
-        <div class="field">
-            <div class="label">First Name</div>
-            <div class="value" id="name"></div>
-        </div>
-
-        <div class="field">
-            <div class="label">Surname</div>
-            <div class="value" id="surname"></div>
-        </div>
-
-        <div class="field">
-            <div class="label">Mobile Number</div>
-            <div class="value" id="mobile"></div>
-        </div>
-
-        <div class="field">
-            <div class="label">Email Address</div>
-            <div class="value" id="email"></div>
-        </div>
-
-        <button class="btn edit-btn" id="openEdit">Edit Profile</button>
-        <button class="btn logout-btn" id="logoutBtn">Logout</button>
-        <button class="btn delete-btn" id="deleteBtn">Delete Account</button>
-
-    </div>
+    <button class="edit-btn" id="openEdit">Edit Profile</button>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+    <button class="delete-btn" id="deleteBtn">Delete Account</button>
 </div>
 
 
 <!-- EDIT MODAL -->
 <div class="modal-bg" id="editModal">
     <div class="modal">
-        <h2 style="text-align:center;color:#ffd700;">Edit Profile</h2>
+        <h3>Edit Profile</h3>
 
-        <input type="text" id="editName" placeholder="First Name">
+        <input type="text" id="editName" placeholder="Name">
         <input type="text" id="editSurname" placeholder="Surname">
-        <input type="text" id="editMobile" placeholder="Mobile Number">
+        <input type="text" id="editMobile" placeholder="Mobile">
 
-        <button class="btn save-btn" id="saveChanges">Save Changes</button>
-        <button class="btn cancel-btn" id="closeModal">Cancel</button>
+        <button class="save-btn" id="saveChanges">Save Changes</button>
+        <button class="close-btn" id="closeModal">Cancel</button>
     </div>
 </div>
 
 
 <script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const supabase = createClient(
     "https://bhmycvrbucmbbrpzeane.supabase.co",
     "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv"
 );
 
-const loading = document.getElementById("loading");
-const profileDiv = document.getElementById("profileData");
-
-loading.style.display = "block";
-
-// LOAD USER DATA
-async function loadUserProfile() {
+// ------------------- LOAD USER -------------------
+async function loadUser() {
     const { data: { user } } = await supabase.auth.getUser();
-
     if (!user) {
-        loading.innerText = "Please login first...";
+        alert("Not logged in");
+        window.location.href = "login.html";
         return;
     }
 
-    // Fetch row by email (YOUR TABLE WORKS THIS WAY)
-    const { data } = await supabase
+    const email = user.email;
+
+    const { data, error } = await supabase
         .from("users")
         .select("*")
-        .eq("email", user.email)
+        .eq("email", email)
         .single();
 
-    document.getElementById("name").innerText = data.name ?? "-";
-    document.getElementById("surname").innerText = data.surname ?? "-";
-    document.getElementById("mobile").innerText = data.mobile ?? "-";
-    document.getElementById("email").innerText = data.email ?? "-";
+    if (error) {
+        console.log(error);
+        return;
+    }
 
-    loading.style.display = "none";
-    profileDiv.style.display = "block";
+    document.getElementById("userName").innerText = "Name: " + data.name;
+    document.getElementById("userSurname").innerText = "Surname: " + data.surname;
+    document.getElementById("userMobile").innerText = "Mobile: " + data.mobile;
+    document.getElementById("userEmail").innerText = "Email: " + data.email;
 
-    // Fill modal inputs
-    editName.value = data.name;
-    editSurname.value = data.surname;
-    editMobile.value = data.mobile;
+    // Prefill edit fields
+    document.getElementById("editName").value = data.name;
+    document.getElementById("editSurname").value = data.surname;
+    document.getElementById("editMobile").value = data.mobile;
 }
-
-loadUserProfile();
-
-
-// EDIT POPUP
-openEdit.onclick = () => editModal.style.display = "flex";
-closeModal.onclick = () => editModal.style.display = "none";
+loadUser();
 
 
-// SAVE CHANGES
-saveChanges.onclick = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+// ------------------- MODAL OPEN/CLOSE -------------------
+document.getElementById("openEdit").onclick = () => {
+    document.getElementById("editModal").style.display = "flex";
+};
 
-    await supabase
-        .from("users")
-        .update({
-            name: editName.value,
-            surname: editSurname.value,
-            mobile: editMobile.value
-        })
-        .eq("email", user.email);
-
-    alert("Profile updated successfully!");
-    editModal.style.display = "none";
-    loadUserProfile();
+document.getElementById("closeModal").onclick = () => {
+    document.getElementById("editModal").style.display = "none";
 };
 
 
-// LOGOUT
-logoutBtn.onclick = async () => {
+// ------------------- SAVE CHANGES -------------------
+document.getElementById("saveChanges").onclick = async () => {
+
+    const { data: { user }} = await supabase.auth.getUser();
+    const email = user.email;
+
+    const updatedName = document.getElementById("editName").value;
+    const updatedSurname = document.getElementById("editSurname").value;
+    const updatedMobile = document.getElementById("editMobile").value;
+
+    const { error } = await supabase
+        .from("users")
+        .update({
+            name: updatedName,
+            surname: updatedSurname,
+            mobile: updatedMobile
+        })
+        .eq("email", email);
+
+    if (!error) {
+        alert("Profile updated!");
+        document.getElementById("editModal").style.display = "none";
+        loadUser(); // Refresh on page
+    }
+};
+
+
+
+// ------------------- LOGOUT -------------------
+document.getElementById("logoutBtn").onclick = async () => {
     await supabase.auth.signOut();
     window.location.href = "login.html";
 };
 
 
-// DELETE ACCOUNT
-deleteBtn.onclick = async () => {
-    const { data: { user }} = await supabase.auth.getUser();
-
+// ------------------- DELETE ACCOUNT -------------------
+document.getElementById("deleteBtn").onclick = async () => {
     if (!confirm("Are you sure? Your account will be permanently deleted.")) return;
 
+    const { data: { user }} = await supabase.auth.getUser();
+
+    // Delete from Supabase users table
     await supabase.from("users").delete().eq("email", user.email);
+
+    // Delete auth user
     await supabase.auth.admin.deleteUser(user.id);
 
-    alert("Your account has been deleted.");
+    alert("Account deleted.");
     window.location.href = "register.html";
 };
 
 </script>
-
 </body>
 </html>
