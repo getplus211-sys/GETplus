@@ -2,164 +2,142 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Account</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: "Poppins", sans-serif;
-  background: #f4f6fa;
-}
+    body {
+        font-family: Arial, sans-serif;
+        background: #0f0f0f;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+    }
 
-.container {
-  max-width: 450px;
-  margin: 28px auto;
-  padding: 20px;
-}
+    .container {
+        max-width: 420px;
+        margin: 40px auto;
+        background: #1a1a1a;
+        padding: 25px;
+        border-radius: 18px;
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.18);
+        border: 1px solid #2a2a2a;
+    }
 
-.card {
-  background: #fff;
-  padding: 25px;
-  border-radius: 18px;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.08);
-  animation: fadeIn 0.35s ease;
-}
+    h2 {
+        text-align: center;
+        color: #ffd700;
+        margin-bottom: 25px;
+    }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+    .field {
+        background: #111;
+        padding: 12px 15px;
+        margin-bottom: 14px;
+        border-radius: 10px;
+        border: 1px solid #333;
+    }
 
-.title {
-  font-size: 24px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 20px;
-}
+    .label {
+        font-size: 14px;
+        color: #bbb;
+    }
 
-.row {
-  background: #f1f3f5;
-  padding: 14px;
-  margin: 10px 0;
-  border-radius: 12px;
-}
+    .value {
+        font-size: 17px;
+        font-weight: bold;
+        margin-top: 3px;
+        color: #fff;
+    }
 
-.label {
-  font-size: 13px;
-  color: #666;
-}
-
-.value {
-  font-size: 17px;
-  font-weight: 600;
-  margin-top: 3px;
-}
-
-.btn {
-  width: 100%;
-  padding: 14px;
-  border: none;
-  background: #4c6ef5;
-  color: #fff;
-  border-radius: 10px;
-  font-size: 16px;
-  margin-top: 20px;
-}
-
-.loading {
-  text-align: center;
-  padding: 25px;
-  font-size: 18px;
-}
+    #loading {
+        text-align: center;
+        padding: 15px;
+        color: #ffd700;
+        display: none;
+    }
 </style>
 </head>
 
 <body>
+
 <div class="container">
-  <div class="card">
-    <div id="loading" class="loading">Loading your profile…</div>
+    <h2>Your Account</h2>
 
-    <div id="profileBox" style="display:none;">
-      <div class="title">Your Account</div>
+    <div id="loading">Loading your profile...</div>
 
-      <div class="row">
-        <div class="label">Name</div>
-        <div class="value" id="name"></div>
-      </div>
+    <div id="profileData" style="display:none;">
 
-      <div class="row">
-        <div class="label">Surname</div>
-        <div class="value" id="surname"></div>
-      </div>
+        <div class="field">
+            <div class="label">First Name</div>
+            <div class="value" id="name"></div>
+        </div>
 
-      <div class="row">
-        <div class="label">Mobile</div>
-        <div class="value" id="mobile"></div>
-      </div>
+        <div class="field">
+            <div class="label">Surname</div>
+            <div class="value" id="surname"></div>
+        </div>
 
-      <div class="row">
-        <div class="label">Email</div>
-        <div class="value" id="email"></div>
-      </div>
+        <div class="field">
+            <div class="label">Mobile Number</div>
+            <div class="value" id="mobile"></div>
+        </div>
 
-      <div class="row">
-        <div class="label">Created At</div>
-        <div class="value" id="created"></div>
-      </div>
+        <div class="field">
+            <div class="label">Email Address</div>
+            <div class="value" id="email"></div>
+        </div>
 
-      <button class="btn" id="logoutBtn">Logout</button>
     </div>
-  </div>
 </div>
 
+
+
 <script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const supabase = createClient(
-  "https://bhmycvrbucmbbrpzeane.supabase.co",
-  "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv"
-);
+    // 🔥 YOUR SUPABASE DETAILS
+    const supabaseUrl = "https://bhmycvrbucmbbrpzeane.supabase.co";
+    const supabaseKey = "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv";
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function loadProfile() {
-  // 🔹 Step 1: Check logged-in user
-  const { data: { user } } = await supabase.auth.getUser();
+    const loading = document.getElementById("loading");
+    const profileDiv = document.getElementById("profileData");
 
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
+    loading.style.display = "block";
 
-  // 🔹 Step 2: Fetch from your USERS table
-  const { data, error } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+    async function loadUserProfile() {
+        // 1️⃣ Get logged-in user
+        const { data: { user } } = await supabase.auth.getUser();
 
-  if (error) {
-    alert("Error loading profile");
-    return;
-  }
+        if (!user) {
+            loading.innerText = "Please login first...";
+            return;
+        }
 
-  document.getElementById("loading").style.display = "none";
-  document.getElementById("profileBox").style.display = "block";
+        // 2️⃣ Fetch user's data from Supabase table
+        const { data, error } = await supabase
+            .from("users")
+            .select("*")
+            .eq("id", user.id)
+            .single();
 
-  // 🔹 Step 3: Fill values
-  document.getElementById("name").textContent = data.name || "—";
-  document.getElementById("surname").textContent = data.surname || "—";
-  document.getElementById("mobile").textContent = data.mobile || "—";
-  document.getElementById("email").textContent = data.email || "—";
-  document.getElementById("created").textContent = data.created_at || "—";
-}
+        if (error) {
+            loading.innerText = "Error loading profile!";
+            console.log(error);
+            return;
+        }
 
-// 🔹 Logout
-document.getElementById("logoutBtn").onclick = async () => {
-  await supabase.auth.signOut();
-  window.location.href = "login.html";
-};
+        // 3️⃣ Put data into UI
+        document.getElementById("name").innerText = data.name ?? "-";
+        document.getElementById("surname").innerText = data.surname ?? "-";
+        document.getElementById("mobile").innerText = data.mobile ?? "-";
+        document.getElementById("email").innerText = data.email ?? "-";
 
-loadProfile();
+        loading.style.display = "none";
+        profileDiv.style.display = "block";
+    }
+
+    loadUserProfile();
 </script>
 
 </body>
