@@ -1,111 +1,149 @@
 <!DOCTYPE html>
-<html lang="gu">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GETplus - પ્રોફાઇલ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Profile</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 25px;
+      width: 92%;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00000015;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 7px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      background: #007bff;
+      border: none;
+      color: white;
+      font-size: 17px;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    #logoutBtn {
+      background: red;
+      margin-top: 10px;
+    }
+  </style>
 </head>
+
 <body>
-<section id="userProfile" class="min-h-screen bg-gray-50 dark:bg-gray-900 py-6 px-4">
-    <div class="container mx-auto max-w-lg">
-        <header class="mb-6">
-            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white border-b-4 border-indigo-500 pb-2">મારી પ્રોફાઇલ</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-1 text-sm">તમારી અંગત માહિતીનું સંચાલન કરો.</p>
-        </header>
 
-        <div class="space-y-6">
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-lg">
-                <h2 class="text-xl font-bold mb-4 text-indigo-600 dark:text-indigo-400 border-b pb-2">એકાઉન્ટ વિગતો</h2>
-                
-                <form id="profileUpdateForm" class="space-y-4">
-                    <div class="relative">
-                        <label for="profileName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">નામ</label>
-                        <input type="text" id="profileName" name="name" value="રોહિત પટેલ"
-                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-gray-700 dark:text-white" required>
-                    </div>
-                    <div class="relative">
-                        <label for="profileMobile" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">મોબાઈલ નંબર</label>
-                        <input type="tel" id="profileMobile" name="mobileNumber" value="9876543210"
-                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400 cursor-not-allowed" readonly disabled>
-                    </div>
-                    <div class="relative">
-                        <label for="profileAddress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">સરનામું</label>
-                        <textarea id="profileAddress" name="address" rows="3" placeholder="તમારું સરનામું"
-                            class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 dark:bg-gray-700 dark:text-white">અમદાવાદ, ગુજરાત</textarea>
-                    </div>
+  <div class="container">
+      <h2>User Profile</h2>
 
-                    <button type="submit" id="updateProfileBtn" 
-                        class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300">
-                        વિગતો અપડેટ કરો
-                    </button>
-                </form>
-                
-                <hr class="my-6 border-gray-200 dark:border-gray-700">
+      <label>Email (Read Only)</label>
+      <input type="email" id="email" disabled />
 
-                <div class="flex flex-col space-y-3">
-                    <button id="changePasswordBtn" class="w-full bg-purple-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-purple-700 transition duration-300">
-                        પાસવર્ડ બદલો
-                    </button>
-                    <button id="logoutButton" class="w-full bg-red-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-red-600 transition duration-300">
-                        લોગઆઉટ
-                    </button>
-                </div>
-            </div>
+      <label>First Name</label>
+      <input type="text" id="firstname" placeholder="Enter first name" />
 
-            <div class="space-y-4">
-                <a href="/progress-board" class="flex items-center justify-between bg-white dark:bg-gray-800 p-5 rounded-xl shadow-lg border-l-4 border-yellow-500 transition duration-300 hover:shadow-xl">
-                    <div class="flex items-center space-x-3">
-                        <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                        <span class="text-base font-semibold text-gray-900 dark:text-white">ક્વિઝ પ્રગતિ બોર્ડ</span>
-                    </div>
-                    <span class="text-indigo-600 dark:text-indigo-400 font-bold text-lg">→</span>
-                </a>
-                <a href="/my-test-results" class="flex items-center justify-between bg-white dark:bg-gray-800 p-5 rounded-xl shadow-lg border-l-4 border-green-500 transition duration-300 hover:shadow-xl">
-                    <div class="flex items-center space-x-3">
-                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <span class="text-base font-semibold text-gray-900 dark:text-white">મારા મોક ટેસ્ટ પરિણામો</span>
-                    </div>
-                    <span class="text-indigo-600 dark:text-indigo-400 font-bold text-lg">→</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
+      <label>Last Name</label>
+      <input type="text" id="lastname" placeholder="Enter last name" />
 
-<script>
-    // 1. પ્રોફાઇલ અપડેટ ફોર્મ સબમિશન
-    document.getElementById('profileUpdateForm').addEventListener('submit', function(event) {
-        event.preventDefault(); 
-        
-        const name = document.getElementById('profileName').value;
-        const address = document.getElementById('profileAddress').value;
-        
-        // **Dummy Logic:** Replace this with actual API call to save data to Supabase/Server
-        
-        alert(`પ્રોફાઇલ અપડેટ થઈ ગઈ છે!\nનામ: ${name}\nસરનામું: ${address}\n\nનોંધ: આ ડમી અપડેટ છે, વાસ્તવિક કોડ અહીં ઉમેરો.`);
-        
-        // UI Feedback
-        document.getElementById('updateProfileBtn').innerText = '✅ અપડેટ થયું!';
-        setTimeout(() => {
-            document.getElementById('updateProfileBtn').innerText = 'વિગતો અપડેટ કરો';
-        }, 3000);
+      <label>Mobile Number</label>
+      <input type="text" id="mobile" placeholder="Enter 10-digit mobile" />
+
+      <button onclick="updateProfile()">Update Profile</button>
+      <button id="logoutBtn" onclick="logoutUser()">Logout</button>
+  </div>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://bhmycvrbucmbbrpzeane.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Load user data when opening page
+    document.addEventListener("DOMContentLoaded", async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      document.getElementById("email").value = user.email;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (profile) {
+        document.getElementById("firstname").value = profile.firstname || "";
+        document.getElementById("lastname").value = profile.lastname || "";
+        document.getElementById("mobile").value = profile.mobile || "";
+      }
     });
 
-    // 2. પાસવર્ડ બદલો બટન
-    document.getElementById('changePasswordBtn').addEventListener('click', function() {
-        // **Dummy Logic:** In a real app, this would open a modal/new page
-        alert('પાસવર્ડ બદલવાની વિન્ડો ખોલો.\n\nનોંધ: આ ડમી એક્શન છે.');
-    });
+    // Update profile
+    async function updateProfile() {
+      const firstname = document.getElementById("firstname").value.trim();
+      const lastname = document.getElementById("lastname").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
 
-    // 3. લોગઆઉટ બટન
-    document.getElementById('logoutButton').addEventListener('click', function() {
-        if (confirm('શું તમે ખરેખર લોગઆઉટ કરવા માંગો છો?')) {
-            // **Dummy Logic:** Clear local session storage and redirect to login
-            alert('લોગઆઉટ સફળ. લૉગિન પેજ પર રીડાયરેક્ટ કરી રહ્યાં છીએ.');
-            // window.location.href = 'login.html'; // જો લૉગિન પેજ હોય તો
-        }
-    });
-</script>
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { error } = await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          firstname,
+          lastname,
+          mobile
+        });
+
+      if (error) alert(error.message);
+      else alert("Profile updated successfully!");
+    }
+
+    // Logout
+    async function logoutUser() {
+      await supabase.auth.signOut();
+      window.location.href = "login.html";
+    }
+  </script>
+
 </body>
 </html>
