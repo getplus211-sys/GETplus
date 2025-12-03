@@ -1,165 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Account - User Profile</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <style>
-        /* CSS for Premium Look */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #333;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        .profile-container {
-            background-color: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            padding: 40px;
-            max-width: 450px;
-            width: 90%;
-            transition: transform 0.3s ease-in-out;
-        }
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #0f0f0f;
+        font-family: Arial, sans-serif;
+        color: #fff;
+    }
 
-        .profile-container:hover {
-            transform: translateY(-5px);
-        }
+    .container {
+        max-width: 450px;
+        background: #1a1a1a;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 0 12px rgba(255,255,255,0.08);
+    }
 
-        h1 {
-            color: #007bff; /* Primary blue color */
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
+    h2 {
+        text-align: center;
+        color: #ffd369;
+        margin-bottom: 20px;
+    }
 
-        .profile-detail {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
+    .info-box {
+        background: #222;
+        padding: 18px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
 
-        .profile-detail:last-child {
-            border-bottom: none;
-        }
+    .info-box p {
+        margin: 6px 0;
+        font-size: 15px;
+    }
 
-        .label {
-            font-weight: 500;
-            color: #555;
-            flex-basis: 35%;
-        }
+    button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+    }
 
-        .value {
-            font-weight: 600;
-            color: #333;
-            text-align: right;
-            flex-basis: 60%;
-            word-wrap: break-word; 
-        }
-        
-        .loading-message {
-            text-align: center;
-            color: #007bff;
-            font-style: italic;
-        }
+    .edit-btn {
+        background: #ffcc00;
+        color: #000;
+    }
+    .logout-btn {
+        background: #ff4444;
+        color: #fff;
+    }
+    .delete-btn {
+        background: #b30000;
+        color: #fff;
+    }
 
-        .error-message {
-            text-align: center;
-            color: #dc3545; /* Red for errors */
-            font-weight: 600;
-        }
-    </style>
+    /* Popup modal */
+    .modal {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .modal-content {
+        background: #1a1a1a;
+        padding: 20px;
+        border-radius: 14px;
+        width: 100%;
+        max-width: 400px;
+    }
+    .modal-content h3 {
+        text-align: center;
+        color: #ffd369;
+    }
+    label {
+        font-size: 14px;
+        margin-top: 10px;
+        display: block;
+    }
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        border-radius: 8px;
+        border: none;
+        background: #2a2a2a;
+        color: #fff;
+        font-size: 15px;
+    }
+    .save-btn {
+        background: #00e676;
+        color: #000;
+    }
+    .close-btn {
+        background: #555;
+        color: #fff;
+        margin-top: 8px;
+    }
+</style>
 </head>
+
 <body>
 
-    <div class="profile-container">
-        <h1>🔑 Your Account</h1>
-        
-        <div id="profile-data">
-            <p class="loading-message">Loading user data...</p>
-        </div>
+<div class="container">
+    <h2>My Account</h2>
+
+    <div class="info-box">
+        <p><b>Name:</b> <span id="name"></span></p>
+        <p><b>Surname:</b> <span id="surname"></span></p>
+        <p><b>Mobile:</b> <span id="mobile"></span></p>
+        <p><b>Email:</b> <span id="email"></span></p>
     </div>
 
-    <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv'; // This is your provided API key
-        
-        // Supabase Client Initialization
-        const { createClient } = supabase;
-        // WARNING: Ensure you have "const supabase = createClient(..." or similar for the library to work.
-        // We are using "supabaseClient" variable to avoid confusion.
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // Table Name
-        const TABLE_NAME = 'users';
+    <button class="edit-btn" onclick="openEdit()">Edit Profile</button>
+    <button class="logout-btn" onclick="logoutUser()">Logout</button>
+    <button class="delete-btn" onclick="deleteUser()">Delete Account</button>
+</div>
 
-        // Element to display the data
-        const profileDataElement = document.getElementById('profile-data');
+<!-- EDIT POPUP -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <h3>Edit Profile</h3>
 
-        async function fetchUserProfile() {
-            try {
-                // Fetch the first record from the 'users' table
-                // NOTE: We removed .single() to avoid the "Cannot coerce" error.
-                // We use .limit(1) and expect an array with one object.
-                const { data, error } = await supabaseClient
-                    .from(TABLE_NAME)
-                    .select('name, surname, mobile, email')
-                    .limit(1); 
-                
-                // Clear the loading message
-                profileDataElement.innerHTML = '';
+        <label>Name</label>
+        <input type="text" id="edit_name">
 
-                if (error) {
-                    console.error('Supabase Error:', error);
-                    profileDataElement.innerHTML = `<p class="error-message">Error fetching data: ${error.message}</p>`;
-                    return;
-                }
+        <label>Surname</label>
+        <input type="text" id="edit_surname">
 
-                // Check if data is an array and if it contains at least one record
-                if (data && data.length > 0) {
-                    const user = data[0]; // Get the first user object from the array
-                    
-                    // Render the data on the page with English labels
-                    profileDataElement.innerHTML = `
-                        <div class="profile-detail">
-                            <span class="label">First Name:</span>
-                            <span class="value">${user.name || 'N/A'}</span>
-                        </div>
-                        <div class="profile-detail">
-                            <span class="label">Last Name:</span>
-                            <span class="value">${user.surname || 'N/A'}</span>
-                        </div>
-                        <div class="profile-detail">
-                            <span class="label">Mobile:</span>
-                            <span class="value">${user.mobile || 'N/A'}</span>
-                        </div>
-                        <div class="profile-detail">
-                            <span class="label">Email:</span>
-                            <span class="value">${user.email || 'N/A'}</span>
-                        </div>
-                    `;
-                } else {
-                     profileDataElement.innerHTML = '<p class="loading-message">No user data found.</p>';
-                }
+        <label>Mobile</label>
+        <input type="text" id="edit_mobile">
 
-            } catch (error) {
-                console.error('General Error:', error);
-                profileDataElement.innerHTML = `<p class="error-message">An unexpected error occurred.</p>`;
-            }
-        }
+        <label>Email (Not Editable)</label>
+        <input type="text" id="edit_email" disabled>
 
-        // Call the function to fetch data when the page loads
-        fetchUserProfile();
-    </script>
+        <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+        <button class="close-btn" onclick="closeEdit()">Close</button>
+    </div>
+</div>
+
+<script>
+const supabase = supabasejs.createClient(
+    "https://bhmycvrbucmbbrpzeane.supabase.co",
+    "sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv"
+);
+
+// Load user profile
+async function loadProfile() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    const { data } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", user.email)
+        .single();
+
+    document.getElementById("name").textContent = data.name;
+    document.getElementById("surname").textContent = data.surname;
+    document.getElementById("mobile").textContent = data.mobile;
+    document.getElementById("email").textContent = data.email;
+}
+
+loadProfile();
+
+// Open Edit Popup
+function openEdit() {
+    document.getElementById("editModal").style.display = "flex";
+
+    document.getElementById("edit_name").value =
+        document.getElementById("name").textContent;
+
+    document.getElementById("edit_surname").value =
+        document.getElementById("surname").textContent;
+
+    document.getElementById("edit_mobile").value =
+        document.getElementById("mobile").textContent;
+
+    document.getElementById("edit_email").value =
+        document.getElementById("email").textContent;
+}
+
+// Close Popup
+function closeEdit() {
+    document.getElementById("editModal").style.display = "none";
+}
+
+// Save Changes
+async function saveProfile() {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    await supabase
+        .from("users")
+        .update({
+            name: document.getElementById("edit_name").value,
+            surname: document.getElementById("edit_surname").value,
+            mobile: document.getElementById("edit_mobile").value
+        })
+        .eq("email", user.email);
+
+    closeEdit();
+    loadProfile();
+}
+
+// Logout
+async function logoutUser() {
+    await supabase.auth.signOut();
+    window.location.href = "login.html";
+}
+
+// Delete Account
+async function deleteUser() {
+    if (!confirm("Are you sure you want to delete your account permanently?"))
+        return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Delete from table
+    await supabase.from("users").delete().eq("email", user.email);
+
+    // Delete authentication account
+    await supabase.auth.admin.deleteUser(user.id);
+
+    alert("Account deleted");
+    window.location.href = "register.html";
+}
+</script>
+
 </body>
 </html>
