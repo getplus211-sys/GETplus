@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GETplus - મોક ટેસ્ટ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for question navigation status */
+        .q-answered { background-color: #10B981 !important; } /* Green */
+        .q-marked { background-color: #FBBF24 !important; } /* Yellow */
+        .q-unanswered { background-color: #EF4444 !important; } /* Red */
+        .q-unvisited { background-color: #D1D5DB !important; color: #4B5563 !important; } /* Gray */
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+<section id="testContainer" class="min-h-screen flex flex-col">
+    
+    <header class="bg-indigo-600 text-white p-4 shadow-xl sticky top-0 z-10">
+        <div class="flex justify-between items-center">
+            <h1 id="testTitle" class="text-lg font-bold truncate">GPSC મોક ટેસ્ટ - 1</h1>
+            <div id="testTimer" class="bg-white text-indigo-700 font-extrabold py-1 px-3 rounded-full shadow-lg">
+                <span class="text-sm">સમય બાકી:</span> <span id="timerDisplay">02:59:59</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-grow p-4 space-y-4">
+
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg border-b-2 border-indigo-400">
+            <details open>
+                <summary class="font-semibold text-gray-800 dark:text-gray-200 cursor-pointer">
+                    પ્રશ્ન નેવિગેશન (<span id="currentQNumDisplay">1</span> / <span id="totalQNumDisplay">10</span>)
+                </summary>
+                <div id="questionNavigation" class="grid grid-cols-6 gap-2 pt-3 border-t mt-3 border-gray-200 dark:border-gray-700">
+                    </div>
+            </details>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-2xl">
+            <h2 class="text-base font-semibold text-indigo-700 dark:text-indigo-400 mb-3 border-b pb-2">પ્રશ્ન નંબર: <span id="qNumber">1</span></h2>
+            
+            <p id="questionText" class="text-lg text-gray-900 dark:text-white mb-4">
+                "ખેડા સત્યાગ્રહ" ની મુખ્ય માંગણી શું હતી?
+            </p>
+
+            <form id="optionsForm" class="space-y-4">
+                </form>
+        </div>
+
+    </div>
+    
+    <footer class="bg-white dark:bg-gray-800 p-3 shadow-2xl sticky bottom-0 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex justify-between space-x-2">
+            
+            <button id="markAndNextBtn" class="flex-1 bg-yellow-500 text-white py-3 rounded-lg text-sm font-semibold shadow-md hover:bg-yellow-600">
+                માર્ક & નેક્સ્ટ
+            </button>
+            
+            <button id="saveAndNextBtn" class="flex-1 bg-green-600 text-white py-3 rounded-lg text-sm font-semibold shadow-md hover:bg-green-700">
+                સેવ & નેક્સ્ટ
+            </button>
+            
+            <button id="submitTestBtn" class="flex-1 bg-red-600 text-white py-3 rounded-lg text-sm font-semibold shadow-md hover:bg-red-700">
+                ટેસ્ટ પૂરો કરો
+            </button>
+        </div>
+    </footer>
+</section>
+
+<script>
+    let currentQuestionIndex = 0; // Starts at Question 1
+    const totalQuestions = 10; // Dummy total
+    let timeLeft = 180 * 60; // 3 hours in seconds for Mock Test
+    let timerInterval;
+
+    // Dummy Question Data (In a real app, this comes from an API/Database)
+    const questions = [
+        { id: 1, text: '"ખેડા સત્યાગ્રહ" ની મુખ્ય માંગણી શું હતી?', options: ['જમીન મહેસૂલ માફ કરવું', 'વેઠ પ્રથાનો અંત લાવવો', 'આંતરરાષ્ટ્રીય વ્યાપાર પર પ્રતિબંધ', 'મીઠા પરનો કર દૂર કરવો'], status: 'unvisited', selectedAnswer: null },
+        { id: 2, text: 'ભારતમાં રાષ્ટ્રીય વિજ્ઞાન દિવસ ક્યારે ઉજવવામાં આવે છે?', options: ['જાન્યુઆરી 12', 'ફેબ્રુઆરી 28', 'માર્ચ 15', 'એપ્રિલ 22'], status: 'unvisited', selectedAnswer: null },
+        { id: 3, text: 'સૂર્યમંડળનો સૌથી ગરમ ગ્રહ કયો છે?', options: ['બુધ', 'શુક્ર', 'મંગળ', 'ગુરુ'], status: 'unvisited', selectedAnswer: null },
+        { id: 4, text: 'ગુજરાતનો સૌથી ઊંચો પર્વત કયો છે?', options: ['સાતપુડા', 'આરાવલ્લી', 'ગીરનાર', 'ચોટીલા'], status: 'unvisited', selectedAnswer: null },
+        { id: 5, text: 'કયા વર્ષે ભારતનું બંધારણ અપનાવવામાં આવ્યું?', options: ['1947', '1950', '1949', '1952'], status: 'unvisited', selectedAnswer: null },
+        // ... more dummy questions
+    ];
+    questions.length = totalQuestions; // Ensure array size matches totalQuestions
+
+    // --- Helper Functions ---
+
+    function formatTime(seconds) {
+        const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+        const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        return `${h}:${m}:${s}`;
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                document.getElementById('timerDisplay').innerText = formatTime(timeLeft);
+            } else {
+                clearInterval(timerInterval);
+                alert("સમય સમાપ્ત! ટેસ્ટ આપોઆપ સબમિટ થઈ ગયો છે.");
+                submitTest();
+            }
+        }, 1000);
+    }
+
+    function renderQuestion(qIndex) {
+        const q = questions[qIndex];
+        if (!q) return;
+
+        // Update main content
+        document.getElementById('qNumber').innerText = q.id;
+        document.getElementById('currentQNumDisplay').innerText = q.id;
+        document.getElementById('questionText').innerText = q.text;
+        
+        const optionsForm = document.getElementById('optionsForm');
+        optionsForm.innerHTML = ''; // Clear previous options
+
+        // Render options
+        q.options.forEach((optionText, index) => {
+            const optionValue = `option_${index}`;
+            const isChecked = q.selectedAnswer === optionValue;
+            
+            const label = document.createElement('label');
+            label.className = 'block bg-gray-50 dark:bg-gray-700 p-4 rounded-lg shadow-sm hover:shadow-md transition duration-150 cursor-pointer';
+            
+            label.innerHTML = `
+                <input type="radio" name="answer" value="${optionValue}" class="mr-3 text-indigo-600 focus:ring-indigo-500" ${isChecked ? 'checked' : ''}>
+                <span class="text-gray-800 dark:text-gray-200">${String.fromCharCode(65 + index)}) ${optionText}</span>
+            `;
+            optionsForm.appendChild(label);
+
+            // Listen for change to update selectedAnswer immediately
+            label.querySelector('input').addEventListener('change', (e) => {
+                q.selectedAnswer = e.target.value;
+                if (q.status === 'unvisited') {
+                    q.status = 'unanswered'; // Mark as touched/unanswered if selecting an option
+                }
+            });
+        });
+
+        // Update status for the current question to 'unanswered' if it was 'unvisited'
+        if (q.status === 'unvisited') {
+            q.status = 'unanswered';
+        }
+
+        renderNavigation(); // Update navigation panel status
+    }
+
+    function renderNavigation() {
+        const navContainer = document.getElementById('questionNavigation');
+        navContainer.innerHTML = '';
+
+        for (let i = 0; i < totalQuestions; i++) {
+            const q = questions[i] || { id: i + 1, status: 'unvisited' };
+            const statusClass = `q-${q.status}`;
+            const button = document.createElement('button');
+            
+            button.className = `w-full aspect-square text-sm font-bold rounded-lg text-white shadow-md transition duration-150 ${statusClass} ${i === currentQuestionIndex ? 'ring-4 ring-indigo-500 ring-offset-2' : ''}`;
+            button.innerText = q.id;
+            button.setAttribute('data-q-id', q.id);
+            button.addEventListener('click', () => {
+                currentQuestionIndex = i;
+                renderQuestion(currentQuestionIndex);
+            });
+            navContainer.appendChild(button);
+        }
+    }
+
+    // --- Button Actions ---
+    
+    function updateQuestionStatus(newStatus) {
+        const q = questions[currentQuestionIndex];
+        if (!q) return;
+
+        const selectedOption = document.querySelector('#optionsForm input[name="answer"]:checked');
+        
+        if (selectedOption) {
+            // Save selection and update status to 'answered' or 'marked'
+            q.selectedAnswer = selectedOption.value;
+            q.status = (newStatus === 'marked') ? 'marked' : 'answered';
+        } else {
+             // If no answer selected, mark as 'unanswered' or 'marked'
+             q.status = (newStatus === 'marked') ? 'marked' : 'unanswered';
+        }
+
+        // Move to the next question
+        currentQuestionIndex = (currentQuestionIndex + 1) % totalQuestions;
+        renderQuestion(currentQuestionIndex);
+    }
+    
+    function submitTest() {
+        clearInterval(timerInterval);
+        
+        let answeredCount = questions.filter(q => q.status === 'answered').length;
+        let unansweredCount = questions.filter(q => q.status === 'unanswered').length;
+        
+        if (!confirm(`ટેસ્ટ સબમિટ કરી રહ્યા છીએ:\n\nજવાબ આપ્યા: ${answeredCount}\nજવાબ નથી આપ્યા/છોડી દીધા: ${unansweredCount}\n\nશું તમે ચાલુ રાખવા માંગો છો?`)) {
+            startTimer(); // Resume if user cancels
+            return;
+        }
+
+        // **Dummy Logic:** Send results to server/database
+        alert(`ટેસ્ટ સફળતાપૂર્વક સબમિટ થયો છે. ${answeredCount} પ્રશ્નોનો જવાબ આપવામાં આવ્યો છે.\n\nતમારા પરિણામો ટૂંક સમયમાં બતાવવામાં આવશે.`);
+        // window.location.href = 'results.html'; // Redirect to results page
+    }
+
+    // --- Initialization ---
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set total number of questions in display
+        document.getElementById('totalQNumDisplay').innerText = totalQuestions;
+        
+        // Start the timer
+        startTimer();
+
+        // Render the first question and navigation
+        renderQuestion(currentQuestionIndex);
+        
+        // Setup button event listeners
+        document.getElementById('saveAndNextBtn').addEventListener('click', () => updateQuestionStatus('answered'));
+        document.getElementById('markAndNextBtn').addEventListener('click', () => updateQuestionStatus('marked'));
+        document.getElementById('submitTestBtn').addEventListener('click', submitTest);
+    });
+</script>
+</body>
+</html>
