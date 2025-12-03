@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Account - Premium Look</title>
+    <title>Your Account - User Profile</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -55,7 +55,7 @@
         .label {
             font-weight: 500;
             color: #555;
-            flex-basis: 35%; /* Adjusted for English labels */
+            flex-basis: 35%;
         }
 
         .value {
@@ -92,10 +92,12 @@
     <script>
         // Supabase Configuration
         const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv'; // Your API key
+        const SUPABASE_ANON_KEY = 'sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv'; // This is your provided API key
         
         // Supabase Client Initialization
         const { createClient } = supabase;
+        // WARNING: Ensure you have "const supabase = createClient(..." or similar for the library to work.
+        // We are using "supabaseClient" variable to avoid confusion.
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Table Name
@@ -107,11 +109,12 @@
         async function fetchUserProfile() {
             try {
                 // Fetch the first record from the 'users' table
+                // NOTE: We removed .single() to avoid the "Cannot coerce" error.
+                // We use .limit(1) and expect an array with one object.
                 const { data, error } = await supabaseClient
                     .from(TABLE_NAME)
                     .select('name, surname, mobile, email')
-                    .limit(1) // Get only the first record
-                    .single(); // Expect a single object
+                    .limit(1); 
                 
                 // Clear the loading message
                 profileDataElement.innerHTML = '';
@@ -122,24 +125,27 @@
                     return;
                 }
 
-                if (data) {
+                // Check if data is an array and if it contains at least one record
+                if (data && data.length > 0) {
+                    const user = data[0]; // Get the first user object from the array
+                    
                     // Render the data on the page with English labels
                     profileDataElement.innerHTML = `
                         <div class="profile-detail">
                             <span class="label">First Name:</span>
-                            <span class="value">${data.name || 'N/A'}</span>
+                            <span class="value">${user.name || 'N/A'}</span>
                         </div>
                         <div class="profile-detail">
                             <span class="label">Last Name:</span>
-                            <span class="value">${data.surname || 'N/A'}</span>
+                            <span class="value">${user.surname || 'N/A'}</span>
                         </div>
                         <div class="profile-detail">
                             <span class="label">Mobile:</span>
-                            <span class="value">${data.mobile || 'N/A'}</span>
+                            <span class="value">${user.mobile || 'N/A'}</span>
                         </div>
                         <div class="profile-detail">
                             <span class="label">Email:</span>
-                            <span class="value">${data.email || 'N/A'}</span>
+                            <span class="value">${user.email || 'N/A'}</span>
                         </div>
                     `;
                 } else {
