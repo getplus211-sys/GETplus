@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GETplus - સફળતાનું કેન્દ્ર</title>
+    <title>Kapila Online - Premium Learning Platform</title>
     <style>
-        /* ==================== સામાન્ય સ્ટાઇલ ==================== */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -13,245 +14,583 @@
         }
 
         body {
-            /* બેકગ્રાઉન્ડ ગ્રેડિયન્ટ જાળવી રાખ્યો */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
             min-height: 100vh;
-            padding-bottom: 80px;
+            padding-top: 80px;
+            padding-bottom: 90px;
+            overflow-x: hidden;
         }
 
-        /* ==================== હેડર (બ્રાન્ડિંગ) ==================== */
-        .header {
-            background: white;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
+        /* Background Gradient */
+        .background-gradient {
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.15), transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15), transparent 50%),
+                        radial-gradient(circle at 40% 90%, rgba(59, 130, 246, 0.15), transparent 50%);
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .header h1 {
-            /* બ્રાન્ડ કલર */
-            color: #764ba2; 
+        /* Header Styles */
+        .header {
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 15px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 22px;
-            text-align: center;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .brand-info h1 {
+            background: linear-gradient(135deg, #fff 0%, #a8b3ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 18px;
             font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
-        .header p {
-            text-align: center;
-            color: #666;
-            font-size: 13px;
-            margin-top: 5px;
+        .brand-info p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 11px;
+            font-weight: 400;
+            margin-top: 2px;
         }
 
+        .menu-dropdown {
+            position: relative;
+        }
+
+        .menu-toggle {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 20px;
+        }
+
+        .menu-toggle:active {
+            transform: scale(0.92);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: rgba(20, 20, 20, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 14px 18px;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .dropdown-item:active {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .dropdown-item .item-icon {
+            font-size: 18px;
+        }
+
+        /* Container */
         .container {
             max-width: 500px;
             margin: 0 auto;
-            padding: 15px;
-        }
-
-        /* ==================== સર્ચ બોક્સ ==================== */
-        .search-box {
-            margin: 20px 0;
+            padding: 20px;
             position: relative;
+            z-index: 1;
         }
 
-        .search-box input {
-            width: 100%;
-            padding: 15px 45px 15px 20px;
-            border: none;
-            border-radius: 25px;
-            font-size: 15px;
-            background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        /* Section Styles */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 25px 0 20px 0;
         }
 
-        .search-box::after {
-            content: "🔍";
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 18px;
-        }
-
-        /* ==================== સેક્શન ટાઇટલ ==================== */
         .section-title {
             color: white;
-            font-size: 18px;
-            font-weight: 600;
-            margin: 25px 0 15px 5px;
+            font-size: 20px;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            letter-spacing: -0.5px;
         }
 
-        /* ==================== પરીક્ષા કાર્ડ્સ ==================== */
-        .exam-grid {
+        /* Daily Learning - Single Row */
+        .daily-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
-        .exam-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px 15px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+        .daily-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 22px 18px;
             cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            text-decoration: none;
+            display: block;
         }
 
-        .exam-card::before {
-            /* ગ્રેડિયન્ટ લાઇન જાળવી રાખી */
+        .daily-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        .daily-card:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .daily-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(52, 211, 153, 0.2) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .daily-card h3 {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .daily-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .update-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        /* Exam Cards */
+        .exam-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .exam-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 22px 18px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: block;
+        }
+
+        .exam-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
             height: 3px;
             background: linear-gradient(90deg, #667eea, #764ba2);
         }
 
         .exam-card:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .exam-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .exam-card h3 {
-            color: #333;
+            color: white;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 8px;
+            letter-spacing: -0.3px;
         }
 
-        .exam-card .subjects {
+        .exam-subjects {
+            color: rgba(255, 255, 255, 0.5);
             font-size: 11px;
-            color: #666;
             line-height: 1.5;
-        }
-
-        .exam-card .badge {
-            display: inline-block;
-            background: #e8f0fe;
-            color: #1967d2;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            margin-top: 8px;
-            font-weight: 600;
-        }
-
-        /* ==================== ફીચર કાર્ડ્સ ==================== */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .feature-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:active {
-            transform: scale(0.95);
-        }
-
-        .feature-icon {
-            font-size: 32px;
             margin-bottom: 10px;
         }
 
-        .feature-card h4 {
-            color: #333;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .feature-card p {
-            color: #666;
+        .exam-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(102, 126, 234, 0.15);
+            color: #a8b3ff;
+            padding: 5px 10px;
+            border-radius: 8px;
             font-size: 11px;
+            font-weight: 600;
+            border: 1px solid rgba(102, 126, 234, 0.2);
         }
 
-        /* ==================== બોટમ નેવિગેશન ==================== */
-        .bottom-nav {
+        /* Study Tools - 2 Columns */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tool-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .tool-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.3));
+        }
+
+        .tool-card h4 {
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .tool-card p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .coming-soon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(234, 179, 8, 0.2);
+            color: #fcd34d;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 700;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        /* Footer Navigation */
+        .footer-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             justify-content: space-around;
-            padding: 12px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 100;
+            padding: 16px 10px 20px 10px;
+            z-index: 1000;
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
-            padding: 5px 15px;
-            border-radius: 10px;
+            padding: 8px 15px;
+            border-radius: 14px;
+            position: relative;
+            text-decoration: none;
         }
 
         .nav-item.active {
-            background: #f0f4ff;
+            background: rgba(102, 126, 234, 0.15);
         }
 
         .nav-item .icon {
-            font-size: 22px;
+            font-size: 24px;
+            transition: all 0.3s ease;
         }
-
-        .nav-item.active .icon {
-            /* એક્ટિવ આઇકોન કલર મેચ કરવા માટે */
-            color: #667eea; 
-        }
-        .nav-item.active .icon {
-             /* filter: hue-rotate(220deg) saturate(2); આનાથી આઇકોન કલર બદલાશે નહીં, સીધો કલર આપીએ */
-            color: #667eea; 
-        }
-
 
         .nav-item span {
             font-size: 11px;
-            color: #666;
-            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .nav-item.active span {
-            color: #667eea;
-            font-weight: 600;
+            color: white;
         }
 
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #f44336;
+        /* Colorful Icons */
+        .icon-account { filter: drop-shadow(0 0 8px #667eea); }
+        .icon-progress { filter: drop-shadow(0 0 8px #10b981); }
+        .icon-contact { filter: drop-shadow(0 0 8px #f59e0b); }
+        .icon-notification { filter: drop-shadow(0 0 8px #ef4444); }
+
+        /* Modal Popup */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 20, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
             color: white;
-            border-radius: 10px;
-            padding: 2px 6px;
-            font-size: 10px;
+            font-size: 22px;
             font-weight: 700;
         }
 
-        /* ==================== મીડિયા ક્વેરીઝ ==================== */
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:active {
+            transform: scale(0.9);
+        }
+
+        .modal-body {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .contact-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .contact-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .contact-btn:active {
+            transform: scale(0.96);
+        }
+
+        .contact-btn.whatsapp {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @media (max-width: 400px) {
             .exam-grid {
                 grid-template-columns: 1fr;
@@ -260,180 +599,265 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🌟 GETplus</h1>
-        <p>તમારી સફળતા માટે સંપૂર્ણ માર્ગદર્શન</p>
-    </div>
+    <div class="background-gradient"></div>
 
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-icon">🎓</div>
+                <div class="brand-info">
+                    <h1>Kapila Online</h1>
+                    <p>Premium Learning Platform</p>
+                </div>
+            </div>
+            <div class="menu-dropdown">
+                <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <div class="dropdown-item" onclick="goHome()">
+                        <span class="item-icon">🏠</span>
+                        <span>Home</span>
+                    </div>
+                    <div class="dropdown-item" onclick="openAboutModal()">
+                        <span class="item-icon">ℹ️</span>
+                        <span>About Us</span>
+                    </div>
+                    <div class="dropdown-item" onclick="openMyselfModal()">
+                        <span class="item-icon">👤</span>
+                        <span>My Self</span>
+                    </div>
+                    <div class="dropdown-item" onclick="openContactModal()">
+                        <span class="item-icon">📞</span>
+                        <span>Contact Us</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
     <div class="container">
-        <div class="search-box">
-            <input type="text" placeholder="પરીક્ષા અથવા વિષય શોધો...">
+        <!-- Daily Learning Section -->
+        <div class="section-header">
+            <div class="section-title">📅 Daily Learning</div>
+        </div>
+        <div class="daily-grid">
+            <a href="everyday.html" class="daily-card">
+                <div class="update-badge">LIVE</div>
+                <div class="daily-icon">📝</div>
+                <h3>Everyday Quiz</h3>
+                <span class="daily-time">⏰ 8:00 PM</span>
+            </a>
+            <a href="dailycurrent.html" class="daily-card">
+                <div class="update-badge">NEW</div>
+                <div class="daily-icon">📰</div>
+                <h3>Daily Current</h3>
+                <span class="daily-time">⏰ 8:00 AM</span>
+            </a>
         </div>
 
-        <div class="section-title">🎯 મુખ્ય પરીક્ષાઓ</div>
+        <!-- Exam Corners Section -->
+        <div class="section-header">
+            <div class="section-title">🎯 Exam Corners</div>
+        </div>
         <div class="exam-grid">
-            <div class="exam-card" onclick="openExam('gpsc1-2')">
+            <a href="gpsc.html" class="exam-card">
+                <div class="exam-icon">📊</div>
                 <h3>GPSC Class 1/2</h3>
-                <div class="subjects">
-                    Gujarati • English • Maths • Reasoning • GK • Current Affairs • Science • History • Geography • Polity • Economy
-                </div>
-                <span class="badge">11 વિષયો</span>
-            </div>
-
-            <div class="exam-card" onclick="openExam('dyso')">
-                <h3>GPSC DySO</h3>
-                <div class="subjects">
-                    Gujarati • English • Maths • Reasoning • GK • Current Affairs • History • Geography • Polity • Economy
-                </div>
-                <span class="badge">10 વિષયો</span>
-            </div>
-
-            <div class="exam-card" onclick="openExam('talati')">
-                <h3>Talati</h3>
-                <div class="subjects">
-                    Gujarati • English • Maths • Reasoning • GK • Current Affairs • Computer • Science
-                </div>
-                <span class="badge">8 વિષયો</span>
-            </div>
-
-            <div class="exam-card" onclick="openExam('clerk')">
-                <h3>Junior Clerk</h3>
-                <div class="subjects">
-                    Gujarati • English • Maths • Reasoning • GK • Current Affairs • Computer
-                </div>
-                <span class="badge">7 વિષયો</span>
-            </div>
-
-            <div class="exam-card" onclick="openExam('forest')">
-                <h3>Forest Guard</h3>
-                <div class="subjects">
-                    Gujarati • English • Maths • Reasoning • GK • Science • Geography
-                </div>
-                <span class="badge">7 વિષયો</span>
-            </div>
-
-            <div class="exam-card" onclick="openExam('police')">
-                <h3>Police Constable</h3>
-                <div class="subjects">
-                    Gujarati • English • Maths • Reasoning • GK • Current Affairs
-                </div>
-                <span class="badge">6 વિષયો</span>
-            </div>
-
-            <div class="exam-card" onclick="openExam('tet1')">
-                <h3>TET-1</h3>
-                <div class="subjects">
-                    Gujarati • English • Maths • Science • Social Science • Pedagogy
-                </div>
-                <span class="badge">6 વિષયો</span>
-            </div>
-
-            <div class="exam-card" onclick="openExam('tet2')">
-                <h3>TET-2</h3>
-                <div class="subjects">
-                    Gujarati • English • Maths • EVS • Pedagogy
-                </div>
-                <span class="badge">5 વિષયો</span>
-            </div>
-
-            <div class="exam-card" onclick="openExam('htat')">
-                <h3>HTAT</h3>
-                <div class="subjects">
-                    Gujarati • English • Subject Knowledge • Pedagogy • GK
-                </div>
-                <span class="badge">5 વિષયો</span>
-            </div>
-
-            <div class="exam-card" onclick="openExam('cce')">
+                <div class="exam-subjects">Gujarati, English, Maths, Reasoning, GK, Current Affairs</div>
+                <span class="exam-badge">11 Subjects</span>
+            </a>
+            <a href="gpsc2.html" class="exam-card">
+                <div class="exam-icon">💼</div>
+                <h3>DySO / STI</h3>
+                <div class="exam-subjects">Gujarati, English, Maths, History, Geography, Polity</div>
+                <span class="exam-badge">10 Subjects</span>
+            </a>
+            <a href="lrd.html" class="exam-card">
+                <div class="exam-icon">👮</div>
+                <h3>Constable</h3>
+                <div class="exam-subjects">Gujarati, English, Maths, Reasoning, GK</div>
+                <span class="exam-badge">6 Subjects</span>
+            </a>
+            <a href="psi.html" class="exam-card">
+                <div class="exam-icon">🚔</div>
+                <h3>PSI</h3>
+                <div class="exam-subjects">Gujarati, English, Reasoning, GK, Law, Computer</div>
+                <span class="exam-badge">8 Subjects</span>
+            </a>
+            <a href="cce.html" class="exam-card">
+                <div class="exam-icon">💻</div>
                 <h3>CCE</h3>
-                <div class="subjects">
-                    Gujarati • English • Maths • Reasoning • GK • Computer
-                </div>
-                <span class="badge">6 વિષયો</span>
-            </div>
-
-            <div class="exam-card" onclick="openExam('ssc')">
-                <h3>SSC / Railway</h3>
-                <div class="subjects">
-                    English • Maths • Reasoning • GK • Current Affairs
-                </div>
-                <span class="badge">5 વિષયો</span>
-            </div>
+                <div class="exam-subjects">Gujarati, English, Maths, Reasoning, Computer</div>
+                <span class="exam-badge">6 Subjects</span>
+            </a>
+            <a href="tet1.html" class="exam-card">
+                <div class="exam-icon">👨‍🏫</div>
+                <h3>TET-1</h3>
+                <div class="exam-subjects">Gujarati, English, Maths, Science, Social Science</div>
+                <span class="exam-badge">6 Subjects</span>
+            </a>
+            <a href="tet2.html" class="exam-card">
+                <div class="exam-icon">👩‍🏫</div>
+                <h3>TET-2</h3>
+                <div class="exam-subjects">Gujarati, English, Maths, EVS, Pedagogy</div>
+                <span class="exam-badge">5 Subjects</span>
+            </a>
+            <a href="forest.html" class="exam-card">
+                <div class="exam-icon">🌲</div>
+                <h3>Forest Guard</h3>
+                <div class="exam-subjects">Gujarati, English, Maths, Science, Geography</div>
+                <span class="exam-badge">7 Subjects</span>
+            </a>
         </div>
 
-        <div class="section-title">✨ અભ્યાસ સાધનો</div>
-        <div class="features-grid">
-            <div class="feature-card" onclick="openFeature('videos')">
-                <div class="feature-icon">🎥</div>
+        <!-- Study Tools Section -->
+        <div class="section-header">
+            <div class="section-title">✨ Study Tools</div>
+        </div>
+        <div class="tools-grid">
+            <div class="tool-card" onclick="showComingSoon()">
+                <div class="coming-soon">Soon</div>
+                <div class="tool-icon">🎥</div>
                 <h4>Video Lectures</h4>
-                <p>વિષય પ્રમાણે વિડિયો</p>
+                <p>HD Video Classes</p>
             </div>
-
-            <div class="feature-card" onclick="openFeature('pdf')">
-                <div class="feature-icon">📄</div>
+            <div class="tool-card" onclick="showComingSoon()">
+                <div class="coming-soon">Soon</div>
+                <div class="tool-icon">📄</div>
                 <h4>PDF Materials</h4>
-                <p>ડાઉનલોડ નોટ્સ</p>
+                <p>Download Notes</p>
             </div>
-
-            <div class="feature-card" onclick="openFeature('tests')">
-                <div class="feature-icon">📝</div>
+            <div class="tool-card" onclick="showComingSoon()">
+                <div class="coming-soon">Soon</div>
+                <div class="tool-icon">📝</div>
                 <h4>Test Series</h4>
-                <p>પ્રેક્ટિસ ટેસ્ટ</p>
+                <p>Mock Tests</p>
             </div>
-
-            <div class="feature-card" onclick="openFeature('syllabus')">
-                <div class="feature-icon">📋</div>
+            <div class="tool-card" onclick="showComingSoon()">
+                <div class="coming-soon">Soon</div>
+                <div class="tool-icon">📋</div>
                 <h4>Syllabus</h4>
-                <p>સંપૂર્ણ અભ્યાસક્રમ</p>
+                <p>Full Curriculum</p>
             </div>
         </div>
     </div>
 
-    <div class="bottom-nav">
-        <div class="nav-item active">
-            <div class="icon">🏠</div>
-            <span>હોમ</span>
+    <!-- Footer Navigation -->
+    <footer class="footer-nav">
+        <a href="profile.html" class="nav-item">
+            <div class="icon icon-account">👤</div>
+            <span>Account</span>
+        </a>
+        <a href="testmode.html" class="nav-item">
+            <div class="icon icon-progress">📊</div>
+            <span>Progress</span>
+        </a>
+        <div class="nav-item" onclick="openContactModal()">
+            <div class="icon icon-contact">📞</div>
+            <span>Contact</span>
         </div>
-        <div class="nav-item">
-            <div class="icon">📚</div>
-            <span>અભ્યાસ</span>
+        <a href="notification.html" class="nav-item">
+            <div class="icon icon-notification">🔔</div>
+            <span>Notification</span>
+        </a>
+    </footer>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">About Us</div>
+                <div class="close-btn" onclick="closeModal('aboutModal')">✕</div>
+            </div>
+            <div class="modal-body">
+                <h3 style="margin-bottom: 15px; color: #a8b3ff;">Coming Soon...</h3>
+                <p>We are working hard to bring you the best learning experience. Stay tuned!</p>
+            </div>
         </div>
-        <div class="nav-item">
-            <div class="icon">🔔</div>
-            <span>સૂચનાઓ</span>
-            <div class="notification-badge">3</div>
+    </div>
+
+    <!-- Myself Modal -->
+    <div id="myselfModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">My Self</div>
+                <div class="close-btn" onclick="closeModal('myselfModal')">✕</div>
+            </div>
+            <div class="modal-body">
+                <h3 style="margin-bottom: 15px; color: #a8b3ff;">Coming Soon...</h3>
+                <p>Personal profile section will be available soon!</p>
+            </div>
         </div>
-        <div class="nav-item">
-            <div class="icon">📊</div>
-            <span>પરિણામ</span>
-        </div>
-        <div class="nav-item">
-            <div class="icon">👤</div>
-            <span>પ્રોફાઇલ</span>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Contact Us</div>
+                <div class="close-btn" onclick="closeModal('contactModal')">✕</div>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; font-size: 18px; color: white; font-weight: 600;">📞 +91 6353511804</p>
+                <div class="contact-links">
+                    <a href="tel:+916353511804" class="contact-btn">
+                        📞 Call
+                    </a>
+                    <a href="https://wa.me/916353511804" class="contact-btn whatsapp" target="_blank">
+                        💬 WhatsApp
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        function openExam(examId) {
-            alert('ખુલી રહ્યું છે: ' + examId + ' પરીક્ષાનું વિગતવાર પેજ');
-            // અહીં Supabase સાથેનું વાસ્તવિક નેવિગેશન લોજિક ઉમેરી શકાય.
+        // Dropdown Menu Functions
+        function toggleMenu() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('active');
         }
 
-        function openFeature(featureId) {
-            alert('ખુલી રહ્યું છે: ' + featureId);
-            // અહીં Supabase સાથેનું વાસ્તવિક નેવિગેશન લોજિક ઉમેરી શકાય.
+        function goHome() {
+            window.location.href = 'index.html';
+            toggleMenu();
         }
 
-        // નેવિગેશન બાર એક્ટિવ સ્ટેટ લોજિક
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.querySelector('.menu-dropdown');
+            if (!dropdown.contains(e.target)) {
+                document.getElementById('dropdownMenu').classList.remove('active');
+            }
         });
-        
-        // જો તમે Supabase લોજિક ઉમેરવા માંગતા હો, તો app.js ને અહીં લિંક કરી શકાય:
-        // <script src="app.js"></script>
-    </script>
-</body>
-</html>
+
+        // Modal Functions
+        function openAboutModal() {
+            openModal('aboutModal');
+            toggleMenu();
+        }
+
+        function openMyselfModal() {
+            openModal('myselfModal');
+            toggleMenu();
+        }
+
+        function openContactModal() {
+            openModal('contactModal');
+            const menu = document.getElementById('dropdownMenu');
+            if (menu) menu.classList.remove('active');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on background click
+        document.querySelectorAll('.modal').forEach
