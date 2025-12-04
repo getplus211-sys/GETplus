@@ -241,6 +241,7 @@
             transform: translateX(400px);
             transition: all 0.3s ease;
             z-index: 1000;
+            max-width: 350px;
         }
 
         .toast.show {
@@ -256,6 +257,16 @@
             border-left: 4px solid #dc3545;
         }
 
+        .error-container {
+            text-align: center;
+            padding: 40px 20px;
+            color: #dc3545;
+        }
+
+        .error-container h2 {
+            margin-bottom: 10px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 border-radius: 0;
@@ -268,6 +279,12 @@
             .content {
                 padding: 30px 20px;
             }
+
+            .toast {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
         }
     </style>
 </head>
@@ -278,27 +295,35 @@
             <p>Loading your profile...</p>
         </div>
 
+        <div id="errorContainer" class="hidden error-container">
+            <h2>⚠️ Error</h2>
+            <p id="errorMessage">Unable to load profile</p>
+            <button class="btn btn-secondary" onclick="location.reload()" style="margin: 20px auto; max-width: 200px;">
+                🔄 Retry
+            </button>
+        </div>
+
         <div id="profileContent" class="hidden">
             <div class="header">
-                <div class="avatar" id="avatar">JD</div>
-                <h1 id="fullName">John Doe</h1>
-                <p>Manage your account information</p>
+                <div class="avatar" id="avatar">?</div>
+                <h1 id="fullName">Loading...</h1>
+                <p id="userEmail">Loading...</p>
             </div>
 
             <div class="content">
                 <div class="profile-field">
                     <label>First Name</label>
-                    <input type="text" id="name" disabled>
+                    <input type="text" id="name" disabled placeholder="Enter your first name">
                 </div>
 
                 <div class="profile-field">
                     <label>Surname</label>
-                    <input type="text" id="surname" disabled>
+                    <input type="text" id="surname" disabled placeholder="Enter your surname">
                 </div>
 
                 <div class="profile-field">
                     <label>Mobile</label>
-                    <input type="tel" id="mobile" disabled>
+                    <input type="tel" id="mobile" disabled placeholder="Enter your mobile number">
                 </div>
 
                 <div class="profile-field">
@@ -331,82 +356,82 @@
 
     <script>
         const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzMzIyNDUsImV4cCI6MjA0ODkwODI0NX0.sb_publishable_YKcxL1DwwxPBLtnUZZzIAA_BwsFqgYv';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         let currentUser = null;
         let originalData = {};
+        let userDataId = null;
 
         async function init() {
             try {
-                // Check session first
+                console.log('🔍 Checking authentication...');
+                
+                // Check session
                 const { data: { session }, error: sessionError } = await supabase.auth.getSession();
                 
                 if (sessionError) {
-                    console.error('Session error:', sessionError);
-                    showToast('Session error. Please login again.', 'error');
+                    console.error('❌ Session error:', sessionError);
+                    throw new Error('Session error: ' + sessionError.message);
+                }
+
+                if (!session) {
+                    console.warn('⚠️ No active session found');
+                    showError('Please login to access your profile');
                     setTimeout(() => {
                         window.location.href = 'login.html';
                     }, 2000);
                     return;
                 }
 
-                if (!session) {
-                    showToast('Please login to access your profile', 'error');
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
-                    return;
-                }
+                console.log('✅ Session found:', session.user.email);
 
                 // Get user details
                 const { data: { user }, error: userError } = await supabase.auth.getUser();
                 
                 if (userError || !user) {
-                    console.error('User error:', userError);
-                    showToast('Unable to load user. Please login again.', 'error');
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
-                    return;
+                    console.error('❌ User error:', userError);
+                    throw new Error('Unable to get user details');
                 }
 
                 currentUser = user;
+                console.log('✅ User authenticated:', currentUser.email);
+                
                 await loadProfile();
                 
             } catch (error) {
-                console.error('Init error:', error);
-                showToast('Error loading profile. Please try again.', 'error');
+                console.error('❌ Init error:', error);
+                showError(error.message || 'Failed to initialize profile');
             }
         }
 
         async function loadProfile() {
             try {
+                console.log('📥 Loading profile data for:', currentUser.email);
+                
                 const { data, error } = await supabase
                     .from('users')
                     .select('*')
                     .eq('email', currentUser.email)
                     .maybeSingle();
 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Database error:', error);
+                    throw error;
+                }
+
+                console.log('📊 Database response:', data);
 
                 if (data) {
-                    document.getElementById('name').value = data.name || '';
-                    document.getElementById('surname').value = data.surname || '';
-                    document.getElementById('mobile').value = data.mobile || '';
-                    document.getElementById('email').value = data.email || '';
-                    
-                    const firstName = data.name || 'User';
-                    const lastName = data.surname || '';
-                    document.getElementById('fullName').textContent = `${firstName} ${lastName}`.trim();
-                    
-                    const initials = (firstName.charAt(0) + (lastName.charAt(0) || '')).toUpperCase();
-                    document.getElementById('avatar').textContent = initials;
-
+                    // User data exists
+                    userDataId = data.id;
+                    populateFields(data);
                     originalData = { ...data };
+                    console.log('✅ Profile loaded successfully');
                 } else {
-                    // Create new user record if doesn't exist
+                    // No user data found - create new record
+                    console.log('📝 Creating new user record...');
                     const { data: newUser, error: insertError } = await supabase
                         .from('users')
                         .insert([
@@ -420,18 +445,41 @@
                         .select()
                         .single();
 
-                    if (insertError) throw insertError;
+                    if (insertError) {
+                        console.error('❌ Insert error:', insertError);
+                        throw insertError;
+                    }
                     
-                    document.getElementById('email').value = currentUser.email;
-                    originalData = newUser;
+                    userDataId = newUser.id;
+                    populateFields(newUser);
+                    originalData = { ...newUser };
+                    console.log('✅ New user record created');
                 }
 
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('profileContent').classList.remove('hidden');
+                
             } catch (error) {
-                showToast('Error loading profile: ' + error.message, 'error');
-                console.error('Error:', error);
+                console.error('❌ Load profile error:', error);
+                showError('Failed to load profile: ' + error.message);
             }
+        }
+
+        function populateFields(data) {
+            document.getElementById('name').value = data.name || '';
+            document.getElementById('surname').value = data.surname || '';
+            document.getElementById('mobile').value = data.mobile || '';
+            document.getElementById('email').value = data.email || currentUser.email;
+            
+            const firstName = data.name || 'User';
+            const lastName = data.surname || '';
+            const fullName = `${firstName} ${lastName}`.trim();
+            
+            document.getElementById('fullName').textContent = fullName;
+            document.getElementById('userEmail').textContent = data.email || currentUser.email;
+            
+            const initials = firstName.charAt(0).toUpperCase() + (lastName.charAt(0) || '').toUpperCase();
+            document.getElementById('avatar').textContent = initials || '?';
         }
 
         function toggleEdit() {
@@ -449,9 +497,7 @@
         }
 
         function cancelEdit() {
-            document.getElementById('name').value = originalData.name || '';
-            document.getElementById('surname').value = originalData.surname || '';
-            document.getElementById('mobile').value = originalData.mobile || '';
+            populateFields(originalData);
             
             document.getElementById('name').disabled = true;
             document.getElementById('surname').disabled = true;
@@ -477,61 +523,97 @@
             }
 
             try {
-                const { error } = await supabase
+                console.log('💾 Saving profile...');
+                
+                const { data, error } = await supabase
                     .from('users')
                     .update({
                         name: name,
                         surname: surname,
                         mobile: mobile
                     })
-                    .eq('email', currentUser.email);
+                    .eq('email', currentUser.email)
+                    .select()
+                    .single();
 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Update error:', error);
+                    throw error;
+                }
 
+                console.log('✅ Profile updated:', data);
                 showToast('Profile updated successfully!', 'success');
                 
-                originalData = { name, surname, mobile, email: currentUser.email };
-                
-                document.getElementById('fullName').textContent = `${name} ${surname}`;
-                const initials = (name.charAt(0) + surname.charAt(0)).toUpperCase();
-                document.getElementById('avatar').textContent = initials;
+                originalData = { ...data };
+                populateFields(data);
                 
                 cancelEdit();
             } catch (error) {
-                showToast('Error updating profile: ' + error.message, 'error');
-                console.error('Error:', error);
+                console.error('❌ Save error:', error);
+                showToast('Failed to update: ' + error.message, 'error');
             }
         }
 
         async function logout() {
             if (confirm('Are you sure you want to log out?')) {
-                await supabase.auth.signOut();
-                window.location.href = 'login.html';
+                try {
+                    console.log('🚪 Logging out...');
+                    const { error } = await supabase.auth.signOut();
+                    
+                    if (error) throw error;
+                    
+                    console.log('✅ Logged out successfully');
+                    showToast('Logged out successfully', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1000);
+                } catch (error) {
+                    console.error('❌ Logout error:', error);
+                    showToast('Logout failed: ' + error.message, 'error');
+                }
             }
         }
 
         async function deleteAccount() {
-            const confirmation = prompt('This action cannot be undone. Type "DELETE" to confirm:');
+            const confirmation = prompt('⚠️ WARNING: This will permanently delete your account and all data!\n\nType "DELETE" to confirm:');
             
             if (confirmation === 'DELETE') {
                 try {
-                    const { error } = await supabase
+                    console.log('🗑️ Deleting account...');
+                    
+                    // First delete user data from users table
+                    const { error: deleteDataError } = await supabase
                         .from('users')
                         .delete()
                         .eq('email', currentUser.email);
 
-                    if (error) throw error;
+                    if (deleteDataError) {
+                        console.error('❌ Data delete error:', deleteDataError);
+                        throw new Error('Failed to delete user data: ' + deleteDataError.message);
+                    }
 
+                    console.log('✅ User data deleted');
+
+                    // Then delete the auth user (this requires admin privileges)
+                    // Note: Regular users cannot delete their own auth account
+                    // You need to implement this on backend or use Supabase admin functions
+                    
+                    // For now, just sign out
                     await supabase.auth.signOut();
-                    showToast('Account deleted successfully', 'success');
+                    
+                    showToast('Account data deleted successfully', 'success');
                     
                     setTimeout(() => {
                         window.location.href = 'login.html';
                     }, 2000);
+                    
                 } catch (error) {
-                    showToast('Error deleting account: ' + error.message, 'error');
-                    console.error('Error:', error);
+                    console.error('❌ Delete error:', error);
+                    showToast('Delete failed: ' + error.message, 'error');
                 }
+            } else if (confirmation !== null) {
+                showToast('Account deletion cancelled', 'error');
             }
         }
 
@@ -546,6 +628,13 @@
             }, 3000);
         }
 
+        function showError(message) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('errorContainer').classList.remove('hidden');
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        // Initialize on page load
         init();
     </script>
 </body>
