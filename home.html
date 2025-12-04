@@ -1,93 +1,854 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="gu">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GETplus | Home</title>
-    
-    <!-- External Dependencies -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+    <title>Kapila Online - Home</title>
     <style>
-        /* ==================== Home CSS Style ==================== */
-        
-        /* 1. Global Reset for Responsiveness */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
         * {
-            box-sizing: border-box; 
-        }
-        
-        :root {
-            --primary-purple: #5d35b9; 
-            --background-gradient: linear-gradient(135deg, #a797f1 0%, #764ba2 100%);
-            --card-bg: #fff;
-        }
-        
-        body { 
-            font-family: Arial, sans-serif; 
-            background: var(--background-gradient);
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            overflow-x: hidden; /* FIX: Prevents horizontal scrolling */
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .container { 
-            background: var(--card-bg); 
-            padding: 40px; 
-            border-radius: 20px; 
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2); 
-            width: 90%;
-            max-width: 500px; 
-            text-align: center;
-            color: #333;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            padding-top: 85px; /* Space for sticky header */
+            padding-bottom: 90px; /* Space for sticky footer */
+            overflow-x: hidden;
         }
 
-        h2 { 
-            color: var(--primary-purple); 
-            margin-bottom: 25px; 
+        .background-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.15), transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15), transparent 50%),
+                        radial-gradient(circle at 40% 90%, rgba(59, 130, 246, 0.15), transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- Header Styling --- */
+        .header {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 15px 20px;
+            position: fixed; /* Changed to fixed for sticky */
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #FF6F00 0%, #FFD54F 100%); /* Kapila color */
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 8px 24px rgba(255, 111, 0, 0.3);
+            color: #fff;
+        }
+
+        .header-text h1 {
+            background: linear-gradient(135deg, #fff 0%, #ffc107 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 20px;
             font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
-        #user-info {
-            min-height: 60px;
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px dashed #ddd;
+        .header-text p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        .menu-dropdown {
+            position: relative;
+        }
+
+        .menu-icon-btn {
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 10px;
-            font-size: 1.1em;
-            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 20px;
         }
 
-        #logout-btn { 
-            padding: 12px 25px; 
-            background: #e04444; /* Red Logout Button */
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: bold;
-            cursor: pointer; 
-            transition: background 0.3s; 
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: #1a1a1a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            min-width: 180px;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.4);
+            z-index: 1001;
+            padding: 8px 0;
         }
-        #logout-btn:hover { 
-            background: #c0392b; 
+
+        .dropdown-content a, .dropdown-content div {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .dropdown-content a:hover, .dropdown-content div:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* --- Main Content Styling --- */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 35px 0 20px 0;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .view-all {
+            color: #FFC107; /* Kapila accent */
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* --- Daily Learning Grid --- */
+        .daily-learning-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .daily-card {
+            background: linear-gradient(135deg, rgba(255, 111, 0, 0.1) 0%, rgba(255, 213, 79, 0.1) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 111, 0, 0.3);
+            border-radius: 20px;
+            padding: 22px 18px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .daily-card:active {
+            transform: scale(0.96);
+            background: linear-gradient(135deg, rgba(255, 111, 0, 0.2) 0%, rgba(255, 213, 79, 0.2) 100%);
+        }
+
+        .daily-card h3 {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: -0.3px;
+        }
+
+        .daily-card p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+        }
+
+        .daily-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+
+        /* --- Exam Grid (Same as before, but with new colors/content) --- */
+        .exam-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .exam-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 22px 18px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exam-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #FF6F00, #ffc107, #ffd54f);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .exam-card:hover::before {
+            opacity: 1;
+        }
+
+        .exam-card:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .exam-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(255, 111, 0, 0.2) 0%, rgba(255, 213, 79, 0.2) 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .exam-card h3 {
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+
+        .exam-card .subjects {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.6;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .exam-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255, 111, 0, 0.15); /* Kapila accent */
+            color: #FFC107;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 111, 0, 0.2);
+        }
+
+        /* --- Study Tools Grid --- */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 111, 0, 0.2), transparent); /* Kapila accent */
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .feature-card:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .feature-card:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .feature-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 12px rgba(255, 111, 0, 0.3)); /* Kapila accent */
+        }
+
+        .feature-card h4 {
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        /* --- Footer (Bottom Nav) Styling --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 10px 20px 10px;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px 10px; /* Reduced horizontal padding */
+            border-radius: 14px;
+            position: relative;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 111, 0, 0.15); /* Kapila accent */
+        }
+
+        .nav-item .icon {
+            font-size: 24px;
+            transition: all 0.3s ease;
+            filter: grayscale(1) opacity(0.5);
+        }
+        /* Colorful Icons for Footer */
+        .nav-item:nth-child(1) .icon { color: #8BC34A; } /* Home - Green */
+        .nav-item:nth-child(2) .icon { color: #2196F3; } /* Account - Blue */
+        .nav-item:nth-child(3) .icon { color: #FF9800; } /* Progress - Orange */
+        .nav-item:nth-child(4) .icon { color: #F44336; } /* Contact - Red */
+        .nav-item:nth-child(5) .icon { color: #9C27B0; } /* Notification - Purple */
+
+        .nav-item.active .icon {
+            filter: grayscale(0) opacity(1);
+            transform: scale(1.1);
+        }
+
+        .nav-item span {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active span {
+            color: #FFC107; /* Kapila accent */
+        }
+
+        .nav-badge {
+            position: absolute;
+            top: 4px;
+            right: 12px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        /* --- Modal (Pop-up) Styling --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 80%;
+            max-width: 350px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: zoomIn 0.3s ease-out;
+            color: white;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #FFC107;
+        }
+
+        .modal-content p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .modal-btn-primary {
+            background-color: #FF6F00;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background-color: #e56400;
+        }
+
+        .modal-btn-secondary {
+            background-color: #333;
+            color: white;
+        }
+
+        .modal-btn-secondary:hover {
+            background-color: #444;
+        }
+        
+        @keyframes zoomIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @media (max-width: 400px) {
+            .exam-grid, .features-grid, .daily-learning-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>🎉 GETplus Dashboard</h2>
-        <div id="user-info">Checking session status...</div>
-        <button id="logout-btn">
-            <i class="fas fa-sign-out-alt"></i> Logout
-        </button>
+    <div class="background-gradient"></div>
+
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo-icon floating">📚</div>
+            <div class="header-text">
+                <h1>Kapila Online</h1>
+                <p>Premium Learning Platform</p>
+            </div>
+        </div>
+        <div class="menu-dropdown">
+            <div class="menu-icon-btn">☰</div>
+            <div class="dropdown-content">
+                <a href="index.html">🏠 Home</a>
+                <div onclick="openAboutUsModal()">👥 About Us</div>
+                <div onclick="openMySelfModal()">👤 My self</div>
+                <div onclick="openContactUsModal()">📞 Contact Us</div>
+            </div>
+        </div>
     </div>
 
-    <!-- Link the JavaScript file -->
-    <script src="app.js"></script>
+    <div class="container">
+
+        <div class="section-header">
+            <div class="section-title">
+                📅 દૈનિક શિક્ષણ (Daily Learning)
+            </div>
+        </div>
+        <div class="daily-learning-grid">
+            <a class="daily-card" href="everyday.html">
+                <div class="daily-icon">🧠</div>
+                <h3>દરરોજ ક્વિઝ</h3>
+                <p>સાંજે 8:00 વાગ્યે (8:00 pm)</p>
+            </a>
+            <a class="daily-card" href="dailycurrent.html">
+                <div class="daily-icon">📰</div>
+                <h3>દૈનિક કરંટ અફેર્સ</h3>
+                <p>સવારે 8:00 વાગ્યે (8:00 am)</p>
+            </a>
+        </div>
+        
+        <hr/>
+
+        <div class="section-header">
+            <div class="section-title">
+                🎯 પરીક્ષા કોર્નર (Exam Corner)
+            </div>
+            <div class="view-all" onclick="viewAllExams()">બધી જુઓ →</div>
+        </div>
+
+        <div class="exam-grid">
+            <a class="exam-card" href="gpsc.html">
+                <div class="exam-icon">📊</div>
+                <h3>GPSC Class 1/2</h3>
+                <div class="subjects">ગુજરાતી • English • ઇતિહાસ • ભૂગોળ • કરંટ અફેર્સ</div>
+                <div class="exam-meta">
+                    <span class="badge">📚 11 વિષયો</span>
+                </div>
+            </a>
+
+            <a class="exam-card" href="gpsc2.html">
+                <div class="exam-icon">💼</div>
+                <h3>DySO / STI</h3>
+                <div class="subjects">ગુજરાતી • English • ગણિત • રીઝનિંગ • પોલિટી</div>
+                <div class="exam-meta">
+                    <span class="badge">📚 10 વિષયો</span>
+                </div>
+            </a>
+
+            <a class="exam-card" href="lrd.html">
+                <div class="exam-icon">👮</div>
+                <h3>Constable (LRD)</h3>
+                <div class="subjects">બંધારણ • કાયદો • IPC • CRPC • સામાન્ય જ્ઞાન</div>
+                <div class="exam-meta">
+                    <span class="badge">📚 7 વિષયો</span>
+                </div>
+            </a>
+
+            <a class="exam-card" href="psi.html">
+                <div class="exam-icon">🚨</div>
+                <h3>PSI</h3>
+                <div class="subjects">ગુજરાતી • English • કાયદો • મનોવિજ્ઞાન • કરંટ અફેર્સ</div>
+                <div class="exam-meta">
+                    <span class="badge">📚 8 વિષયો</span>
+                </div>
+            </a>
+
+            <a class="exam-card" href="cce.html">
+                <div class="exam-icon">💻</div>
+                <h3>CCE</h3>
+                <div class="subjects">ગણિત • રીઝનિંગ • ગુજરાતી • English • કમ્પ્યુટર</div>
+                <div class="exam-meta">
+                    <span class="badge">📚 6 વિષયો</span>
+                </div>
+            </a>
+
+            <a class="exam-card" href="tet1.html">
+                <div class="exam-icon">👨‍🏫</div>
+                <h3>TET-1</h3>
+                <div class="subjects">ભાષા • ગણિત • પર્યાવરણ • બાળ વિકાસ • શિક્ષણશાસ્ત્ર</div>
+                <div class="exam-meta">
+                    <span class="badge">📚 6 વિષયો</span>
+                </div>
+            </a>
+            
+            <a class="exam-card" href="tet2.html">
+                <div class="exam-icon">👩‍🏫</div>
+                <h3>TET-2</h3>
+                <div class="subjects">ભાષા • સામાજિક વિજ્ઞાન • વિજ્ઞાન • બાળ વિકાસ</div>
+                <div class="exam-meta">
+                    <span class="badge">📚 5 વિષયો</span>
+                </div>
+            </a>
+
+            <a class="exam-card" href="forest.html">
+                <div class="exam-icon">🌲</div>
+                <h3>Forest Guard</h3>
+                <div class="subjects">પર્યાવરણ • ભૂગોળ • વન્યજીવ • સામાન્ય જ્ઞાન</div>
+                <div class="exam-meta">
+                    <span class="badge">📚 7 વિષયો</span>
+                </div>
+            </a>
+        </div>
+
+        <hr/>
+
+        <div class="section-header">
+            <div class="section-title">
+                ✨ અભ્યાસ સાધનો (Study Tools)
+            </div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card" onclick="openFeature('videos')">
+                <div class="feature-icon">🎥</div>
+                <h4>Video Lectures</h4>
+                <p>HD વિડિયો લેક્ચર્સ</p>
+                <p style="color:red; margin-top:5px; font-size:10px;">(Coming Soon...)</p>
+            </div>
+
+            <div class="feature-card" onclick="openFeature('pdf')">
+                <div class="feature-icon">📄</div>
+                <h4>PDF Materials</h4>
+                <p>ડાઉનલોડ કરો નોટ્સ</p>
+                <p style="color:red; margin-top:5px; font-size:10px;">(Coming Soon...)</p>
+            </div>
+
+            <div class="feature-card" onclick="openFeature('tests')">
+                <div class="feature-icon">📝</div>
+                <h4>Test Series</h4>
+                <p>મોક ટેસ્ટ અને ક્વિઝ</p>
+                <p style="color:red; margin-top:5px; font-size:10px;">(Coming Soon...)</p>
+            </div>
+
+            <div class="feature-card" onclick="openFeature('syllabus')">
+                <div class="feature-icon">📋</div>
+                <h4>Syllabus</h4>
+                <p>સંપૂર્ણ અભ્યાસક્રમ</p>
+                <p style="color:red; margin-top:5px; font-size:10px;">(Coming Soon...)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a class="nav-item active" href="index.html">
+            <div class="icon">🏠</div>
+            <span>હોમ</span>
+        </a>
+        <a class="nav-item" href="profile.html">
+            <div class="icon">👤</div>
+            <span>અકાઉન્ટ</span>
+        </a>
+        <a class="nav-item" href="Testmode.html">
+            <div class="icon">📈</div>
+            <span>પ્રગતિ</span>
+        </a>
+        <div class="nav-item" onclick="openContactUsModal()">
+            <div class="icon">📞</div>
+            <span>સંપર્ક</span>
+        </div>
+        <a class="nav-item" href="Notification.html">
+            <div class="icon">🔔</div>
+            <span>સૂચના</span>
+            <div class="nav-badge">3</div>
+        </a>
+    </div>
+
+    <div id="contactUsModal" class="modal" onclick="closeModal('contactUsModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2>📞 સંપર્ક કરો</h2>
+            <p>તમારા પ્રશ્નો અને પ્રતિસાદ માટે.</p>
+            <div class="modal-buttons">
+                <a class="modal-btn modal-btn-primary" href="tel:+916353511804">
+                    <span style="font-size: 20px;">📞</span> Call Now (+916353511804)
+                </a>
+                <a class="modal-btn modal-btn-primary" href="https://wa.me/916353511804" target="_blank">
+                    <span style="font-size: 20px;">💬</span> WhatsApp (+916353511804)
+                </a>
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('contactUsModal')">બંધ કરો</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="aboutUsModal" class="modal" onclick="closeModal('aboutUsModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2>👥 અમારા વિશે</h2>
+            <p>આ વિભાગ ટૂંક સમયમાં આવી રહ્યો છે! અમે ઉત્તમ શિક્ષણ સામગ્રી સાથે ટૂંક સમયમાં ઉપલબ્ધ થઈશું.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('aboutUsModal')">બંધ કરો</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mySelfModal" class="modal" onclick="closeModal('mySelfModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2>👤 મારું પ્રોફાઇલ</h2>
+            <p>આ વિભાગ ટૂંક સમયમાં આવી રહ્યો છે! અહીં તમે તમારી વ્યક્તિગત માહિતી જોઈ શકશો.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" onclick="closeModal('mySelfModal')">બંધ કરો</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Pop-up/Modal Functions ---
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openContactUsModal() {
+            openModal('contactUsModal');
+        }
+
+        function openAboutUsModal() {
+            openModal('aboutUsModal');
+        }
+
+        function openMySelfModal() {
+            openModal('mySelfModal');
+        }
+
+        // --- Other General Functions ---
+        function viewAllExams() {
+            console.log('View all exams');
+            // Navigate to an 'all exams' page if it existed
+        }
+
+        function openFeature(featureId) {
+            console.log('Opening feature:', featureId);
+            // You can add logic here to show the "Coming Soon" message dynamically
+            alert('Study Tool: ' + featureId + ' is Coming Soon...');
+        }
+        
+        // --- Card Click Animation ---
+        function addCardAnimation() {
+            const cards = document.querySelectorAll('.exam-card, .daily-card, .feature-card');
+            cards.forEach(card => {
+                card.addEventListener('click', function(event) {
+                    if (event.target.tagName.toLowerCase() === 'a' || event.target.closest('a')) {
+                        return; // Let the link handle navigation
+                    }
+                    if (this.onclick.toString().includes('openFeature')) {
+                         // Feature cards have a built-in active state via CSS
+                         return;
+                    }
+
+                    this.style.transform = 'scale(0.96)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        }
+        
+        // --- Footer Active State Logic ---
+        document.addEventListener('DOMContentLoaded', function() {
+            addCardAnimation();
+            
+            // Set active state for footer based on URL
+            const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            document.querySelectorAll('.bottom-nav a').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                } else if (currentPath === '' && link.getAttribute('href') === 'index.html') {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-
