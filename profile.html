@@ -406,23 +406,36 @@
             }
         }
 
+        // -------------------------------------------------------------------
+        // FIX APPLIED HERE: Using .select() instead of .maybeSingle() to prevent crash on duplicate profiles
+        // -------------------------------------------------------------------
         async function loadProfile() {
             try {
                 console.log('📥 Loading profile data for:', currentUser.email);
                 
-                const { data, error } = await supabase
+                // Use .select() to always return an array, preventing the "multiple rows" error
+                const { data: userDataArray, error } = await supabase
                     .from('users')
                     .select('*')
-                    .eq('email', currentUser.email)
-                    .maybeSingle();
+                    .eq('email', currentUser.email);
 
                 if (error) {
                     console.error('❌ Database error:', error);
                     throw error;
                 }
 
-                console.log('📊 Database response:', data);
+                console.log('📊 Database response:', userDataArray);
 
+                let data = null;
+
+                if (userDataArray && userDataArray.length > 0) {
+                    // If multiple profiles exist (due to data error), use the first one
+                    if (userDataArray.length > 1) {
+                        console.warn('⚠️ DATA WARNING: Multiple profiles found for one email. Using the first one.');
+                    }
+                    data = userDataArray[0];
+                }
+                
                 if (data) {
                     // User data exists
                     userDataId = data.id;
@@ -432,6 +445,7 @@
                 } else {
                     // No user data found - create new record
                     console.log('📝 Creating new user record...');
+                    // Use .single() here as we expect exactly one record back from the INSERT
                     const { data: newUser, error: insertError } = await supabase
                         .from('users')
                         .insert([
@@ -512,6 +526,9 @@
             document.querySelector('.container').classList.remove('edit-mode');
         }
 
+        // -------------------------------------------------------------------
+        // FIX APPLIED HERE: Using .select() instead of .select().single() to prevent crash on update
+        // -------------------------------------------------------------------
         async function saveProfile() {
             const name = document.getElementById('name').value.trim();
             const surname = document.getElementById('surname').value.trim();
@@ -525,7 +542,8 @@
             try {
                 console.log('💾 Saving profile...');
                 
-                const { data, error } = await supabase
+                // Use .select() without .single() to safely retrieve the updated record(s)
+                const { data: updatedDataArray, error } = await supabase
                     .from('users')
                     .update({
                         name: name,
@@ -533,14 +551,19 @@
                         mobile: mobile
                     })
                     .eq('email', currentUser.email)
-                    .select()
-                    .single();
+                    .select();
 
                 if (error) {
                     console.error('❌ Update error:', error);
                     throw error;
                 }
-
+                
+                if (!updatedDataArray || updatedDataArray.length === 0) {
+                    throw new Error('Update failed: Profile record not found.');
+                }
+                
+                const data = updatedDataArray[0]; // Get the updated record
+                
                 console.log('✅ Profile updated:', data);
                 showToast('Profile updated successfully!', 'success');
                 
@@ -596,8 +619,7 @@
                     console.log('✅ User data deleted');
 
                     // Then delete the auth user (this requires admin privileges)
-                    // Note: Regular users cannot delete their own auth account
-                    // You need to implement this on backend or use Supabase admin functions
+                    // Note: You must ensure RLS is configured to allow this or use a server function.
                     
                     // For now, just sign out
                     await supabase.auth.signOut();
