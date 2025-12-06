@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="gu">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kapila Online - Premium Learning Platform</title>
+    <title>GETplus - Digital Learning Platform</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
         * {
             margin: 0;
             padding: 0;
@@ -14,141 +12,93 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #0a0a0a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
             min-height: 100vh;
-            padding-top: 80px;
-            padding-bottom: 90px;
-            overflow-x: hidden;
-        }
-
-        /* Background Gradient */
-        .background-gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.15), transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15), transparent 50%),
-                        radial-gradient(circle at 40% 90%, rgba(59, 130, 246, 0.15), transparent 50%);
-            pointer-events: none;
-            z-index: 0;
+            padding-top: 70px;
+            padding-bottom: 60px;
+            max-width: 480px;
+            margin: 0 auto;
         }
 
         /* Header Styles */
-        .header {
-            background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 15px 20px;
+        header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             z-index: 1000;
+            height: 70px;
+            max-width: 480px;
+            margin: 0 auto;
         }
 
-        .header-content {
-            max-width: 500px;
-            margin: 0 auto;
+        nav {
+            padding: 0 15px;
+            height: 100%;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
         }
 
         .logo-section {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            flex-direction: column;
         }
 
-        .logo-icon {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
-            animation: float 3s ease-in-out infinite;
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1976d2;
+            line-height: 1.2;
         }
 
-        .brand-info h1 {
-            background: linear-gradient(135deg, #fff 0%, #a8b3ff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .brand-info p {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 11px;
+        .tagline {
+            font-size: 10px;
+            color: #666;
             font-weight: 400;
-            margin-top: 2px;
         }
 
-        .menu-dropdown {
+        /* Dropdown Menu */
+        .menu-wrapper {
             position: relative;
         }
 
         .menu-toggle {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: none;
+            border: none;
+            font-size: 24px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 20px;
-        }
-
-        .menu-toggle:active {
-            transform: scale(0.92);
+            padding: 5px;
+            color: #333;
         }
 
         .dropdown-menu {
             position: absolute;
-            top: 50px;
+            top: 45px;
             right: 0;
-            background: rgba(20, 20, 20, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            min-width: 200px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 150px;
+            display: none;
+            overflow: hidden;
         }
 
         .dropdown-menu.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+            display: block;
         }
 
         .dropdown-item {
-            padding: 14px 18px;
-            color: white;
+            display: block;
+            padding: 12px 20px;
+            color: #333;
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
             font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .dropdown-item:last-child {
@@ -156,320 +106,216 @@
         }
 
         .dropdown-item:hover {
-            background: rgba(102, 126, 234, 0.1);
+            background: #f5f5f5;
+            color: #1976d2;
         }
 
-        .dropdown-item:active {
-            background: rgba(102, 126, 234, 0.2);
-        }
-
-        .dropdown-item .item-icon {
-            font-size: 18px;
-        }
-
-        /* Container */
+        /* Main Content */
         .container {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 1;
+            padding: 15px;
         }
 
-        /* Section Styles */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 25px 0 20px 0;
+        .section {
+            margin-bottom: 25px;
         }
 
         .section-title {
-            color: white;
-            font-size: 20px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: -0.5px;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 600;
         }
 
-        /* Daily Learning - Single Row */
+        /* Daily Learning Cards - 2 in 1 row */
         .daily-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
         }
 
         .daily-card {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 22px 18px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            text-decoration: none;
-            display: block;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .daily-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #10b981, #34d399);
+        .daily-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .daily-card:active {
-            transform: scale(0.96);
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .daily-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(52, 211, 153, 0.2) 100%);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 14px;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .daily-card h3 {
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.3px;
-        }
-
-        .daily-time {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(16, 185, 129, 0.15);
-            color: #6ee7b7;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 11px;
+        .daily-card-title {
+            font-size: 14px;
             font-weight: 600;
-            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #333;
+            margin-bottom: 6px;
         }
 
-        .update-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 9px;
-            font-weight: 700;
-            animation: pulse 2s infinite;
+        .daily-card-time {
+            font-size: 12px;
+            color: #666;
         }
 
         /* Exam Cards */
-        .exam-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
         .exam-card {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 22px 18px;
+            background: #fff;
+            border-radius: 15px;
+            padding: 18px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            text-decoration: none;
-            display: block;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .exam-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-        }
-
-        .exam-card:active {
-            transform: scale(0.96);
-            background: rgba(255, 255, 255, 0.06);
+        .exam-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .exam-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-            border-radius: 14px;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            margin-bottom: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 28px;
+            flex-shrink: 0;
         }
 
-        .exam-card h3 {
-            color: white;
-            font-size: 16px;
+        .icon-blue { background: #e3f2fd; }
+        .icon-orange { background: #fff3e0; }
+        .icon-teal { background: #e0f2f1; }
+        .icon-green { background: #e8f5e9; }
+        .icon-purple { background: #f3e5f5; }
+        .icon-pink { background: #fce4ec; }
+        .icon-cyan { background: #e0f7fa; }
+        .icon-lime { background: #f9fbe7; }
+
+        .exam-info {
+            flex: 1;
+        }
+
+        .exam-title {
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.3px;
+            color: #000;
+            margin-bottom: 6px;
         }
 
         .exam-subjects {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 11px;
-            line-height: 1.5;
-            margin-bottom: 10px;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
         }
 
-        .exam-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(102, 126, 234, 0.15);
-            color: #a8b3ff;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 11px;
+        .subject-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 600;
-            border: 1px solid rgba(102, 126, 234, 0.2);
+            white-space: nowrap;
         }
 
-        /* Study Tools - 2 Columns */
+        /* Tools Grid - 2 in 1 row */
         .tools-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
 
         .tool-card {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 24px 20px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px 15px;
             text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .tool-card:active {
-            transform: scale(0.96);
-            background: rgba(255, 255, 255, 0.06);
+        .tool-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .tool-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
-            filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.3));
+            font-size: 32px;
+            margin-bottom: 8px;
         }
 
-        .tool-card h4 {
-            color: white;
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 6px;
-            letter-spacing: -0.3px;
-        }
-
-        .tool-card p {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 12px;
-            font-weight: 400;
+        .tool-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
         }
 
         .coming-soon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(234, 179, 8, 0.2);
-            color: #fcd34d;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 9px;
-            font-weight: 700;
-            border: 1px solid rgba(234, 179, 8, 0.3);
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
         }
 
-        /* Footer Navigation */
-        .footer-nav {
+        /* Footer Styles */
+        footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(15, 15, 15, 0.95);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            display: flex;
-            justify-content: space-around;
-            padding: 16px 10px 20px 10px;
+            background: #fff;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
             z-index: 1000;
+            height: 60px;
+            max-width: 480px;
+            margin: 0 auto;
         }
 
-        .nav-item {
+        .footer-content {
+            height: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .footer-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 3px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 8px 15px;
-            border-radius: 14px;
-            position: relative;
+            transition: transform 0.2s;
             text-decoration: none;
+            color: #666;
         }
 
-        .nav-item.active {
-            background: rgba(102, 126, 234, 0.15);
+        .footer-item:hover {
+            transform: scale(1.05);
         }
 
-        .nav-item .icon {
-            font-size: 24px;
-            transition: all 0.3s ease;
+        .footer-item.active {
+            color: #1976d2;
         }
 
-        .nav-item span {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 600;
-            transition: all 0.3s ease;
+        .footer-icon {
+            font-size: 20px;
         }
 
-        .nav-item.active span {
-            color: white;
+        .footer-label {
+            font-size: 10px;
+            font-weight: 500;
         }
 
-        /* Colorful Icons */
-        .icon-account { filter: drop-shadow(0 0 8px #667eea); }
-        .icon-progress { filter: drop-shadow(0 0 8px #10b981); }
-        .icon-contact { filter: drop-shadow(0 0 8px #f59e0b); }
-        .icon-notification { filter: drop-shadow(0 0 8px #ef4444); }
-
-        /* Modal Popup */
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -477,12 +323,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.6);
             z-index: 2000;
-            align-items: center;
             justify-content: center;
-            padding: 20px;
+            align-items: center;
         }
 
         .modal.active {
@@ -490,374 +334,295 @@
         }
 
         .modal-content {
-            background: rgba(20, 20, 20, 0.98);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
+            background: white;
             padding: 30px;
-            max-width: 400px;
-            width: 100%;
+            border-radius: 15px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
             position: relative;
-            animation: modalSlideIn 0.3s ease;
         }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 26px;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
         }
 
         .modal-title {
-            color: white;
             font-size: 22px;
+            margin-bottom: 12px;
+            color: #333;
             font-weight: 700;
         }
 
-        .close-btn {
-            width: 36px;
-            height: 36px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+        .contact-buttons {
             display: flex;
-            align-items: center;
+            gap: 10px;
             justify-content: center;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .close-btn:active {
-            transform: scale(0.9);
-        }
-
-        .modal-body {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 16px;
-            line-height: 1.6;
-            text-align: center;
-        }
-
-        .contact-links {
-            display: flex;
-            gap: 12px;
             margin-top: 20px;
         }
 
         .contact-btn {
-            flex: 1;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 14px;
-            border-radius: 12px;
-            text-decoration: none;
-            text-align: center;
-            font-weight: 600;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
             font-size: 14px;
-            transition: all 0.3s ease;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            color: white;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .contact-btn:active {
-            transform: scale(0.96);
+        .contact-btn:hover {
+            transform: scale(1.05);
         }
 
-        .contact-btn.whatsapp {
-            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        .call-btn {
+            background: #4CAF50;
         }
 
-        /* Animations */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 400px) {
-            .exam-grid {
-                grid-template-columns: 1fr;
-            }
+        .whatsapp-btn {
+            background: #25D366;
         }
     </style>
 </head>
 <body>
-    <div class="background-gradient"></div>
-
     <!-- Header -->
-    <header class="header">
-        <div class="header-content">
+    <header>
+        <nav>
             <div class="logo-section">
-                <div class="logo-icon">🎓</div>
-                <div class="brand-info">
-                    <h1>Kapila Online</h1>
-                    <p>Premium Learning Platform</p>
+                <div class="logo">GETplus</div>
+                <div class="tagline">Digital Learning Platform</div>
+            </div>
+            <div class="menu-wrapper">
+                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                <div id="dropdownMenu" class="dropdown-menu">
+                    <a href="index.html" class="dropdown-item">Home</a>
+                    <a href="#" class="dropdown-item" onclick="showComingSoon(event)">About Us</a>
+                    <a href="#" class="dropdown-item" onclick="showComingSoon(event)">About Me</a>
+                    <a href="#" class="dropdown-item" onclick="showContact(event)">Contact Us</a>
                 </div>
             </div>
-            <div class="menu-dropdown">
-                <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <div class="dropdown-item" onclick="goHome()">
-                        <span class="item-icon">🏠</span>
-                        <span>Home</span>
-                    </div>
-                    <div class="dropdown-item" onclick="openAboutModal()">
-                        <span class="item-icon">ℹ️</span>
-                        <span>About Us</span>
-                    </div>
-                    <div class="dropdown-item" onclick="openMyselfModal()">
-                        <span class="item-icon">👤</span>
-                        <span>My Self</span>
-                    </div>
-                    <div class="dropdown-item" onclick="openContactModal()">
-                        <span class="item-icon">📞</span>
-                        <span>Contact Us</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </nav>
     </header>
 
-    <!-- Main Container -->
+    <!-- Main Content -->
     <div class="container">
         <!-- Daily Learning Section -->
-        <div class="section-header">
-            <div class="section-title">📅 Daily Learning</div>
-        </div>
-        <div class="daily-grid">
-            <a href="everyday.html" class="daily-card">
-                <div class="update-badge">LIVE</div>
-                <div class="daily-icon">📝</div>
-                <h3>Everyday Quiz</h3>
-                <span class="daily-time">⏰ 8:00 PM</span>
-            </a>
-            <a href="dailycurrent.html" class="daily-card">
-                <div class="update-badge">NEW</div>
-                <div class="daily-icon">📰</div>
-                <h3>Daily Current</h3>
-                <span class="daily-time">⏰ 8:00 AM</span>
-            </a>
+        <div class="section">
+            <h2 class="section-title">📚 Daily Learning</h2>
+            <div class="daily-grid">
+                <div class="daily-card">
+                    <div class="daily-card-title">Everyday Quiz</div>
+                    <div class="daily-card-time">Starting 8:00 PM</div>
+                </div>
+                <div class="daily-card">
+                    <div class="daily-card-title">Everyday Current Affairs</div>
+                    <div class="daily-card-time">Read Everyday at 8:00 AM</div>
+                </div>
+            </div>
         </div>
 
-        <!-- Exam Corners Section -->
-        <div class="section-header">
-            <div class="section-title">🎯 Exam Corners</div>
-        </div>
-        <div class="exam-grid">
-            <a href="gpsc.html" class="exam-card">
-                <div class="exam-icon">📊</div>
-                <h3>GPSC Class 1/2</h3>
-                <div class="exam-subjects">Gujarati, English, Maths, Reasoning, GK, Current Affairs</div>
-                <span class="exam-badge">11 Subjects</span>
-            </a>
-            <a href="gpsc2.html" class="exam-card">
-                <div class="exam-icon">💼</div>
-                <h3>DySO / STI</h3>
-                <div class="exam-subjects">Gujarati, English, Maths, History, Geography, Polity</div>
-                <span class="exam-badge">10 Subjects</span>
-            </a>
-            <a href="lrd.html" class="exam-card">
-                <div class="exam-icon">👮</div>
-                <h3>Constable</h3>
-                <div class="exam-subjects">Gujarati, English, Maths, Reasoning, GK</div>
-                <span class="exam-badge">6 Subjects</span>
-            </a>
-            <a href="psi.html" class="exam-card">
-                <div class="exam-icon">🚔</div>
-                <h3>PSI</h3>
-                <div class="exam-subjects">Gujarati, English, Reasoning, GK, Law, Computer</div>
-                <span class="exam-badge">8 Subjects</span>
-            </a>
-            <a href="cce.html" class="exam-card">
-                <div class="exam-icon">💻</div>
-                <h3>CCE</h3>
-                <div class="exam-subjects">Gujarati, English, Maths, Reasoning, Computer</div>
-                <span class="exam-badge">6 Subjects</span>
-            </a>
-            <a href="tet1.html" class="exam-card">
-                <div class="exam-icon">👨‍🏫</div>
-                <h3>TET-1</h3>
-                <div class="exam-subjects">Gujarati, English, Maths, Science, Social Science</div>
-                <span class="exam-badge">6 Subjects</span>
-            </a>
-            <a href="tet2.html" class="exam-card">
-                <div class="exam-icon">👩‍🏫</div>
-                <h3>TET-2</h3>
-                <div class="exam-subjects">Gujarati, English, Maths, EVS, Pedagogy</div>
-                <span class="exam-badge">5 Subjects</span>
-            </a>
-            <a href="forest.html" class="exam-card">
-                <div class="exam-icon">🌲</div>
-                <h3>Forest Guard</h3>
-                <div class="exam-subjects">Gujarati, English, Maths, Science, Geography</div>
-                <span class="exam-badge">7 Subjects</span>
-            </a>
+        <!-- Exam Corner Section -->
+        <div class="section">
+            <h2 class="section-title">🎓 Exam Corner</h2>
+            
+            <div class="exam-card" onclick="window.location.href='gpsc.html'">
+                <div class="exam-icon icon-blue">📊</div>
+                <div class="exam-info">
+                    <div class="exam-title">GPSC Class 1/2</div>
+                    <div class="exam-subjects">Gujarati, English, Maths, Reasoning, GK, Current Affairs</div>
+                </div>
+                <div class="subject-badge">11 Subjects</div>
+            </div>
+
+            <div class="exam-card" onclick="window.location.href='dysosti.html'">
+                <div class="exam-icon icon-orange">💼</div>
+                <div class="exam-info">
+                    <div class="exam-title">DySO / STI</div>
+                    <div class="exam-subjects">Gujarati, English, Maths, History, Geography, Polity</div>
+                </div>
+                <div class="subject-badge">10 Subjects</div>
+            </div>
+
+            <div class="exam-card" onclick="window.location.href='lrd.html'">
+                <div class="exam-icon icon-teal">🛡️</div>
+                <div class="exam-info">
+                    <div class="exam-title">Constable</div>
+                    <div class="exam-subjects">Gujarati, English, Maths, Reasoning, GK</div>
+                </div>
+                <div class="subject-badge">6 Subjects</div>
+            </div>
+
+            <div class="exam-card" onclick="window.location.href='psi.html'">
+                <div class="exam-icon icon-green">🚗</div>
+                <div class="exam-info">
+                    <div class="exam-title">PSI</div>
+                    <div class="exam-subjects">Gujarati, English, Reasoning, GK, Law, Computer</div>
+                </div>
+                <div class="subject-badge">8 Subjects</div>
+            </div>
+
+            <div class="exam-card" onclick="window.location.href='cce.html'">
+                <div class="exam-icon icon-purple">📖</div>
+                <div class="exam-info">
+                    <div class="exam-title">CCE</div>
+                    <div class="exam-subjects">Gujarati, English, Maths, Reasoning, Computer</div>
+                </div>
+                <div class="subject-badge">7 Subjects</div>
+            </div>
+
+            <div class="exam-card" onclick="window.location.href='talati.html'">
+                <div class="exam-icon icon-pink">📝</div>
+                <div class="exam-info">
+                    <div class="exam-title">Talati</div>
+                    <div class="exam-subjects">Gujarati, English, Maths, GK, Accounts</div>
+                </div>
+                <div class="subject-badge">9 Subjects</div>
+            </div>
+
+            <div class="exam-card" onclick="window.location.href='tet1.html'">
+                <div class="exam-icon icon-cyan">🎓</div>
+                <div class="exam-info">
+                    <div class="exam-title">TET-1</div>
+                    <div class="exam-subjects">Gujarati, English, Child Development, Pedagogy</div>
+                </div>
+                <div class="subject-badge">8 Subjects</div>
+            </div>
+
+            <div class="exam-card" onclick="window.location.href='forest.html'">
+                <div class="exam-icon icon-lime">🌲</div>
+                <div class="exam-info">
+                    <div class="exam-title">Forest Guard</div>
+                    <div class="exam-subjects">Gujarati, English, Maths, GK, Environment</div>
+                </div>
+                <div class="subject-badge">7 Subjects</div>
+            </div>
         </div>
 
-        <!-- Study Tools Section -->
-        <div class="section-header">
-            <div class="section-title">✨ Study Tools</div>
-        </div>
-        <div class="tools-grid">
-            <div class="tool-card" onclick="showComingSoon()">
-                <div class="coming-soon">Soon</div>
-                <div class="tool-icon">🎥</div>
-                <h4>Video Lectures</h4>
-                <p>HD Video Classes</p>
-            </div>
-            <div class="tool-card" onclick="showComingSoon()">
-                <div class="coming-soon">Soon</div>
-                <div class="tool-icon">📄</div>
-                <h4>PDF Materials</h4>
-                <p>Download Notes</p>
-            </div>
-            <div class="tool-card" onclick="showComingSoon()">
-                <div class="coming-soon">Soon</div>
-                <div class="tool-icon">📝</div>
-                <h4>Test Series</h4>
-                <p>Mock Tests</p>
-            </div>
-            <div class="tool-card" onclick="showComingSoon()">
-                <div class="coming-soon">Soon</div>
-                <div class="tool-icon">📋</div>
-                <h4>Syllabus</h4>
-                <p>Full Curriculum</p>
+        <!-- Exam Tools Section -->
+        <div class="section">
+            <h2 class="section-title">🛠️ Exam Tools</h2>
+            <div class="tools-grid">
+                <div class="tool-card" onclick="showComingSoon(event)">
+                    <div class="tool-icon">🎥</div>
+                    <div class="tool-title">Video Lecture</div>
+                    <div class="coming-soon">Coming Soon</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📋</div>
+                    <div class="tool-title">Syllabus</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📝</div>
+                    <div class="tool-title">Mock Test</div>
+                </div>
+                <div class="tool-card">
+                    <div class="tool-icon">📊</div>
+                    <div class="tool-title">Performance</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Footer Navigation -->
-    <footer class="footer-nav">
-        <a href="profile.html" class="nav-item">
-            <div class="icon icon-account">👤</div>
-            <span>Account</span>
-        </a>
-        <a href="testmode.html" class="nav-item">
-            <div class="icon icon-progress">📊</div>
-            <span>Progress</span>
-        </a>
-        <div class="nav-item" onclick="openContactModal()">
-            <div class="icon icon-contact">📞</div>
-            <span>Contact</span>
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <a href="profile.html" class="footer-item">
+                <div class="footer-icon">👤</div>
+                <div class="footer-label">Account</div>
+            </a>
+            <div class="footer-item">
+                <div class="footer-icon">📊</div>
+                <div class="footer-label">Progress</div>
+            </div>
+            <div class="footer-item" onclick="showContact(event)">
+                <div class="footer-icon">📞</div>
+                <div class="footer-label">Contact</div>
+            </div>
+            <div class="footer-item">
+                <div class="footer-icon">🔔</div>
+                <div class="footer-label">Notification</div>
+            </div>
         </div>
-        <a href="notification.html" class="nav-item">
-            <div class="icon icon-notification">🔔</div>
-            <span>Notification</span>
-        </a>
     </footer>
 
-    <!-- About Modal -->
-    <div id="aboutModal" class="modal">
+    <!-- Coming Soon Modal -->
+    <div id="comingSoonModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">About Us</div>
-                <div class="close-btn" onclick="closeModal('aboutModal')">✕</div>
-            </div>
-            <div class="modal-body">
-                <h3 style="margin-bottom: 15px; color: #a8b3ff;">Coming Soon...</h3>
-                <p>We are working hard to bring you the best learning experience. Stay tuned!</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Myself Modal -->
-    <div id="myselfModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">My Self</div>
-                <div class="close-btn" onclick="closeModal('myselfModal')">✕</div>
-            </div>
-            <div class="modal-body">
-                <h3 style="margin-bottom: 15px; color: #a8b3ff;">Coming Soon...</h3>
-                <p>Personal profile section will be available soon!</p>
-            </div>
+            <button class="modal-close" onclick="closeModal('comingSoonModal')">&times;</button>
+            <h2 class="modal-title">Coming Soon</h2>
+            <p>This feature will be available soon. Stay tuned!</p>
         </div>
     </div>
 
     <!-- Contact Modal -->
     <div id="contactModal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Contact Us</div>
-                <div class="close-btn" onclick="closeModal('contactModal')">✕</div>
-            </div>
-            <div class="modal-body">
-                <p style="margin-bottom: 20px; font-size: 18px; color: white; font-weight: 600;">📞 +91 6353511804</p>
-                <div class="contact-links">
-                    <a href="tel:+916353511804" class="contact-btn">
-                        📞 Call
-                    </a>
-                    <a href="https://wa.me/916353511804" class="contact-btn whatsapp" target="_blank">
-                        💬 WhatsApp
-                    </a>
-                </div>
+            <button class="modal-close" onclick="closeModal('contactModal')">&times;</button>
+            <h2 class="modal-title">Contact Us</h2>
+            <p style="margin-bottom: 8px;">Get in touch with us</p>
+            <p style="font-size: 16px; font-weight: 600; color: #1976d2;">+91 6353511804</p>
+            <div class="contact-buttons">
+                <a href="tel:+916353511804" class="contact-btn call-btn">
+                    <span>📞</span>
+                    <span>Call</span>
+                </a>
+                <a href="https://wa.me/916353511804" target="_blank" class="contact-btn whatsapp-btn">
+                    <span>💬</span>
+                    <span>WhatsApp</span>
+                </a>
             </div>
         </div>
     </div>
 
     <script>
-        // Dropdown Menu Functions
         function toggleMenu() {
             const menu = document.getElementById('dropdownMenu');
             menu.classList.toggle('active');
         }
 
-        function goHome() {
-            window.location.href = 'index.html';
-            toggleMenu();
-        }
-
         // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            const dropdown = document.querySelector('.menu-dropdown');
-            if (!dropdown.contains(e.target)) {
-                document.getElementById('dropdownMenu').classList.remove('active');
+        document.addEventListener('click', function(event) {
+            const menuWrapper = document.querySelector('.menu-wrapper');
+            const menu = document.getElementById('dropdownMenu');
+            
+            if (!menuWrapper.contains(event.target)) {
+                menu.classList.remove('active');
             }
         });
 
-        // Modal Functions
-        function openAboutModal() {
-            openModal('aboutModal');
-            toggleMenu();
+        function showComingSoon(event) {
+            event.preventDefault();
+            document.getElementById('dropdownMenu').classList.remove('active');
+            document.getElementById('comingSoonModal').classList.add('active');
         }
 
-        function openMyselfModal() {
-            openModal('myselfModal');
-            toggleMenu();
-        }
-
-        function openContactModal() {
-            openModal('contactModal');
-            const menu = document.getElementById('dropdownMenu');
-            if (menu) menu.classList.remove('active');
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.body.style.overflow = 'hidden';
+        function showContact(event) {
+            event.preventDefault();
+            document.getElementById('dropdownMenu').classList.remove('active');
+            document.getElementById('contactModal').classList.add('active');
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
-            document.body.style.overflow = 'auto';
         }
 
-        // Close modal on background click
-        document.querySelectorAll('.modal').forEach
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
