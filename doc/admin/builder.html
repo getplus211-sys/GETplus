@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Page Builder</title>
+  <style>
+    body{font-family:Arial;margin:0;background:#f6f8fb}
+    header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#fff;border-bottom:1px solid #eee}
+    .container{max-width:1100px;margin:20px auto;padding:12px}
+    .top{display:flex;gap:12px;margin-bottom:12px}
+    input[type=text]{padding:10px;border-radius:6px;border:1px solid #ddd;width:100%}
+    .left{flex:1}
+    .right{width:260px}
+    .panel{background:#fff;padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(20,30,50,0.04)}
+    .blocks-list{margin-top:12px}
+    .block{border:1px dashed #e2e8f0;padding:10px;border-radius:8px;margin-bottom:10px;background:#fff;display:flex;justify-content:space-between;align-items:center}
+    .block .meta{flex:1}
+    .block-controls button{margin-left:6px}
+    .controls button{padding:8px 10px;border-radius:6px;border:none;cursor:pointer;background:#2563eb;color:#fff}
+    .small{padding:6px 8px;border-radius:6px;border:none;cursor:pointer}
+    .up, .down{background:#f3f4f6;color:#111}
+    textarea{width:100%;min-height:100px;padding:8px;border-radius:6px;border:1px solid #ddd}
+    label{font-weight:600}
+    .img-thumb{max-width:100%;height:auto;border-radius:6px;margin-top:8px}
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>Page Builder</strong></div>
+    <div>
+      <a href="pages.html">Back to Pages</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="top">
+      <div class="left panel">
+        <div style="display:flex;gap:10px">
+          <input id="title" placeholder="Page Title" />
+          <input id="slug" placeholder="page-slug (unique)" />
+          <button id="savePage" class="controls">Save Page</button>
+        </div>
+
+        <div style="margin-top:14px">
+          <label>Add Block</label>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="addText" class="small">Text</button>
+            <button id="addHtml" class="small">HTML</button>
+            <button id="addImage" class="small">Image</button>
+            <button id="addHero" class="small">Hero</button>
+            <button id="addButton" class="small">Button</button>
+          </div>
+        </div>
+
+        <div class="blocks-list" id="blocksList"></div>
+      </div>
+
+      <div class="right panel">
+        <h4>Preview (simple)</h4>
+        <div id="previewArea">No blocks yet</div>
+        <hr/>
+        <h4>Image Upload</h4>
+        <input id="imageFile" type="file" accept="image/*" />
+        <button id="uploadImage" class="controls">Upload</button>
+        <p class="muted">Uploaded images will be stored in Supabase Storage "public" bucket.</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+    const SUPABASE_URL = "https://bhmycvrbucmbbrpzeane.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Helpers
+    const qs = s => document.querySelector(s);
+    const qsa = s => Array.from(document.querySelectorAll(s));
+    let pageId = null;
+    let blocks = []; // local state
+
+    // get page_id if editing
+    const params = new URLSearchParams(location.search);
+    if (params.get('page_id')) pageId = params.get('page_id');
+
+    // init
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data?.session) location.href = 'login.html';
+
+      if (pageId) {
+        const { data: p } = await supabase.from('pages').select('*').eq('id', pageId).single();
+        if (p) {
+          qs('#title').value = p.title;
+          qs('#slug').value = p.slug;
+          await loadBlocks();
+        }
+      }
+      renderBlocks();
+    })();
+
+    // block factory
+    function createBlock(type, content){
+      return {
+        id: cryptoRandomId(),
+        type,
+        content,
+        order: blocks.length
+      };
+    }
+
+    function cryptoRandomId(){ return 'b_' + Math.random().toString(36).slice(2,9); }
+
+    // Add block buttons
+    qs('#addText').addEventListener('click', ()=>{ blocks.push(createBlock('text', { text: 'New text...' })); renderBlocks(); });
+    qs('#addHtml').addEventListener('click', ()=>{ blocks.push(createBlock('html', { html: '<div>Custom HTML</div>' })); renderBlocks(); });
+    qs('#addImage').addEventListener('click', ()=>{ blocks.push(createBlock('image', { url: '', alt: '' })); renderBlocks(); });
+    qs('#addHero').addEventListener('click', ()=>{ blocks.push(createBlock('hero', { title: 'Hero Title', subtitle: 'Subtitle', bg: '' })); renderBlocks(); });
+    qs('#addButton').addEventListener('click', ()=>{ blocks.push(createBlock('button', { text: 'Click me', href: '#' })); renderBlocks(); });
+
+    function renderBlocks(){
+      const container = qs('#blocksList');
+      container.innerHTML = '';
+      if (!blocks.length) { container.innerHTML = '<p class="muted">No blocks. Add one.</p>'; qs('#previewArea').innerText = 'No blocks yet'; return; }
+
+      blocks.forEach((b, idx) => {
+        b.order = idx;
+        const el = document.createElement('div');
+        el.className = 'block';
+        el.innerHTML = `
+          <div class="meta">
+            <strong>${escapeHtml(b.type)}</strong>
+            <div style="margin-top:6px" id="editor-${b.id}"></div>
+          </div>
+          <div class="block-controls">
+            <button class="small up" data-id="${b.id}" data-act="up">↑</button>
+            <button class="small down" data-id="${b.id}" data-act="down">↓</button>
+            <button class="small" data-id="${b.id}" data-act="save">Save</button>
+            <button class="small" data-id="${b.id}" data-act="del">Delete</button>
+          </div>
+        `;
+        container.appendChild(el);
+
+        // render editor for this block
+        const editor = qs(`#editor-${b.id}`);
+        if (b.type === 'text') {
+          editor.innerHTML = `<textarea id="ta-${b.id}">${escapeHtml(b.content.text || '')}</textarea>`;
+        } else if (b.type === 'html') {
+          editor.innerHTML = `<textarea id="ta-${b.id}">${escapeHtml(b.content.html || '')}</textarea>`;
+        } else if (b.type === 'image') {
+          editor.innerHTML = `
+            <input id="imgurl-${b.id}" placeholder="Image URL" value="${escapeAttr(b.content.url||'')}" />
+            <input id="imgalt-${b.id}" placeholder="Alt text" value="${escapeAttr(b.content.alt||'')}" />
+            ${b.content.url ? `<img class="img-thumb" src="${escapeAttr(b.content.url)}" />` : ''}
+          `;
+        } else if (b.type === 'hero') {
+          editor.innerHTML = `
+            <input id="heroTitle-${b.id}" placeholder="Title" value="${escapeAttr(b.content.title||'')}" />
+            <input id="heroSub-${b.id}" placeholder="Subtitle" value="${escapeAttr(b.content.subtitle||'')}" />
+            <input id="heroBg-${b.id}" placeholder="Background image URL" value="${escapeAttr(b.content.bg||'')}" />
+          `;
+        } else if (b.type === 'button') {
+          editor.innerHTML = `
+            <input id="btnText-${b.id}" placeholder="Button text" value="${escapeAttr(b.content.text||'')}" />
+            <input id="btnHref-${b.id}" placeholder="Href" value="${escapeAttr(b.content.href||'')}" />
+          `;
+        }
+
+        // attach controls
+        el.querySelectorAll('button').forEach(btn=>{
+          btn.addEventListener('click', async (e)=>{
+            const act = btn.dataset.act;
+            const id = btn.dataset.id;
+            if (act === 'up') moveBlockUp(id);
+            if (act === 'down') moveBlockDown(id);
+            if (act === 'del') { if(confirm('Delete block?')) { blocks = blocks.filter(x=>x.id !== id); renderBlocks(); } }
+            if (act === 'save') {
+              // extract values into blocks
+              const bIndex = blocks.findIndex(x=>x.id===id);
+              if (bIndex === -1) return;
+              const block = blocks[bIndex];
+              if (block.type === 'text') block.content.text = qs(`#ta-${id}`).value;
+              if (block.type === 'html') block.content.html = qs(`#ta-${id}`).value;
+              if (block.type === 'image') {
+                block.content.url = qs(`#imgurl-${id}`).value;
+                block.content.alt = qs(`#imgalt-${id}`).value;
+              }
+              if (block.type === 'hero') {
+                block.content.title = qs(`#heroTitle-${id}`).value;
+                block.content.subtitle = qs(`#heroSub-${id}`).value;
+                block.content.bg = qs(`#heroBg-${id}`).value;
+              }
+              if (block.type === 'button') {
+                block.content.text = qs(`#btnText-${id}`).value;
+                block.content.href = qs(`#btnHref-${id}`).value;
+              }
+              alert('Block saved locally. Click "Save Page" to persist.');
+              renderPreview();
+            }
+          });
+        });
+      });
+
+      renderPreview();
+    }
+
+    function moveBlockUp(id){
+      const i = blocks.findIndex(x=>x.id===id);
+      if (i > 0) { [blocks[i-1], blocks[i]] = [blocks[i], blocks[i-1]]; renderBlocks(); }
+    }
+    function moveBlockDown(id){
+      const i = blocks.findIndex(x=>x.id===id);
+      if (i < blocks.length-1) { [blocks[i+1], blocks[i]] = [blocks[i], blocks[i+1]]; renderBlocks(); }
+    }
+
+    function renderPreview(){
+      const area = qs('#previewArea');
+      if (!blocks.length) { area.innerText = 'No blocks yet'; return; }
+      area.innerHTML = '';
+      blocks.forEach(b=>{
+        if (b.type === 'text') {
+          const p = document.createElement('p'); p.innerText = b.content.text || ''; area.appendChild(p);
+        }
+        if (b.type === 'html') {
+          const wrapper = document.createElement('div'); wrapper.innerHTML = b.content.html || ''; area.appendChild(wrapper);
+        }
+        if (b.type === 'image') {
+          if (b.content.url) {
+            const img = document.createElement('img'); img.src = b.content.url; img.style.maxWidth='100%'; area.appendChild(img);
+          }
+        }
+        if (b.type === 'hero') {
+          const div = document.createElement('div'); div.style.padding='20px'; div.style.border='1px solid #eee';
+          div.innerHTML = `<h2>${escapeHtml(b.content.title||'')}</h2><p>${escapeHtml(b.content.subtitle||'')}</p>`;
+          if (b.content.bg) { div.style.backgroundImage = `url(${b.content.bg})`; div.style.backgroundSize='cover'; div.style.color='#fff'; }
+          area.appendChild(div);
+        }
+        if (b.type === 'button') {
+          const a = document.createElement('a'); a.href = b.content.href||'#'; a.innerText = b.content.text||'Button'; a.style.display='inline-block'; a.style.padding='8px 12px'; a.style.background='#2563eb'; a.style.color='#fff'; a.style.borderRadius='6px'; a.style.textDecoration='none';
+          area.appendChild(a);
+        }
+      });
+    }
+
+    // Save page + blocks to supabase
+    qs('#savePage').addEventListener('click', async () => {
+      const title = qs('#title').value.trim();
+      const slug = qs('#slug').value.trim();
+      if (!title || !slug) return alert('Title and slug required');
+
+      // save page
+      if (!pageId) {
+        const { data, error } = await supabase.from('pages').insert([{ title, slug }]).select().single();
+        if (error) return alert('Save page failed: ' + error.message);
+        pageId = data.id;
+      } else {
+        const { error } = await supabase.from('pages').update({ title, slug }).eq('id', pageId);
+        if (error) return alert('Update page failed: ' + error.message);
+        // remove existing blocks then insert new ones for simplicity
+        await supabase.from('page_blocks').delete().eq('page_id', pageId);
+      }
+
+      // insert blocks
+      const toInsert = blocks.map((b, idx) => ({
+        page_id: pageId,
+        type: b.type,
+        content: b.content,
+        order: idx
+      }));
+
+      const { error } = await supabase.from('page_blocks').insert(toInsert);
+      if (error) return alert('Save blocks failed: ' + error.message);
+      alert('Page saved successfully');
+      // redirect to pages list
+      location.href = 'pages.html';
+    });
+
+    // load existing blocks if editing
+    async function loadBlocks(){
+      if (!pageId) return;
+      const { data, error } = await supabase.from('page_blocks').select('*').eq('page_id', pageId).order('order', {ascending:true});
+      if (error) { console.error(error); return; }
+      blocks = (data || []).map(b => ({ id: b.id, type: b.type, content: b.content, order: b.order }));
+    }
+
+    // image upload
+    qs('#uploadImage').addEventListener('click', async () => {
+      const f = qs('#imageFile').files[0];
+      if (!f) return alert('Choose file first');
+      const filename = `images/${Date.now()}_${f.name}`;
+      const { data, error } = await supabase.storage.from('public').upload(filename, f, { cacheControl: '3600', upsert: false });
+      if (error) return alert('Upload error: ' + error.message);
+      const { publicUrl } = supabase.storage.from('public').getPublicUrl(filename);
+      // show link
+      prompt('Image uploaded. Copy URL:', publicUrl);
+    });
+
+    // small helpers
+    function escapeHtml(str){ return (''+str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
+  </script>
+</body>
+</html>

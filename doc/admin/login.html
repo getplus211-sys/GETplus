@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Login</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+    .card{background:#fff;padding:28px;border-radius:10px;box-shadow:0 6px 18px rgba(20,30,50,0.08);width:360px}
+    h2{margin:0 0 14px;}
+    input{width:100%;padding:10px;margin:8px 0;border:1px solid #ddd;border-radius:6px}
+    button{width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer}
+    .note{font-size:13px;color:#666;margin-top:10px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Admin Login</h2>
+    <input id="email" placeholder="Email" />
+    <input id="password" placeholder="Password" type="password" />
+    <button id="loginBtn">Login</button>
+    <p class="note">Uses Supabase Auth (email/password). Create admin users in Supabase Auth dashboard.</p>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+    // TODO: replace with your supabase values
+    const SUPABASE_URL = "https://bhmycvrbucmbbrpzeane.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      if (!email || !password) return alert('Enter email and password');
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return alert('Login error: ' + error.message);
+      // Redirect to dashboard
+      location.href = 'dashboard.html';
+    });
+
+    // If already logged in, go to dashboard
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) location.href = 'dashboard.html';
+    })();
+  </script>
+</body>
+</html>

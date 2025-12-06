@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pages - Admin</title>
+  <style>
+    body{font-family:Arial;margin:0;background:#f7f9fc}
+    header{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;background:#fff;border-bottom:1px solid #eee}
+    .container{max-width:1100px;margin:20px auto;padding:0 12px}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 6px 18px rgba(20,30,50,0.04)}
+    th,td{padding:12px;border-bottom:1px solid #f0f2f6;text-align:left}
+    th{background:#fafbfd}
+    .btn{padding:8px 10px;border-radius:6px;border:none;cursor:pointer}
+    .edit{background:#10b981;color:#fff}
+    .del{background:#ef4444;color:#fff}
+    .create{background:#2563eb;color:#fff;margin-left:8px}
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>Pages</strong></div>
+    <div>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="builder.html"><button class="btn create">Create Page</button></a>
+    </div>
+  </header>
+
+  <div class="container">
+    <table id="pagesTable">
+      <thead>
+        <tr><th>Title</th><th>Slug</th><th>Created</th><th>Actions</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+    const SUPABASE_URL = "https://bhmycvrbucmbbrpzeane.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadPages(){
+      const { data, error } = await supabase.from('pages').select('*').order('created_at', { ascending: false });
+      if (error) return alert('Error loading pages: ' + error.message);
+      const tbody = document.querySelector('#pagesTable tbody');
+      tbody.innerHTML = '';
+      data.forEach(p=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(p.title)}</td>
+          <td>${escapeHtml(p.slug)}</td>
+          <td>${new Date(p.created_at).toLocaleString()}</td>
+          <td>
+            <button class="btn edit" onclick="editPage('${p.id}')">Edit</button>
+            <button class="btn del" onclick="deletePage('${p.id}')">Delete</button>
+            <a href="../public/page.html?slug=${encodeURIComponent(p.slug)}" target="_blank"><button class="btn">View</button></a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    loadPages();
+
+    window.editPage = (id) => {
+      location.href = `builder.html?page_id=${id}`;
+    }
+
+    window.deletePage = async (id) => {
+      if (!confirm('Delete this page? This cannot be undone.')) return;
+      const { error } = await supabase.from('pages').delete().eq('id', id);
+      if (error) return alert('Delete failed: ' + error.message);
+      await supabase.from('page_blocks').delete().eq('page_id', id); // ensure blocks removed
+      alert('Deleted');
+      loadPages();
+    }
+
+    // simple sanitizer for display
+    function escapeHtml(str){ return (''+str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data?.session) location.href = 'login.html';
+    })();
+  </script>
+</body>
+</html>

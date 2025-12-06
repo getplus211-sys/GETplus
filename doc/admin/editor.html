@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Builder</title>
+<style>
+    body { font-family: Arial; padding:20px; }
+    textarea { width:100%; height:300px; }
+</style>
+</head>
+<body>
+
+<h2>Page Editor</h2>
+
+<input id="title" placeholder="Page Title" style="width:100%;padding:10px">
+<br><br>
+
+<textarea id="content" placeholder="Write HTML code here"></textarea>
+
+<br>
+<button id="saveBtn">Save Page</button>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabase = createClient("https://bhmycvrbucmbbrpzeane.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4");
+
+/* 🔥 SESSION CHECK START */
+const { data: sessionData } = await supabase.auth.getSession();
+if (!sessionData.session) {
+    window.location = "index.html";
+}
+
+/* 🔥 ADMIN USER CHECK (તમારે અહીં USER ID મૂકી દેવાની છે!) */
+const adminUserID = "ca1e88af-005c-4b97-a3bc-9427763ea150";
+if (sessionData.session.user.id !== adminUserID) {
+    alert("Access Denied");
+    window.location = "../";
+}
+/* 🔥 SESSION CHECK END */
+
+const url = new URL(window.location);
+const editID = url.searchParams.get("id");
+
+if(editID){
+  const { data } = await supabase
+        .from("pages")
+        .select("*")
+        .eq("id", editID)
+        .single();
+
+  document.getElementById("title").value = data.title;
+  document.getElementById("content").value = data.content;
+}
+
+document.getElementById("saveBtn").onclick = async () => {
+  const title = document.getElementById("title").value;
+  const content = document.getElementById("content").value;
+
+  if(editID){
+    await supabase.from("pages").update({title,content}).eq("id",editID);
+  } else {
+    await supabase.from("pages").insert([{title,content}]);
+  }
+
+  alert("Saved!");
+  window.location = "dashboard.html";
+};
+</script>
+
+</body>
+</html>
