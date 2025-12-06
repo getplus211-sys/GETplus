@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+<style>
+    body { font-family: Arial; padding:20px; }
+    a { display:block; margin:10px 0; }
+</style>
+</head>
+<body>
+
+<h2>Admin Dashboard</h2>
+
+<button onclick="window.location='editor.html'">➕ Add New Page</button>
+
+<h3>All Pages</h3>
+<div id="pages"></div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabase = createClient("YOUR_SUPABASE_URL", "YOUR_SUPABASE_API_KEY");
+
+/* 🔥 SESSION CHECK START */
+const { data: sessionData } = await supabase.auth.getSession();
+if (!sessionData.session) {
+    window.location = "index.html";
+}
+
+/* 🔥 ADMIN USER CHECK (તમારે અહીં USER ID મૂકી દેવાની છે!) */
+const adminUserID = "YOUR_ADMIN_USER_ID_HERE";  
+if (sessionData.session.user.id !== adminUserID) {
+    alert("Access Denied");
+    window.location = "../";
+}
+/* 🔥 SESSION CHECK END */
+
+async function loadPages(){
+  let { data } = await supabase.from("pages").select("*");
+  document.getElementById("pages").innerHTML = data.map(p =>
+    `<p>
+      <b>${p.title}</b>
+      <button onclick="edit(${p.id})">Edit</button>
+      <button onclick="del(${p.id})">Delete</button>
+    </p>`
+  ).join("");
+}
+
+window.edit = (id) => {
+  window.location = "editor.html?id=" + id;
+};
+
+window.del = async (id) => {
+  await supabase.from("pages").delete().eq("id", id);
+  loadPages();
+};
+
+loadPages();
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+<style>
+    body { font-family: Arial; padding:20px; }
+    a { display:block; margin:10px 0; }
+</style>
+</head>
+<body>
+
+<h2>Admin Dashboard</h2>
+
+<button onclick="window.location='editor.html'">➕ Add New Page</button>
+
+<h3>All Pages</h3>
+<div id="pages"></div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabase = createClient("https://bhmycvrbucmbbrpzeane.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4");
+
+/* 🔥 SESSION CHECK START */
+const { data: sessionData } = await supabase.auth.getSession();
+if (!sessionData.session) {
+    window.location = "index.html";
+}
+
+/* 🔥 ADMIN USER CHECK (તમારે અહીં USER ID મૂકી દેવાની છે!) */
+const adminUserID = "ca1e88af-005c-4b97-a3bc-9427763ea150";  
+if (sessionData.session.user.id !== adminUserID) {
+    alert("Access Denied");
+    window.location = "../";
+}
+/* 🔥 SESSION CHECK END */
+
+async function loadPages(){
+  let { data } = await supabase.from("pages").select("*");
+  document.getElementById("pages").innerHTML = data.map(p =>
+    `<p>
+      <b>${p.title}</b>
+      <button onclick="edit(${p.id})">Edit</button>
+      <button onclick="del(${p.id})">Delete</button>
+    </p>`
+  ).join("");
+}
+
+window.edit = (id) => {
+  window.location = "editor.html?id=" + id;
+};
+
+window.del = async (id) => {
+  await supabase.from("pages").delete().eq("id", id);
+  loadPages();
+};
+
+loadPages();
+</script>
+
+</body>
+</html>
