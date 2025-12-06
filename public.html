@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Page</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:24px;background:#fff;color:#111}
+    .container{max-width:900px;margin:0 auto}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="content">Loading...</div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+    const SUPABASE_URL = "https://bhmycvrbucmbbrpzeane.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadPageBySlug(slug){
+      const { data: page, error: pageErr } = await supabase.from('pages').select('*').eq('slug', slug).maybeSingle();
+      if (pageErr) return showError(pageErr.message);
+      if (!page) return showError('Page not found');
+
+      const { data: blocks, error: blocksErr } = await supabase.from('page_blocks').select('*').eq('page_id', page.id).order('order', { ascending: true });
+      if (blocksErr) return showError(blocksErr.message);
+
+      render(page, blocks || []);
+    }
+
+    function showError(m){
+      document.getElementById('content').innerText = m;
+    }
+
+    function render(page, blocks){
+      const c = document.getElementById('content');
+      c.innerHTML = `<h1>${escapeHtml(page.title)}</h1>`;
+      blocks.forEach(b => {
+        if (b.type === 'text') {
+          const p = document.createElement('p'); p.innerText = b.content.text || ''; c.appendChild(p);
+        }
+        if (b.type === 'html') {
+          // raw html inserted intentionally
+          const wrapper = document.createElement('div'); wrapper.innerHTML = b.content.html || ''; c.appendChild(wrapper);
+        }
+        if (b.type === 'image') {
+          if (b.content.url) {
+            const img = document.createElement('img'); img.src = b.content.url; img.style.maxWidth='100%'; c.appendChild(img);
+            if (b.content.alt) { const alt = document.createElement('div'); alt.innerText = b.content.alt; c.appendChild(alt); }
+          }
+        }
+        if (b.type === 'hero') {
+          const div = document.createElement('div'); div.style.padding='40px'; div.style.margin='12px 0'; div.style.border='1px solid #eee';
+          div.innerHTML = `<h2>${escapeHtml(b.content.title||'')}</h2><p>${escapeHtml(b.content.subtitle||'')}</p>`;
+          if (b.content.bg) div.style.backgroundImage = `url(${b.content.bg})`;
+          c.appendChild(div);
+        }
+        if (b.type === 'button') {
+          const a = document.createElement('a'); a.href = b.content.href||'#'; a.innerText = b.content.text||'Button'; a.style.display='inline-block'; a.style.padding='8px 12px'; a.style.background='#2563eb'; a.style.color='#fff'; a.style.borderRadius='6px'; a.style.textDecoration='none';
+          c.appendChild(a);
+        }
+      });
+    }
+
+    function escapeHtml(str){ return (''+str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    // get slug from query
+    const params = new URLSearchParams(location.search);
+    const slug = params.get('slug');
+    if (!slug) showError('No slug specified.');
+    else loadPageBySlug(slug);
+  </script>
+</body>
+</html>
