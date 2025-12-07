@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Builder - GETplus CMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .btn-back {
+            padding: 10px 20px;
+            background: #e1e8ed;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-back:hover {
+            background: #d1d8dd;
+        }
+        
+        .page-title-input {
+            font-size: 20px;
+            font-weight: 600;
+            border: 2px solid transparent;
+            padding: 8px 12px;
+            border-radius: 8px;
+            min-width: 300px;
+            transition: all 0.3s;
+        }
+        
+        .page-title-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn-save {
+            padding: 10px 24px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-save:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .btn-publish {
+            padding: 10px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-publish:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        /* Main Layout */
+        .builder-container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+        
+        /* Sidebar - Block Palette */
+        .blocks-sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e1e8ed;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .blocks-sidebar h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .block-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .block-item:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+        
+        .block-icon {
+            font-size: 24px;
+        }
+        
+        .block-info h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+        
+        .block-info p {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        /* Canvas - Main Editor */
+        .canvas {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f5f7fa;
+        }
+        
+        .canvas-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            min-height: 500px;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            padding: 40px;
+        }
+        
+        .empty-canvas {
+            text-align: center;
+            padding: 80px 20px;
+            color: #888;
+        }
+        
+        .empty-canvas-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        /* Block Wrapper */
+        .content-block {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px dashed transparent;
+            border-radius: 8px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .content-block:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+        
+        .block-toolbar {
+            position: absolute;
+            top: -15px;
+            right: 10px;
+            display: none;
+            gap: 5px;
+        }
+        
+        .content-block:hover .block-toolbar {
+            display: flex;
+        }
+        
+        .toolbar-btn {
+            padding: 6px 10px;
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .toolbar-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        /* Properties Panel */
+        .properties-panel {
+            width: 320px;
+            background: white;
+            border-left: 1px solid #e1e8ed;
+            overflow-y: auto;
+            padding: 20px;
+            display: none;
+        }
+        
+        .properties-panel.show {
+            display: block;
+        }
+        
+        .properties-panel h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .prop-group {
+            margin-bottom: 20px;
+        }
+        
+        .prop-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .prop-input,
+        .prop-textarea,
+        .prop-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .prop-input:focus,
+        .prop-textarea:focus,
+        .prop-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .prop-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* Block Styles */
+        .text-block {
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .image-block {
+            text-align: center;
+        }
+        
+        .image-block img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        
+        .video-block {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        
+        .video-block iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+        }
+        
+        .button-block {
+            text-align: center;
+        }
+        
+        .button-block a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .button-block a:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .hero-block {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+            border-radius: 12px;
+        }
+        
+        .hero-block h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .hero-block p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+        
+        .accordion-block {
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .accordion-item {
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .accordion-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .accordion-header:hover {
+            background: #e1e8ed;
+        }
+        
+        .accordion-content {
+            padding: 15px 20px;
+            display: none;
+        }
+        
+        .accordion-content.show {
+            display: block;
+        }
+        
+        .grid-block {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .grid-item {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+        }
+        
+        .exam-block {
+            background: #f0f8ff;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #2196f3;
+        }
+        
+        .exam-block h3 {
+            color: #2196f3;
+            margin-bottom: 20px;
+        }
+        
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .question-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .option {
+            padding: 10px;
+            background: #f8f9fa;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .option:hover {
+            border-color: #2196f3;
+            background: #e3f2fd;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .blocks-sidebar {
+                width: 240px;
+            }
+            
+            .properties-panel {
+                width: 280px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .blocks-sidebar {
+                position: fixed;
+                left: -280px;
+                top: 70px;
+                height: calc(100vh - 70px);
+                z-index: 100;
+                transition: left 0.3s;
+            }
+            
+            .blocks-sidebar.show {
+                left: 0;
+            }
+            
+            .properties-panel {
+                position: fixed;
+                right: -320px;
+                top: 70px;
+                height: calc(100vh - 70px);
+                z-index: 100;
+                transition: right 0.3s;
+            }
+            
+            .properties-panel.show {
+                right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ADD THIS AFTER THE </style> TAG IN PART 1 -->
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button class="btn-back" onclick="goBack()">← Back</button>
+            <input type="text" class="page-title-input" id="pageTitle" placeholder="Page Title" value="New Page">
+        </div>
+        <div class="header-right">
+            <input type="text" id="pageSlug" placeholder="page-slug" style="padding: 8px 12px; border: 2px solid #e1e8ed; border-radius: 6px;">
+            <button class="btn-save" onclick="savePage('draft')">💾 Save Draft</button>
+            <button class="btn-publish" onclick="savePage('published')">🚀 Publish</button>
+        </div>
+    </header>
+
+    <!-- Main Builder Container -->
+    <div class="builder-container">
+        <!-- Blocks Sidebar -->
+        <aside class="blocks-sidebar">
+            <h3>📦 Content Blocks</h3>
+            
+            <div class="block-item" onclick="addBlock('text')">
+                <div class="block-icon">📝</div>
+                <div class="block-info">
+                    <h4>Text Block</h4>
+                    <p>Add paragraph text</p>
+                </div>
+            </div>
+            
+            <div class="block-item" onclick="addBlock('html')">
+                <div class="block-icon">💻</div>
+                <div class="block-info">
+                    <h4>HTML Block</h4>
+                    <p>Custom HTML code</p>
+                </div>
+            </div>
+            
+            <div class="block-item" onclick="addBlock('image')">
+                <div class="block-icon">🖼️</div>
+                <div class="block-info">
+                    <h4>Image Block</h4>
+                    <p>Add images</p>
+                </div>
+            </div>
+            
+            <div class="block-item" onclick="addBlock('video')">
+                <div class="block-icon">🎥</div>
+                <div class="block-info">
+                    <h4>Video Block</h4>
+                    <p>Embed videos</p>
+                </div>
+            </div>
+            
+            <div class="block-item" onclick="addBlock('button')">
+                <div class="block-icon">🔘</div>
+                <div class="block-info">
+                    <h4>Button Block</h4>
+                    <p>Call-to-action button</p>
+                </div>
+            </div>
+            
+            <div class="block-item" onclick="addBlock('hero')">
+                <div class="block-icon">🎨</div>
+                <div class="block-info">
+                    <h4>Hero Section</h4>
+                    <p>Large header section</p>
+                </div>
+            </div>
+            
+            <div class="block-item" onclick="addBlock('accordion')">
+                <div class="block-icon">📋</div>
+                <div class="block-info">
+                    <h4>Accordion/FAQ</h4>
+                    <p>Collapsible content</p>
+                </div>
+            </div>
+            
+            <div class="block-item" onclick="addBlock('grid')">
+                <div class="block-icon">⬜</div>
+                <div class="block-info">
+                    <h4>Grid Block</h4>
+                    <p>Multiple columns</p>
+                </div>
+            </div>
+            
+            <div class="block-item" onclick="addBlock('exam')">
+                <div class="block-icon">📚</div>
+                <div class="block-info">
+                    <h4>Exam Corner</h4>
+                    <p>Quiz/Test block</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Canvas -->
+        <main class="canvas">
+            <div class="canvas-inner" id="canvas">
+                <div class="empty-canvas">
+                    <div class="empty-canvas-icon">🎨</div>
+                    <h3>Start Building Your Page</h3>
+                    <p>Click on any block from the sidebar to add content</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Properties Panel -->
+        <aside class="properties-panel" id="propertiesPanel">
+            <h3>Block Properties</h3>
+            <div id="propertiesContent">
+                <p style="color: #888; text-align: center; padding: 40px 20px;">
+                    Select a block to edit its properties
+                </p>
+            </div>
+        </aside>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4';
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Global state
+        let pageBlocks = [];
+        let selectedBlockId = null;
+        let currentPageId = null;
+        
+        // Check authentication
+        function checkAuth() {
+            if (localStorage.getItem('cms_admin_auth') !== 'true') {
+                window.location.href = 'admin.html';
+            }
+        }
+        
+        // Go back to dashboard
+        function goBack() {
+            if (confirm('Are you sure? Any unsaved changes will be lost.')) {
+                window.location.href = 'dashboard.html';
+            }
+        }
+        
+        // Generate unique ID
+        function generateId() {
+            return 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Generate slug from title
+        function generateSlug(title) {
+            return title.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+        
+        // Auto-generate slug when title changes
+        document.getElementById('pageTitle').addEventListener('input', function() {
+            const slugInput = document.getElementById('pageSlug');
+            if (!slugInput.dataset.manuallyEdited) {
+                slugInput.value = generateSlug(this.value);
+            }
+        });
+        
+        document.getElementById('pageSlug').addEventListener('input', function() {
+            this.dataset.manuallyEdited = 'true';
+        });
+        
+        // Add block to canvas
+        function addBlock(type) {
+            const blockId = generateId();
+            const block = {
+                id: blockId,
+                type: type,
+                data: getDefaultBlockData(type)
+            };
+            
+            pageBlocks.push(block);
+            renderCanvas();
+            
+            // Remove empty state
+            const emptyState = document.querySelector('.empty-canvas');
+            if (emptyState) {
+                emptyState.remove();
+            }
+        }
+        
+        // Get default data for block type
+        function getDefaultBlockData(type) {
+            const defaults = {
+                text: { content: 'This is a text block. Click to edit.' },
+                html: { code: '<div><p>Your custom HTML here</p></div>' },
+                image: { url: 'https://via.placeholder.com/800x400', alt: 'Image description' },
+                video: { url: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+                button: { text: 'Click Me', url: '#', style: 'primary' },
+                hero: { 
+                    title: 'Welcome to Our Site', 
+                    subtitle: 'This is an amazing hero section' 
+                },
+                accordion: {
+                    items: [
+                        { title: 'Question 1', content: 'Answer 1' },
+                        { title: 'Question 2', content: 'Answer 2' }
+                    ]
+                },
+                grid: {
+                    columns: 3,
+                    items: [
+                        { content: 'Grid Item 1' },
+                        { content: 'Grid Item 2' },
+                        { content: 'Grid Item 3' }
+                    ]
+                },
+                exam: {
+                    title: 'Sample Quiz',
+                    questions: [
+                        {
+                            question: 'What is 2 + 2?',
+                            options: ['3', '4', '5', '6'],
+                            correct: 1
+                        }
+                    ]
+                }
+            };
+            
+            return defaults[type] || {};
+        }
+        
+        // Render canvas with all blocks
+        function renderCanvas() {
+            const canvas = document.getElementById('canvas');
+            canvas.innerHTML = '';
+            
+            if (pageBlocks.length === 0) {
+                canvas.innerHTML = `
+                    <div class="empty-canvas">
+                        <div class="empty-canvas-icon">🎨</div>
+                        <h3>Start Building Your Page</h3>
+                        <p>Click on any block from the sidebar to add content</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            pageBlocks.forEach(block => {
+                const blockElement = createBlockElement(block);
+                canvas.appendChild(blockElement);
+            });
+        }
+        
+        // Create block element
+        function createBlockElement(block) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'content-block';
+            wrapper.dataset.blockId = block.id;
+            
+            // Toolbar
+            const toolbar = document.createElement('div');
+            toolbar.className = 'block-toolbar';
+            toolbar.innerHTML = `
+                <button class="toolbar-btn" onclick="editBlock('${block.id}')">✏️ Edit</button>
+                <button class="toolbar-btn" onclick="moveBlockUp('${block.id}')">↑</button>
+                <button class="toolbar-btn" onclick="moveBlockDown('${block.id}')">↓</button>
+                <button class="toolbar-btn" onclick="deleteBlock('${block.id}')">🗑️</button>
+            `;
+            wrapper.appendChild(toolbar);
+            
+            // Block content
+            const content = document.createElement('div');
+            content.innerHTML = renderBlockContent(block);
+            wrapper.appendChild(content);
+            
+            return wrapper;
+        }
+        
+        // Render block content based on type
+        function renderBlockContent(block) {
+            switch (block.type) {
+                case 'text':
+                    return `<div class="text-block">${block.data.content}</div>`;
+                    
+                case 'html':
+                    return `<div class="html-block">${block.data.code}</div>`;
+                    
+                case 'image':
+                    return `<div class="image-block"><img src="${block.data.url}" alt="${block.data.alt}"></div>`;
+                    
+                case 'video':
+                    return `<div class="video-block"><iframe src="${block.data.url}" allowfullscreen></iframe></div>`;
+                    
+                case 'button':
+                    return `<div class="button-block"><a href="${block.data.url}">${block.data.text}</a></div>`;
+                    
+                case 'hero':
+                    return `<div class="hero-block"><h1>${block.data.title}</h1><p>${block.data.subtitle}</p></div>`;
+                    
+                case 'accordion':
+                    return `<div class="accordion-block">
+                        ${block.data.items.map((item, i) => `
+                            <div class="accordion-item">
+                                <div class="accordion-header" onclick="toggleAccordion(this)">
+                                    <span>${item.title}</span>
+                                    <span>▼</span>
+                                </div>
+                                <div class="accordion-content">${item.content}</div>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                    
+                case 'grid':
+                    return `<div class="grid-block" style="grid-template-columns: repeat(${block.data.columns}, 1fr);">
+                        ${block.data.items.map(item => `<div class="grid-item">${item.content}</div>`).join('')}
+                    </div>`;
+                    
+                case 'exam':
+                    return `<div class="exam-block">
+                        <h3>${block.data.title}</h3>
+                        ${block.data.questions.map((q, i) => `
+                            <div class="question">
+                                <div class="question-title">${i + 1}. ${q.question}</div>
+                                <div class="options">
+                                    ${q.options.map((opt, j) => `
+                                        <div class="option">${opt}</div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                    
+                default:
+                    return '<p>Unknown block type</p>';
+            }
+        }
+        
+        // Toggle accordion
+        function toggleAccordion(header) {
+            const content = header.nextElementSibling;
+            content.classList.toggle('show');
+        }
+        
+        // CONTINUE IN NEXT MESSAGE...
+    </script>
+    // ADD THIS JAVASCRIPT TO CONTINUE FROM PART 2
+
+        // Edit block - Show properties panel
+        function editBlock(blockId) {
+            selectedBlockId = blockId;
+            const block = pageBlocks.find(b => b.id === blockId);
+            
+            if (!block) return;
+            
+            const propertiesPanel = document.getElementById('propertiesPanel');
+            const propertiesContent = document.getElementById('propertiesContent');
+            
+            propertiesPanel.classList.add('show');
+            propertiesContent.innerHTML = renderPropertiesForm(block);
+        }
+        
+        // Render properties form based on block type
+        function renderPropertiesForm(block) {
+            let html = `<h4 style="margin-bottom: 15px; color: #667eea;">Edit ${block.type.toUpperCase()} Block</h4>`;
+            
+            switch (block.type) {
+                case 'text':
+                    html += `
+                        <div class="prop-group">
+                            <label class="prop-label">Content</label>
+                            <textarea class="prop-textarea" id="prop_content">${block.data.content}</textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'html':
+                    html += `
+                        <div class="prop-group">
+                            <label class="prop-label">HTML Code</label>
+                            <textarea class="prop-textarea" id="prop_code" style="font-family: monospace;">${block.data.code}</textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'image':
+                    html += `
+                        <div class="prop-group">
+                            <label class="prop-label">Image URL</label>
+                            <input type="text" class="prop-input" id="prop_url" value="${block.data.url}">
+                        </div>
+                        <div class="prop-group">
+                            <label class="prop-label">Alt Text</label>
+                            <input type="text" class="prop-input" id="prop_alt" value="${block.data.alt}">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'video':
+                    html += `
+                        <div class="prop-group">
+                            <label class="prop-label">Video Embed URL</label>
+                            <input type="text" class="prop-input" id="prop_url" value="${block.data.url}">
+                            <small style="color: #888; font-size: 12px;">Use YouTube embed URL (e.g., youtube.com/embed/VIDEO_ID)</small>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'button':
+                    html += `
+                        <div class="prop-group">
+                            <label class="prop-label">Button Text</label>
+                            <input type="text" class="prop-input" id="prop_text" value="${block.data.text}">
+                        </div>
+                        <div class="prop-group">
+                            <label class="prop-label">Button URL</label>
+                            <input type="text" class="prop-input" id="prop_url" value="${block.data.url}">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'hero':
+                    html += `
+                        <div class="prop-group">
+                            <label class="prop-label">Hero Title</label>
+                            <input type="text" class="prop-input" id="prop_title" value="${block.data.title}">
+                        </div>
+                        <div class="prop-group">
+                            <label class="prop-label">Hero Subtitle</label>
+                            <textarea class="prop-textarea" id="prop_subtitle">${block.data.subtitle}</textarea>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'accordion':
+                    html += `
+                        <div class="prop-group">
+                            <label class="prop-label">Accordion Items (JSON)</label>
+                            <textarea class="prop-textarea" id="prop_items" style="font-family: monospace;">${JSON.stringify(block.data.items, null, 2)}</textarea>
+                            <small style="color: #888; font-size: 12px;">Format: [{"title":"Q1","content":"A1"}]</small>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'grid':
+                    html += `
+                        <div class="prop-group">
+                            <label class="prop-label">Number of Columns</label>
+                            <input type="number" class="prop-input" id="prop_columns" value="${block.data.columns}" min="1" max="4">
+                        </div>
+                        <div class="prop-group">
+                            <label class="prop-label">Grid Items (JSON)</label>
+                            <textarea class="prop-textarea" id="prop_items" style="font-family: monospace;">${JSON.stringify(block.data.items, null, 2)}</textarea>
+                            <small style="color: #888; font-size: 12px;">Format: [{"content":"Item 1"}]</small>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'exam':
+                    html += `
+                        <div class="prop-group">
+                            <label class="prop-label">Quiz Title</label>
+                            <input type="text" class="prop-input" id="prop_title" value="${block.data.title}">
+                        </div>
+                        <div class="prop-group">
+                            <label class="prop-label">Questions (JSON)</label>
+                            <textarea class="prop-textarea" id="prop_questions" style="font-family: monospace; min-height: 200px;">${JSON.stringify(block.data.questions, null, 2)}</textarea>
+                            <small style="color: #888; font-size: 12px;">Format: [{"question":"Q?","options":["A","B"],"correct":0}]</small>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            html += `
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button onclick="updateBlockProperties()" style="flex: 1; padding: 12px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        ✓ Apply
+                    </button>
+                    <button onclick="closeProperties()" style="flex: 1; padding: 12px; background: #e1e8ed; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Cancel
+                    </button>
+                </div>
+            `;
+            
+            return html;
+        }
+        
+        // Update block properties
+        function updateBlockProperties() {
+            const block = pageBlocks.find(b => b.id === selectedBlockId);
+            if (!block) return;
+            
+            try {
+                switch (block.type) {
+                    case 'text':
+                        block.data.content = document.getElementById('prop_content').value;
+                        break;
+                        
+                    case 'html':
+                        block.data.code = document.getElementById('prop_code').value;
+                        break;
+                        
+                    case 'image':
+                        block.data.url = document.getElementById('prop_url').value;
+                        block.data.alt = document.getElementById('prop_alt').value;
+                        break;
+                        
+                    case 'video':
+                        block.data.url = document.getElementById('prop_url').value;
+                        break;
+                        
+                    case 'button':
+                        block.data.text = document.getElementById('prop_text').value;
+                        block.data.url = document.getElementById('prop_url').value;
+                        break;
+                        
+                    case 'hero':
+                        block.data.title = document.getElementById('prop_title').value;
+                        block.data.subtitle = document.getElementById('prop_subtitle').value;
+                        break;
+                        
+                    case 'accordion':
+                        block.data.items = JSON.parse(document.getElementById('prop_items').value);
+                        break;
+                        
+                    case 'grid':
+                        block.data.columns = parseInt(document.getElementById('prop_columns').value);
+                        block.data.items = JSON.parse(document.getElementById('prop_items').value);
+                        break;
+                        
+                    case 'exam':
+                        block.data.title = document.getElementById('prop_title').value;
+                        block.data.questions = JSON.parse(document.getElementById('prop_questions').value);
+                        break;
+                }
+                
+                renderCanvas();
+                closeProperties();
+                alert('✓ Block updated successfully!');
+            } catch (error) {
+                alert('❌ Error updating block: ' + error.message);
+            }
+        }
+        
+        // Close properties panel
+        function closeProperties() {
+            document.getElementById('propertiesPanel').classList.remove('show');
+            selectedBlockId = null;
+        }
+        
+        // Move block up
+        function moveBlockUp(blockId) {
+            const index = pageBlocks.findIndex(b => b.id === blockId);
+            if (index > 0) {
+                [pageBlocks[index], pageBlocks[index - 1]] = [pageBlocks[index - 1], pageBlocks[index]];
+                renderCanvas();
+            }
+        }
+        
+        // Move block down
+        function moveBlockDown(blockId) {
+            const index = pageBlocks.findIndex(b => b.id === blockId);
+            if (index < pageBlocks.length - 1) {
+                [pageBlocks[index], pageBlocks[index + 1]] = [pageBlocks[index + 1], pageBlocks[index]];
+                renderCanvas();
+            }
+        }
+        
+        // Delete block
+        function deleteBlock(blockId) {
+            if (!confirm('Are you sure you want to delete this block?')) return;
+            
+            pageBlocks = pageBlocks.filter(b => b.id !== blockId);
+            renderCanvas();
+            closeProperties();
+        }
+        
+        // Save page to Supabase
+        async function savePage(status) {
+            const title = document.getElementById('pageTitle').value.trim();
+            const slug = document.getElementById('pageSlug').value.trim();
+            
+            if (!title) {
+                alert('❌ Please enter a page title');
+                return;
+            }
+            
+            if (!slug) {
+                alert('❌ Please enter a page slug');
+                return;
+            }
+            
+            try {
+                const pageData = {
+                    title: title,
+                    slug: slug,
+                    content: pageBlocks,
+                    status: status,
+                    updated_at: new Date().toISOString()
+                };
+                
+                let result;
+                
+                if (currentPageId) {
+                    // Update existing page
+                    result = await supabase
+                        .from('pages')
+                        .update(pageData)
+                        .eq('id', currentPageId);
+                } else {
+                    // Create new page
+                    pageData.created_at = new Date().toISOString();
+                    result = await supabase
+                        .from('pages')
+                        .insert([pageData])
+                        .select();
+                    
+                    if (result.data && result.data[0]) {
+                        currentPageId = result.data[0].id;
+                    }
+                }
+                
+                if (result.error) throw result.error;
+                
+                alert(`✓ Page ${status === 'published' ? 'published' : 'saved'} successfully!`);
+                
+                if (status === 'published') {
+                    if (confirm('Page published! View the page?')) {
+                        window.open(`view.html?slug=${slug}`, '_blank');
+                    }
+                }
+            } catch (error) {
+                console.error('Error saving page:', error);
+                alert('❌ Error saving page: ' + error.message);
+            }
+        }
+        
+        // Load page if editing
+        async function loadPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pageId = urlParams.get('id');
+            
+            if (!pageId) return;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('pages')
+                    .select('*')
+                    .eq('id', pageId)
+                    .single();
+                
+                if (error) throw error;
+                
+                if (data) {
+                    currentPageId = data.id;
+                    document.getElementById('pageTitle').value = data.title;
+                    document.getElementById('pageSlug').value = data.slug;
+                    document.getElementById('pageSlug').dataset.manuallyEdited = 'true';
+                    pageBlocks = data.content || [];
+                    renderCanvas();
+                }
+            } catch (error) {
+                console.error('Error loading page:', error);
+                alert('❌ Error loading page: ' + error.message);
+            }
+        }
+        
+        // Initialize
+        checkAuth();
+        loadPage();
+    </script>
+</body>
+</html>
