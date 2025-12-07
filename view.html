@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading... | GETplus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        
+        /* Header */
+        .site-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .site-logo {
+            font-size: 24px;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .site-nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        .site-nav a:hover {
+            opacity: 0.8;
+        }
+        
+        /* Main Content */
+        .page-content {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            min-height: 60vh;
+        }
+        
+        .page-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        /* Block Styles */
+        .content-block {
+            margin-bottom: 30px;
+        }
+        
+        .text-block {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #444;
+        }
+        
+        .text-block p {
+            margin-bottom: 15px;
+        }
+        
+        .html-block {
+            margin: 20px 0;
+        }
+        
+        .image-block {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .image-block img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .video-block {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+        
+        .video-block iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+        
+        .button-block {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .button-block a {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .button-block a:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .hero-block {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 40px;
+            text-align: center;
+            border-radius: 16px;
+            margin: 40px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        
+        .hero-block h1 {
+            font-size: 56px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .hero-block p {
+            font-size: 22px;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .accordion-block {
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 30px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .accordion-item {
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .accordion-header {
+            padding: 20px 25px;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .accordion-header:hover {
+            background: #e8f0fe;
+            color: #667eea;
+        }
+        
+        .accordion-icon {
+            transition: transform 0.3s;
+            font-size: 14px;
+        }
+        
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 25px;
+        }
+        
+        .accordion-item.active .accordion-content {
+            max-height: 500px;
+            padding: 20px 25px;
+        }
+        
+        .grid-block {
+            display: grid;
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .grid-item {
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e1e8ed;
+            transition: all 0.3s;
+        }
+        
+        .grid-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .exam-block {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%);
+            padding: 40px;
+            border-radius: 16px;
+            border: 2px solid #2196f3;
+            margin: 30px 0;
+        }
+        
+        .exam-block h3 {
+            color: #2196f3;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .question {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .question-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option {
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        
+        .option:hover {
+            border-color: #2196f3;
+            background: #e3f2fd;
+        }
+        
+        .option.selected {
+            border-color: #2196f3;
+            background: #2196f3;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .option.correct {
+            border-color: #4caf50;
+            background: #4caf50;
+            color: white;
+        }
+        
+        .option.incorrect {
+            border-color: #f44336;
+            background: #f44336;
+            color: white;
+        }
+        
+        .exam-submit {
+            margin-top: 20px;
+            padding: 15px 40px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .exam-submit:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+        }
+        
+        .exam-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: #888;
+        }
+        
+        .loading-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Error State */
+        .error-state {
+            text-align: center;
+            padding: 100px 20px;
+        }
+        
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .error-state h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .error-state p {
+            color: #888;
+            font-size: 16px;
+        }
+        
+        /* Footer */
+        .site-footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px 20px;
+            margin-top: 60px;
+            text-align: center;
+        }
+        
+        .site-footer p {
+            margin-bottom: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 32px;
+            }
+            
+            .hero-block h1 {
+                font-size: 36px;
+            }
+            
+            .hero-block p {
+                font-size: 18px;
+            }
+            
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .site-nav a {
+                margin-left: 0;
+                margin-right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <a href="index.html" class="site-logo">🚀 GETplus</a>
+            <nav class="site-nav">
+                <a href="index.html">Home</a>
+                <a href="admin.html">Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-content" id="pageContent">
+        <div class="loading">
+            <div class="loading-icon">⏳</div>
+            <h3>Loading page...</h3>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>© 2024 GETplus - Powered by GETplus CMS</p>
+        <p>Built with ❤️ using Supabase</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4';
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Get slug from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageSlug = urlParams.get('slug');
+        
+        // Load and display page
+        async function loadPage() {
+            if (!pageSlug) {
+                showError('No page specified', 'Please provide a page slug in the URL.');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('pages')
+                    .select('*')
+                    .eq('slug', pageSlug)
+                    .eq('status', 'published')
+                    .single();
+                
+                if (error) throw error;
+                
+                if (!data) {
+                    showError('Page not found', 'The page you are looking for does not exist or is not published.');
+                    return;
+                }
+                
+                displayPage(data);
+            } catch (error) {
+                console.error('Error loading page:', error);
+                showError('Error loading page', error.message);
+            }
+        }
+        
+        // Display page content
+        function displayPage(page) {
+            document.title = page.title + ' | GETplus';
+            
+            const pageContent = document.getElementById('pageContent');
+            let html = `<h1 class="page-title">${page.title}</h1>`;
+            
+            if (page.content && page.content.length > 0) {
+                page.content.forEach(block => {
+                    html += `<div class="content-block">${renderBlock(block)}</div>`;
+                });
+            } else {
+                html += '<p style="color: #888; text-align: center; padding: 40px;">This page has no content yet.</p>';
+            }
+            
+            pageContent.innerHTML = html;
+            
+            // Initialize interactive elements
+            initializeAccordions();
+            initializeExams();
+        }
+        
+        // Render individual block
+        function renderBlock(block) {
+            switch (block.type) {
+                case 'text':
+                    return `<div class="text-block">${block.data.content}</div>`;
+                    
+                case 'html':
+                    return `<div class="html-block">${block.data.code}</div>`;
+                    
+                case 'image':
+                    return `<div class="image-block"><img src="${block.data.url}" alt="${block.data.alt}"></div>`;
+                    
+                case 'video':
+                    return `<div class="video-block"><iframe src="${block.data.url}" allowfullscreen></iframe></div>`;
+                    
+                case 'button':
+                    return `<div class="button-block"><a href="${block.data.url}">${block.data.text}</a></div>`;
+                    
+                case 'hero':
+                    return `<div class="hero-block"><h1>${block.data.title}</h1><p>${block.data.subtitle}</p></div>`;
+                    
+                case 'accordion':
+                    return `<div class="accordion-block">
+                        ${block.data.items.map((item, i) => `
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <span>${item.title}</span>
+                                    <span class="accordion-icon">▼</span>
+                                </div>
+                                <div class="accordion-content">${item.content}</div>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                    
+                case 'grid':
+                    return `<div class="grid-block" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                        ${block.data.items.map(item => `<div class="grid-item">${item.content}</div>`).join('')}
+                    </div>`;
+                    
+                case 'exam':
+                    return `<div class="exam-block" data-block-id="${block.id}">
+                        <h3>${block.data.title}</h3>
+                        ${block.data.questions.map((q, i) => `
+                            <div class="question" data-question="${i}">
+                                <div class="question-title">${i + 1}. ${q.question}</div>
+                                <div class="options">
+                                    ${q.options.map((opt, j) => `
+                                        <div class="option" data-option="${j}">${opt}</div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                        <button class="exam-submit">Submit Answers</button>
+                        <div class="exam-result" style="display: none;"></div>
+                    </div>`;
+                    
+                default:
+                    return '<p>Unknown block type</p>';
+            }
+        }
+        
+        // Initialize accordions
+        function initializeAccordions() {
+            document.querySelectorAll('.accordion-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const item = this.parentElement;
+                    const wasActive = item.classList.contains('active');
+                    
+                    // Close all accordions in this block
+                    item.parentElement.querySelectorAll('.accordion-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    
+                    // Open clicked accordion if it wasn't active
+                    if (!wasActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        }
+        
+        // Initialize exam blocks
+        function initializeExams() {
+            document.querySelectorAll('.exam-block').forEach(examBlock => {
+                const questions = Array.from(examBlock.querySelectorAll('.question'));
+                const userAnswers = new Array(questions.length).fill(null);
+                
+                // Handle option selection
+                questions.forEach((question, qIndex) => {
+                    question.querySelectorAll('.option').forEach(option => {
+                        option.addEventListener('click', function() {
+                            // Remove selection from other options in this question
+                            question.querySelectorAll('.option').forEach(opt => {
+                                opt.classList.remove('selected');
+                            });
+                            
+                            // Select this option
+                            this.classList.add('selected');
+                            userAnswers[qIndex] = parseInt(this.dataset.option);
+                        });
+                    });
+                });
+                
+                // Handle submit
+                const submitBtn = examBlock.querySelector('.exam-submit');
+                const resultDiv = examBlock.querySelector('.exam-result');
+                
+                submitBtn.addEventListener('click', function() {
+                    // Get correct answers from the original block data
+                    const blockData = findBlockData(examBlock.dataset.blockId);
+                    if (!blockData) return;
+                    
+                    let correct = 0;
+                    const total = blockData.questions.length;
+                    
+                    // Check answers and show feedback
+                    blockData.questions.forEach((q, i) => {
+                        const question = questions[i];
+                        const options = question.querySelectorAll('.option');
+                        
+                        options.forEach((option, j) => {
+                            option.style.pointerEvents = 'none';
+                            
+                            if (j === q.correct) {
+                                option.classList.add('correct');
+                            }
+                            
+                            if (j === userAnswers[i] && j !== q.correct) {
+                                option.classList.add('incorrect');
+                            }
+                        });
+                        
+                        if (userAnswers[i] === q.correct) {
+                            correct++;
+                        }
+                    });
+                    
+                    // Show result
+                    const percentage = Math.round((correct / total) * 100);
+                    resultDiv.innerHTML = `
+                        <strong>Your Score: ${correct} / ${total} (${percentage}%)</strong><br>
+                        ${percentage >= 70 ? '🎉 Great job!' : '📚 Keep practicing!'}
+                    `;
+                    resultDiv.style.display = 'block';
+                    
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Submitted';
+                    submitBtn.style.background = '#ccc';
+                });
+            });
+        }
+        
+        // Helper to find block data (simplified)
+        let currentPageData = null;
+        function findBlockData(blockId) {
+            if (!currentPageData || !currentPageData.content) return null;
+            return currentPageData.content.find(b => b.id === blockId);
+        }
+        
+        // Show error message
+        function showError(title, message) {
+            const pageContent = document.getElementById('pageContent');
+            pageContent.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">❌</div>
+                    <h2>${title}</h2>
+                    <p>${message}</p>
+                    <br>
+                    <a href="index.html" style="color: #667eea; text-decoration: none; font-weight: 600;">← Go to Homepage</a>
+                </div>
+            `;
+        }
+        
+        // Load page on initialization
+        loadPage().then(() => {
+            // Store page data for exam functionality
+            supabase
+                .from('pages')
+                .select('*')
+                .eq('slug', pageSlug)
+                .single()
+                .then(({ data }) => {
+                    currentPageData = data;
+                });
+        });
+    </script>
+</body>
+</html>
