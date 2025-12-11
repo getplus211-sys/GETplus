@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase GitHub Auth Demo</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* --- CSS STYLES --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f6f8fa;
+            color: #24292e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* --- Main Page Container (The GitHub Profile) --- */
+        .account-page {
+            width: 800px;
+            padding: 20px;
+            margin-top: 50px;
+            background-color: #ffffff;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(27, 31, 35, 0.1);
+        }
+
+        .account-page h1 {
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .account-page h2 {
+            font-size: 20px;
+            border-bottom: 1px solid #eaecef;
+            padding-bottom: 5px;
+            margin-top: 20px;
+        }
+        
+        .account-page p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Modal/Popup Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(9, 10, 11, 0.5); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 350px;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            font-size: 22px;
+            color: #24292e;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-input-container {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #0366d6;
+            box-shadow: 0 0 0 2px rgba(3, 102, 214, 0.2);
+        }
+
+        /* Password Toggle Button */
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #586069;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 5px;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        /* --- Buttons --- */
+        button {
+            width: 100%;
+            padding: 10px 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.15s ease;
+        }
+
+        .primary-btn {
+            background-color: #2da44e;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background-color: #2c974b;
+        }
+
+        .secondary-link {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #0366d6;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .secondary-link:hover {
+            text-decoration: underline;
+        }
+
+        /* --- Auth Switcher --- */
+        .auth-switcher {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eaecef;
+            font-size: 14px;
+        }
+
+        .auth-switcher span {
+            color: #586069;
+        }
+
+        /* --- Success Message --- */
+        .success-message {
+            background-color: #ccfcf0;
+            color: #0366d6;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #82e7c6;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="account-page" class="account-page hidden">
+        <header>
+            <img src="https://avatars.githubusercontent.com/u/10000000?v=4" alt="User Avatar" style="width: 50px; height: 50px; border-radius: 50%; float: right;">
+            <h1 id="welcome-header">Welcome!</h1>
+            <p>This is your private GitHub-style account dashboard.</p>
+        </header>
+        <section>
+            <h2>Profile Details</h2>
+            <p><strong>Full Name:</strong> <span id="display-name"></span></p>
+            <p><strong>Mobile:</strong> <span id="display-mobile"></span></p>
+            <p><strong>Email:</strong> <span id="display-email"></span></p>
+            <p style="color: gray; font-size: 12px; margin-top: 15px;">(Profile details are stored in your custom Supabase `user_profiles` table.)</p>
+        </section>
+        <button onclick="handleLogout()" class="primary-btn" style="background-color: #cb2431;">Log Out</button>
+    </div>
+
+    <div id="auth-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div id="login-form">
+                <h2>Sign in to GitHub Clone</h2>
+                <div class="success-message" id="reset-success-msg"></div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="primary-btn">Sign In</button>
+                </form>
+                <a href="#" class="secondary-link" onclick="showForgotPassword()">Forgot password?</a>
+            </div>
+
+            <div id="register-form" class="hidden">
+                <h2>Create a new account</h2>
+                <form onsubmit="handleRegistration(event)">
+                    <div class="form-group">
+                        <label for="register-name">Full Name</label>
+                        <input type="text" id="register-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-mobile">Mobile Number (e.g., 9876543210)</label>
+                        <input type="tel" id="register-mobile" required pattern="[0-9]{10}" title="10-digit Indian Mobile Number" maxlength="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <div class="form-input-container">
+                            <input type="password" id="register-password" required minlength="6">
+                            <span class="password-toggle" onclick="togglePasswordVisibility('register-password', this)">Show</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="primary-btn">Register</button>
+                </form>
+            </div>
+
+            <div id="forgot-password-form" class="hidden">
+                <h2>Forgot Password</h2>
+                <p style="font-size: 14px; color: #586069;">Enter your email and we'll send a password reset link.</p>
+                <form onsubmit="handleForgotPassword(event)">
+                    <div class="form-group">
+                        <label for="forgot-email">Email</label>
+                        <input type="email" id="forgot-email" required>
+                    </div>
+                    <button type="submit" class="primary-btn">Send Reset Link</button>
+                </form>
+                <a href="#" class="secondary-link" onclick="showLogin()">Back to Sign In</a>
+            </div>
+
+            <div class="auth-switcher">
+                <span id="switcher-text">New to our clone?</span>
+                <a href="#" id="switcher-link" onclick="toggleAuthForm()">Register</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT LOGIC ---
+
+        // =================================================================
+        //                 🔑  SUPABASE CLIENT INITIALIZATION  🔑
+        // =================================================================
+        
+        // !!! REPLACE THESE PLACEHOLDERS WITH YOUR ACTUAL KEYS !!!
+        const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';           
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4'; 
+
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // =================================================================
+        
+        // 1. DOM Element References
+        const accountPage = document.getElementById('account-page');
+        const authModal = document.getElementById('auth-modal');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const forgotPasswordForm = document.getElementById('forgot-password-form');
+        const switcherText = document.getElementById('switcher-text');
+        const switcherLink = document.getElementById('switcher-link');
+        const resetSuccessMsg = document.getElementById('reset-success-msg');
+        
+        const welcomeHeader = document.getElementById('welcome-header');
+        const displayName = document.getElementById('display-name');
+        const displayMobile = document.getElementById('display-mobile');
+        const displayEmail = document.getElementById('display-email');
+
+
+        // --- Mock User Data Structure (Used for display after login) ---
+        let currentUser = null; 
+
+        // 2. Utility Functions
+        function togglePasswordVisibility(fieldId, button) {
+            const passwordField = document.getElementById(fieldId);
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                button.textContent = 'Hide';
+            } else {
+                passwordField.type = 'password';
+                button.textContent = 'Show';
+            }
+        }
+        
+        // 3. Core Display Functions
+        async function renderPage() {
+            // Check the Supabase session state
+            const { data: { session } } = await supabaseClient.auth.getSession();
+
+            if (session) {
+                // User is logged in
+                const userId = session.user.id;
+                
+                // Fetch profile data from the custom table
+                const { data: profile, error: profileError } = await supabaseClient
+                    .from('user_profiles')
+                    .select('full_name, mobile_number')
+                    .eq('user_id', userId)
+                    .single();
+
+                if (profileError) {
+                    console.error("Error fetching profile:", profileError);
+                    alert("Could not load user profile details.");
+                    // Still show the basic page if session is valid but profile fetch failed
+                    currentUser = { email: session.user.email }; 
+                } else {
+                    currentUser = {
+                        email: session.user.email,
+                        name: profile.full_name,
+                        mobile: profile.mobile_number
+                    };
+                }
+                
+                // Populate the account details
+                welcomeHeader.textContent = `Welcome, ${currentUser.name || currentUser.email}!`;
+                displayName.textContent = currentUser.name || 'N/A';
+                displayMobile.textContent = currentUser.mobile || 'N/A';
+                displayEmail.textContent = currentUser.email || 'N/A';
+                
+                accountPage.classList.remove('hidden');
+                authModal.classList.add('hidden');
+            } else {
+                // User is NOT logged in
+                accountPage.classList.add('hidden');
+                authModal.classList.remove('hidden');
+                showLogin(); 
+            }
+        }
+
+        // 4. Modal Toggling Functions (remain similar to previous versions)
+        function toggleAuthForm() {
+            if (!loginForm.classList.contains('hidden')) {
+                showRegister();
+            } else if (!registerForm.classList.contains('hidden')) {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            // ... (hides other forms and shows login form)
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            forgotPasswordForm.classList.add('hidden');
+            switcherText.textContent = 'New to our clone?';
+            switcherLink.textContent = 'Register';
+            switcherLink.onclick = showRegister; 
+            resetSuccessMsg.style.display = 'none'; 
+            document.querySelector('.auth-switcher').classList.remove('hidden'); 
+        }
+
+        function showRegister() {
+            // ... (hides other forms and shows register form)
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            forgotPasswordForm.classList.add('hidden');
+            switcherText.textContent = 'Already have an account?';
+            switcherLink.textContent = 'Sign In';
+            switcherLink.onclick = showLogin; 
+            document.querySelector('.auth-switcher').classList.remove('hidden'); 
+        }
+        
+        function showForgotPassword() {
+            // ... (shows forgot password form)
+            loginForm.classList.add('hidden');
+            registerForm.classList.add('hidden');
+            forgotPasswordForm.classList.remove('hidden');
+            document.querySelector('.auth-switcher').classList.add('hidden'); 
+        }
+        
+        // 5. Supabase API Handlers
+        
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                alert('Login Error: ' + error.message);
+            } else if (data.user) {
+                renderPage();
+            }
+        }
+        
+        async function handleRegistration(event) {
+            event.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const mobile = document.getElementById('register-mobile').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            
+            // STEP 1: Supabase Sign Up (creates user in auth.users)
+            const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({ email, password });
+            
+            if (signUpError) {
+                alert('Registration Error: ' + signUpError.message);
+                return;
+            }
+
+            const newUser = signUpData.user;
+            
+            if (newUser) {
+                // STEP 2: Insert Profile Data into custom table ('user_profiles')
+                const { error: insertError } = await supabaseClient
+                    .from('user_profiles')
+                    .insert([
+                        { 
+                            user_id: newUser.id, 
+                            full_name: name,
+                            mobile_number: mobile 
+                        }
+                    ]);
+                
+                if (insertError) {
+                    // Critical: Handle case where auth succeeded but profile insert failed (e.g., RLS issue)
+                    console.error("Error inserting profile data:", insertError);
+                    alert("Registration successful, but profile saving failed. Check RLS rules.");
+                    return;
+                }
+                
+                alert(`Registration successful for ${name}.`);
+                renderPage(); // Reloads page and fetches new profile data
+            }
+        }
+        
+        async function handleForgotPassword(event) {
+            event.preventDefault();
+            const email = document.getElementById('forgot-email').value;
+            
+            // Replace 'URL_TO_RESET_PAGE' with the exact URL path where your password reset component is hosted
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { 
+                redirectTo: window.location.origin + '/reset-password' // Example redirect URL
+            });
+
+            if (error) {
+                alert('Error sending reset link: ' + error.message);
+            } else {
+                resetSuccessMsg.textContent = `Password reset link sent to ${email}. Check your inbox!`;
+                resetSuccessMsg.style.display = 'block';
+                setTimeout(showLogin, 3000); 
+            }
+        }
+        
+        async function handleLogout() {
+            const { error } = await supabaseClient.auth.signOut();
+            
+            if (error) {
+                alert('Logout Error: ' + error.message);
+            } else {
+                currentUser = null;
+                renderPage();
+                alert('Logged out successfully.');
+            }
+        }
+
+        // 6. Initial Page Load Check
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPage();
+        });
+
+    </script>
+</body>
+</html>
