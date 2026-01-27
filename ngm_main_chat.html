@@ -1,348 +1,688 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Menu, Plus, MessageCircle, Users, Radio, Bookmark, Bot, Pin, X } from 'lucide-react';
-
-// Supabase configuration - will be used when implementing actual data fetching
-const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4';
-
-const NandigramChat = () => {
-  const [activeTab, setActiveTab] = useState('all');
-  const [showMenu, setShowMenu] = useState(false);
-  const [showNewChatMenu, setShowNewChatMenu] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [chats, setChats] = useState([]);
-  const [pinnedChats, setPinnedChats] = useState([]);
-
-  useEffect(() => {
-    // Sample data - replace with actual Supabase queries
-    const sampleChats = [
-      {
-        id: 1,
-        name: 'Ramesh Patel',
-        lastMessage: 'Hello! How are you?',
-        time: '10:30 AM',
-        unread: 3,
-        isPinned: true,
-        type: 'personal',
-        profilePic: null
-      },
-      {
-        id: 2,
-        name: 'Family Group',
-        lastMessage: 'Priya: See you tomorrow!',
-        time: '9:15 AM',
-        unread: 0,
-        isPinned: true,
-        type: 'group',
-        profilePic: null
-      },
-      {
-        id: 3,
-        name: 'Tech News',
-        lastMessage: 'New AI breakthrough announced',
-        time: 'Yesterday',
-        unread: 0,
-        isPinned: false,
-        type: 'channel',
-        profilePic: null
-      },
-      {
-        id: 4,
-        name: 'Anjali Shah',
-        lastMessage: 'Thanks for your help!',
-        time: 'Yesterday',
-        unread: 1,
-        isPinned: false,
-        type: 'personal',
-        profilePic: null
-      },
-      {
-        id: 5,
-        name: 'Office Team',
-        lastMessage: 'Meeting at 3 PM',
-        time: '2 days ago',
-        unread: 5,
-        isPinned: true,
-        type: 'group',
-        profilePic: null
-      }
-    ];
-
-    const pinned = sampleChats.filter(chat => chat.isPinned).slice(0, 5);
-    const regular = sampleChats.filter(chat => !chat.isPinned);
-    
-    setPinnedChats(pinned);
-    setChats(regular);
-  }, []);
-
-  const getInitials = (name) => {
-    if (!name) return '?';
-    return name.charAt(0).toUpperCase();
-  };
-
-  const getProfileColor = (name) => {
-    const colors = [
-      'bg-blue-500', 'bg-green-500', 'bg-purple-500', 
-      'bg-pink-500', 'bg-indigo-500', 'bg-teal-500'
-    ];
-    const index = name ? name.charCodeAt(0) % colors.length : 0;
-    return colors[index];
-  };
-
-  const filteredChats = chats.filter(chat => {
-    if (searchQuery && !chat.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    if (activeTab === 'groups' && chat.type !== 'group') return false;
-    if (activeTab === 'channels' && chat.type !== 'channel') return false;
-    return true;
-  });
-
-  const filteredPinnedChats = pinnedChats.filter(chat => {
-    if (searchQuery && !chat.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    if (activeTab === 'groups' && chat.type !== 'group') return false;
-    if (activeTab === 'channels' && chat.type !== 'channel') return false;
-    return true;
-  });
-
-  const ChatItem = ({ chat, isPinned = false }) => (
-    <div className="flex items-center gap-3 p-3 hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b border-gray-100">
-      <div className={`w-12 h-12 rounded-full ${getProfileColor(chat.name)} flex items-center justify-center text-white font-semibold text-lg flex-shrink-0`}>
-        {getInitials(chat.name)}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-gray-900 truncate">{chat.name}</h3>
-            {isPinned && <Pin className="w-3 h-3 text-gray-400 flex-shrink-0" />}
-          </div>
-          <span className="text-xs text-gray-500 flex-shrink-0">{chat.time}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600 truncate">{chat.lastMessage}</p>
-          {chat.unread > 0 && (
-            <span className="ml-2 bg-green-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center flex-shrink-0">
-              {chat.unread}
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="h-screen flex flex-col bg-white max-w-md mx-auto relative select-none" style={{ touchAction: 'manipulation' }}>
-      {/* Header - 90px */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white" style={{ height: '90px' }}>
-        <div className="h-full flex flex-col justify-end pb-3 px-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold">Nandigram</h1>
-              <span className="text-xs bg-white/20 px-2 py-1 rounded">BETA</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => setSearchQuery(searchQuery ? '' : 'search')}
-                className="p-2 hover:bg-white/10 rounded-full active:bg-white/20 transition-colors"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-              <button 
-                onClick={() => setShowMenu(!showMenu)}
-                className="p-2 hover:bg-white/10 rounded-full active:bg-white/20 transition-colors relative"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Search Bar (when active) */}
-      {searchQuery !== '' && (
-        <div className="px-4 py-3 bg-white border-b border-gray-200">
-          <input
-            type="text"
-            placeholder="Search chats..."
-            value={searchQuery === 'search' ? '' : searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-green-500"
-            autoFocus
-          />
-        </div>
-      )}
-
-      {/* Menu Dropdown */}
-      {showMenu && (
-        <div className="absolute top-20 right-4 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-56 z-50">
-          <button className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3">
-            <Users className="w-4 h-4" />
-            <span>New Group</span>
-          </button>
-          <button className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3">
-            <Radio className="w-4 h-4" />
-            <span>New Channel</span>
-          </button>
-          <div className="border-t border-gray-200 my-1"></div>
-          <button className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100">Profile</button>
-          <button className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100">Settings</button>
-          <button className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100">Help</button>
-        </div>
-      )}
-
-      {/* New Chat Menu */}
-      {showNewChatMenu && (
-        <div className="absolute inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 animate-slide-up">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold">New Chat</h2>
-              <button onClick={() => setShowNewChatMenu(false)} className="p-2 hover:bg-gray-100 rounded-full">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-3">
-              <button className="w-full p-4 bg-green-50 hover:bg-green-100 active:bg-green-200 rounded-lg flex items-center gap-3 transition-colors">
-                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-medium">Create New Group</span>
-              </button>
-              <button className="w-full p-4 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 rounded-lg flex items-center gap-3 transition-colors">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Radio className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-medium">Create New Channel</span>
-              </button>
-              <div className="border-t border-gray-200 my-4"></div>
-              <div className="text-sm text-gray-600 mb-2">Contacts</div>
-              <div className="max-h-64 overflow-y-auto space-y-2">
-                {[1,2,3,4,5].map(i => (
-                  <button key={i} className="w-full p-3 hover:bg-gray-50 active:bg-gray-100 rounded-lg flex items-center gap-3">
-                    <div className={`w-10 h-10 ${getProfileColor(`Contact ${i}`)} rounded-full flex items-center justify-center text-white font-semibold`}>
-                      C
-                    </div>
-                    <span>Contact {i}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Chat List */}
-      <div className="flex-1 overflow-y-auto">
-        {/* Pinned Chats */}
-        {filteredPinnedChats.length > 0 && (
-          <div>
-            <div className="bg-gray-50 px-4 py-2 text-xs text-gray-600 font-medium flex items-center gap-2">
-              <Pin className="w-3 h-3" />
-              PINNED CHATS
-            </div>
-            {filteredPinnedChats.map(chat => (
-              <ChatItem key={chat.id} chat={chat} isPinned={true} />
-            ))}
-          </div>
-        )}
-
-        {/* Regular Chats */}
-        {filteredPinnedChats.length > 0 && filteredChats.length > 0 && (
-          <div className="bg-gray-50 px-4 py-2 text-xs text-gray-600 font-medium">
-            ALL CHATS
-          </div>
-        )}
-        {filteredChats.map(chat => (
-          <ChatItem key={chat.id} chat={chat} />
-        ))}
-
-        {/* Empty State */}
-        {filteredChats.length === 0 && filteredPinnedChats.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-            <MessageCircle className="w-16 h-16 mb-4" />
-            <p className="text-lg">No chats yet</p>
-            <p className="text-sm">Start a new conversation</p>
-          </div>
-        )}
-      </div>
-
-      {/* Footer Navigation */}
-      <div className="bg-white border-t border-gray-200 px-2 py-2 flex justify-around items-center">
-        <button 
-          onClick={() => setActiveTab('all')}
-          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${activeTab === 'all' ? 'text-green-600 bg-green-50' : 'text-gray-600'}`}
-        >
-          <MessageCircle className="w-5 h-5" />
-          <span className="text-xs font-medium">All Chats</span>
-        </button>
-        
-        <button 
-          onClick={() => setActiveTab('groups')}
-          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${activeTab === 'groups' ? 'text-green-600 bg-green-50' : 'text-gray-600'}`}
-        >
-          <Users className="w-5 h-5" />
-          <span className="text-xs font-medium">Groups</span>
-        </button>
-        
-        <button 
-          onClick={() => setActiveTab('channels')}
-          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${activeTab === 'channels' ? 'text-green-600 bg-green-50' : 'text-gray-600'}`}
-        >
-          <Radio className="w-5 h-5" />
-          <span className="text-xs font-medium">Channels</span>
-        </button>
-        
-        <button 
-          onClick={() => setActiveTab('saved')}
-          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${activeTab === 'saved' ? 'text-green-600 bg-green-50' : 'text-gray-600'}`}
-        >
-          <Bookmark className="w-5 h-5" />
-          <span className="text-xs font-medium">Saved</span>
-        </button>
-        
-        <button 
-          onClick={() => window.location.href = '/KAPiLa.html'}
-          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${activeTab === 'kapila' ? 'text-green-600 bg-green-50' : 'text-gray-600'}`}
-        >
-          <Bot className="w-5 h-5" />
-          <span className="text-xs font-medium">KAPiLa</span>
-        </button>
-      </div>
-
-      {/* Floating Action Button */}
-      <button 
-        onClick={() => setShowNewChatMenu(true)}
-        className="fixed bottom-20 right-6 w-14 h-14 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center transition-colors z-40"
-      >
-        <Plus className="w-6 h-6" />
-      </button>
-
-      <style jsx>{`
-        @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nandigram - Chat</title>
+    <style>
         * {
-          -webkit-tap-highlight-color: transparent;
-          -webkit-touch-callout: none;
-          -webkit-user-select: none;
-          user-select: none;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
-        input {
-          -webkit-user-select: text;
-          user-select: text;
-        }
-      `}</style>
-    </div>
-  );
-};
 
-export default NandigramChat;
+        input {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fff;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        /* Header - 90px */
+        .header {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0 16px 12px 16px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .beta-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .icon-btn:active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            padding: 12px 16px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .search-bar.active {
+            display: block;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #16a34a;
+        }
+
+        /* Menu Dropdown */
+        .menu-dropdown {
+            position: fixed;
+            top: 80px;
+            right: 16px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            width: 200px;
+            display: none;
+            z-index: 100;
+        }
+
+        .menu-dropdown.active {
+            display: block;
+        }
+
+        .menu-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:active {
+            background: #f9fafb;
+        }
+
+        /* Chat List */
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .section-header {
+            background: #f9fafb;
+            padding: 8px 16px;
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chat-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+        }
+
+        .chat-item:active {
+            background: #f9fafb;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pin-icon {
+            width: 12px;
+            height: 12px;
+            fill: #9ca3af;
+        }
+
+        .chat-time {
+            font-size: 11px;
+            color: #9ca3af;
+            flex-shrink: 0;
+        }
+
+        .chat-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-message {
+            font-size: 13px;
+            color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .unread-badge {
+            background: #16a34a;
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Footer Navigation */
+        .footer-nav {
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 8px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .nav-item.active {
+            color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .nav-item:active {
+            background: #e5e7eb;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: #16a34a;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            transition: background 0.2s;
+        }
+
+        .fab:active {
+            background: #15803d;
+        }
+
+        /* New Chat Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: flex-end;
+            z-index: 200;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f0fdf4;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .modal-option:active {
+            background: #dcfce7;
+        }
+
+        .modal-option-icon {
+            width: 40px;
+            height: 40px;
+            background: #16a34a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            color: #9ca3af;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            stroke: #d1d5db;
+        }
+
+        /* Colors for avatars */
+        .bg-blue { background: #3b82f6; }
+        .bg-green { background: #10b981; }
+        .bg-purple { background: #a855f7; }
+        .bg-pink { background: #ec4899; }
+        .bg-indigo { background: #6366f1; }
+        .bg-teal { background: #14b8a6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="brand">Nandigram</div>
+                    <div class="beta-badge">BETA</div>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="toggleSearch()">
+                        <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    </button>
+                    <button class="icon-btn" onclick="toggleMenu()">
+                        <svg class="icon" viewBox="0 0 24 24"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" class="search-input" placeholder="Search chats..." id="searchInput" oninput="filterChats()">
+        </div>
+
+        <!-- Menu Dropdown -->
+        <div class="menu-dropdown" id="menuDropdown">
+            <div class="menu-item" onclick="alert('New Group')">New Group</div>
+            <div class="menu-item" onclick="alert('New Channel')">New Channel</div>
+            <div class="menu-item" style="border-top: 1px solid #e5e7eb; margin-top: 4px; padding-top: 12px;">Profile</div>
+            <div class="menu-item">Settings</div>
+            <div class="menu-item">Help</div>
+        </div>
+
+        <!-- Chat List -->
+        <div class="chat-list" id="chatList">
+            <!-- Pinned Chats Section -->
+            <div id="pinnedSection">
+                <div class="section-header">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="#6b7280"><path d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"/></svg>
+                    PINNED CHATS
+                </div>
+                <div id="pinnedChats"></div>
+            </div>
+
+            <!-- Regular Chats Section -->
+            <div id="regularSection">
+                <div class="section-header" id="allChatsHeader" style="display: none;">ALL CHATS</div>
+                <div id="regularChats"></div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <svg class="empty-icon" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <p style="font-size: 18px; margin-bottom: 8px;">No chats yet</p>
+                <p style="font-size: 14px;">Start a new conversation</p>
+            </div>
+        </div>
+
+        <!-- Footer Navigation -->
+        <div class="footer-nav">
+            <button class="nav-item active" onclick="setActiveTab('all')">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span class="nav-label">All Chats</span>
+            </button>
+            <button class="nav-item" onclick="setActiveTab('groups')">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span class="nav-label">Groups</span>
+            </button>
+            <button class="nav-item" onclick="setActiveTab('channels')">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+                <span class="nav-label">Channels</span>
+            </button>
+            <button class="nav-item" onclick="setActiveTab('saved')">
+                <svg class="icon" viewBox="0 0 24 24"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                <span class="nav-label">Saved</span>
+            </button>
+            <button class="nav-item" onclick="window.location.href='KAPiLa.html'">
+                <svg class="icon" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h6"/></svg>
+                <span class="nav-label">KAPiLa</span>
+            </button>
+        </div>
+
+        <!-- Floating Action Button -->
+        <button class="fab" onclick="openNewChatModal()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </button>
+
+        <!-- New Chat Modal -->
+        <div class="modal-overlay" id="newChatModal" onclick="closeModalOnOverlay(event)">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">New Chat</div>
+                    <button class="close-btn" onclick="closeNewChatModal()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
+                <button class="modal-option">
+                    <div class="modal-option-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <span style="font-weight: 500;">Create New Group</span>
+                </button>
+                <button class="modal-option">
+                    <div class="modal-option-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+                    </div>
+                    <span style="font-weight: 500;">Create New Channel</span>
+                </button>
+                <div style="border-top: 1px solid #e5e7eb; margin: 16px 0; padding-top: 16px;">
+                    <div style="font-size: 12px; color: #6b7280; margin-bottom: 12px;">Contacts</div>
+                    <div id="contactsList" style="max-height: 200px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Data
+        const chats = [
+            { id: 1, name: 'Ramesh Patel', message: 'Hello! How are you?', time: '10:30 AM', unread: 3, pinned: true, type: 'personal' },
+            { id: 2, name: 'Family Group', message: 'Priya: See you tomorrow!', time: '9:15 AM', unread: 0, pinned: true, type: 'group' },
+            { id: 3, name: 'Tech News', message: 'New AI breakthrough announced', time: 'Yesterday', unread: 0, pinned: false, type: 'channel' },
+            { id: 4, name: 'Anjali Shah', message: 'Thanks for your help!', time: 'Yesterday', unread: 1, pinned: false, type: 'personal' },
+            { id: 5, name: 'Office Team', message: 'Meeting at 3 PM', time: '2 days ago', unread: 5, pinned: true, type: 'group' }
+        ];
+
+        let currentFilter = 'all';
+
+        const colors = ['bg-blue', 'bg-green', 'bg-purple', 'bg-pink', 'bg-indigo', 'bg-teal'];
+
+        function getAvatarColor(name) {
+            const index = name.charCodeAt(0) % colors.length;
+            return colors[index];
+        }
+
+        function getInitial(name) {
+            return name.charAt(0).toUpperCase();
+        }
+
+        function renderChats() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filteredChats = chats.filter(chat => {
+                if (searchQuery && !chat.name.toLowerCase().includes(searchQuery)) return false;
+                if (currentFilter === 'groups' && chat.type !== 'group') return false;
+                if (currentFilter === 'channels' && chat.type !== 'channel') return false;
+                if (currentFilter === 'saved') return false;
+                return true;
+            });
+
+            const pinned = filteredChats.filter(c => c.pinned).slice(0, 5);
+            const regular = filteredChats.filter(c => !c.pinned);
+
+            const pinnedHTML = pinned.map(chat => createChatHTML(chat, true)).join('');
+            const regularHTML = regular.map(chat => createChatHTML(chat, false)).join('');
+
+            document.getElementById('pinnedChats').innerHTML = pinnedHTML;
+            document.getElementById('regularChats').innerHTML = regularHTML;
+
+            document.getElementById('pinnedSection').style.display = pinned.length > 0 ? 'block' : 'none';
+            document.getElementById('allChatsHeader').style.display = (pinned.length > 0 && regular.length > 0) ? 'block' : 'none';
+            document.getElementById('emptyState').style.display = (pinned.length === 0 && regular.length === 0) ? 'flex' : 'none';
+        }
+
+        function createChatHTML(chat, isPinned) {
+            return `
+                <div class="chat-item" onclick="openChat(${chat.id})">
+                    <div class="avatar ${getAvatarColor(chat.name)}">${getInitial(chat.name)}</div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">
+                                ${chat.name}
+                                ${isPinned ? '<svg class="pin-icon" viewBox="0 0 24 24"><path d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"/></svg>' : ''}
+                            </div>
+                            <div class="chat-time">${chat.time}</div>
+                        </div>
+                        <div class="chat-footer">
+                            <div class="chat-message">${chat.message}</div>
+                            ${chat.unread > 0 ? `<div class="unread-badge">${chat.unread}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleSearch() {
+            const searchBar = document.getElementById('searchBar');
+            searchBar.classList.toggle('active');
+            if (searchBar.classList.contains('active')) {
+                document.getElementById('searchInput').focus();
+            }
+        }
+
+        function toggleMenu() {
+            document.getElementById('menuDropdown').classList.toggle('active');
+        }
+
+        function filterChats() {
+            renderChats();
+        }
+
+        function setActiveTab(tab) {
+            currentFilter = tab;
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+            renderChats();
+        }
+
+        function openNewChatModal() {
+            document.getElementById('newChatModal').classList.add('active');
+            renderContacts();
+        }
+
+        function closeNewChatModal() {
+            document.getElementById('newChatModal').classList.remove('active');
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target === event.currentTarget) {
+                closeNewChatModal();
+            }
+        }
+
+        function renderContacts() {
+            const contacts = [
+                { id: 1, name: 'Contact 1' },
+                { id: 2, name: 'Contact 2' },
+                { id: 3, name: 'Contact 3' },
+                { id: 4, name: 'Contact 4' },
+                { id: 5, name: 'Contact 5' }
+            ];
+
+            const html = contacts.map(contact => `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; cursor: pointer; border-radius: 8px;" onmousedown="this.style.background='#f9fafb'" onmouseup="this.style.background=''" onmouseleave="this.style.background=''">
+                    <div class="avatar ${getAvatarColor(contact.name)}" style="width: 40px; height: 40px; font-size: 16px;">${getInitial(contact.name)}</div>
+                    <span>${contact.name}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('contactsList').innerHTML = html;
+        }
+
+        function openChat(id) {
+            console.log('Opening chat:', id);
+            // Will link to chat window page
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('menuDropdown');
+            const menuBtn = event.target.closest('.icon-btn');
+            if (!menuBtn && !menu.contains(event.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        // Initialize
+        renderChats();
+    </script>
+</body>
+</html>
