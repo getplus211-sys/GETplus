@@ -1,0 +1,348 @@
+import React, { useState, useEffect } from 'react';
+import { Search, Menu, Plus, MessageCircle, Users, Radio, Bookmark, Bot, Pin, X } from 'lucide-react';
+
+// Supabase configuration - will be used when implementing actual data fetching
+const SUPABASE_URL = 'https://bhmycvrbucmbbrpzeane.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJobXljdnJidWNtYmJycHplYW5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2OTQwOTYsImV4cCI6MjA4MDI3MDA5Nn0.qQ3bw9cADG0P8hbGwx76Oeg54l-9FbRWxc92nZdSPL4';
+
+const NandigramChat = () => {
+  const [activeTab, setActiveTab] = useState('all');
+  const [showMenu, setShowMenu] = useState(false);
+  const [showNewChatMenu, setShowNewChatMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [chats, setChats] = useState([]);
+  const [pinnedChats, setPinnedChats] = useState([]);
+
+  useEffect(() => {
+    // Sample data - replace with actual Supabase queries
+    const sampleChats = [
+      {
+        id: 1,
+        name: 'Ramesh Patel',
+        lastMessage: 'Hello! How are you?',
+        time: '10:30 AM',
+        unread: 3,
+        isPinned: true,
+        type: 'personal',
+        profilePic: null
+      },
+      {
+        id: 2,
+        name: 'Family Group',
+        lastMessage: 'Priya: See you tomorrow!',
+        time: '9:15 AM',
+        unread: 0,
+        isPinned: true,
+        type: 'group',
+        profilePic: null
+      },
+      {
+        id: 3,
+        name: 'Tech News',
+        lastMessage: 'New AI breakthrough announced',
+        time: 'Yesterday',
+        unread: 0,
+        isPinned: false,
+        type: 'channel',
+        profilePic: null
+      },
+      {
+        id: 4,
+        name: 'Anjali Shah',
+        lastMessage: 'Thanks for your help!',
+        time: 'Yesterday',
+        unread: 1,
+        isPinned: false,
+        type: 'personal',
+        profilePic: null
+      },
+      {
+        id: 5,
+        name: 'Office Team',
+        lastMessage: 'Meeting at 3 PM',
+        time: '2 days ago',
+        unread: 5,
+        isPinned: true,
+        type: 'group',
+        profilePic: null
+      }
+    ];
+
+    const pinned = sampleChats.filter(chat => chat.isPinned).slice(0, 5);
+    const regular = sampleChats.filter(chat => !chat.isPinned);
+    
+    setPinnedChats(pinned);
+    setChats(regular);
+  }, []);
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    return name.charAt(0).toUpperCase();
+  };
+
+  const getProfileColor = (name) => {
+    const colors = [
+      'bg-blue-500', 'bg-green-500', 'bg-purple-500', 
+      'bg-pink-500', 'bg-indigo-500', 'bg-teal-500'
+    ];
+    const index = name ? name.charCodeAt(0) % colors.length : 0;
+    return colors[index];
+  };
+
+  const filteredChats = chats.filter(chat => {
+    if (searchQuery && !chat.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    if (activeTab === 'groups' && chat.type !== 'group') return false;
+    if (activeTab === 'channels' && chat.type !== 'channel') return false;
+    return true;
+  });
+
+  const filteredPinnedChats = pinnedChats.filter(chat => {
+    if (searchQuery && !chat.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    if (activeTab === 'groups' && chat.type !== 'group') return false;
+    if (activeTab === 'channels' && chat.type !== 'channel') return false;
+    return true;
+  });
+
+  const ChatItem = ({ chat, isPinned = false }) => (
+    <div className="flex items-center gap-3 p-3 hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b border-gray-100">
+      <div className={`w-12 h-12 rounded-full ${getProfileColor(chat.name)} flex items-center justify-center text-white font-semibold text-lg flex-shrink-0`}>
+        {getInitials(chat.name)}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-gray-900 truncate">{chat.name}</h3>
+            {isPinned && <Pin className="w-3 h-3 text-gray-400 flex-shrink-0" />}
+          </div>
+          <span className="text-xs text-gray-500 flex-shrink-0">{chat.time}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-600 truncate">{chat.lastMessage}</p>
+          {chat.unread > 0 && (
+            <span className="ml-2 bg-green-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center flex-shrink-0">
+              {chat.unread}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="h-screen flex flex-col bg-white max-w-md mx-auto relative select-none" style={{ touchAction: 'manipulation' }}>
+      {/* Header - 90px */}
+      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white" style={{ height: '90px' }}>
+        <div className="h-full flex flex-col justify-end pb-3 px-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold">Nandigram</h1>
+              <span className="text-xs bg-white/20 px-2 py-1 rounded">BETA</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setSearchQuery(searchQuery ? '' : 'search')}
+                className="p-2 hover:bg-white/10 rounded-full active:bg-white/20 transition-colors"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => setShowMenu(!showMenu)}
+                className="p-2 hover:bg-white/10 rounded-full active:bg-white/20 transition-colors relative"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Search Bar (when active) */}
+      {searchQuery !== '' && (
+        <div className="px-4 py-3 bg-white border-b border-gray-200">
+          <input
+            type="text"
+            placeholder="Search chats..."
+            value={searchQuery === 'search' ? '' : searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:border-green-500"
+            autoFocus
+          />
+        </div>
+      )}
+
+      {/* Menu Dropdown */}
+      {showMenu && (
+        <div className="absolute top-20 right-4 bg-white rounded-lg shadow-xl border border-gray-200 py-2 w-56 z-50">
+          <button className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3">
+            <Users className="w-4 h-4" />
+            <span>New Group</span>
+          </button>
+          <button className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3">
+            <Radio className="w-4 h-4" />
+            <span>New Channel</span>
+          </button>
+          <div className="border-t border-gray-200 my-1"></div>
+          <button className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100">Profile</button>
+          <button className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100">Settings</button>
+          <button className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100">Help</button>
+        </div>
+      )}
+
+      {/* New Chat Menu */}
+      {showNewChatMenu && (
+        <div className="absolute inset-0 bg-black/50 z-50 flex items-end">
+          <div className="bg-white w-full rounded-t-3xl p-6 animate-slide-up">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold">New Chat</h2>
+              <button onClick={() => setShowNewChatMenu(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <button className="w-full p-4 bg-green-50 hover:bg-green-100 active:bg-green-200 rounded-lg flex items-center gap-3 transition-colors">
+                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-medium">Create New Group</span>
+              </button>
+              <button className="w-full p-4 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 rounded-lg flex items-center gap-3 transition-colors">
+                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                  <Radio className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-medium">Create New Channel</span>
+              </button>
+              <div className="border-t border-gray-200 my-4"></div>
+              <div className="text-sm text-gray-600 mb-2">Contacts</div>
+              <div className="max-h-64 overflow-y-auto space-y-2">
+                {[1,2,3,4,5].map(i => (
+                  <button key={i} className="w-full p-3 hover:bg-gray-50 active:bg-gray-100 rounded-lg flex items-center gap-3">
+                    <div className={`w-10 h-10 ${getProfileColor(`Contact ${i}`)} rounded-full flex items-center justify-center text-white font-semibold`}>
+                      C
+                    </div>
+                    <span>Contact {i}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Chat List */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Pinned Chats */}
+        {filteredPinnedChats.length > 0 && (
+          <div>
+            <div className="bg-gray-50 px-4 py-2 text-xs text-gray-600 font-medium flex items-center gap-2">
+              <Pin className="w-3 h-3" />
+              PINNED CHATS
+            </div>
+            {filteredPinnedChats.map(chat => (
+              <ChatItem key={chat.id} chat={chat} isPinned={true} />
+            ))}
+          </div>
+        )}
+
+        {/* Regular Chats */}
+        {filteredPinnedChats.length > 0 && filteredChats.length > 0 && (
+          <div className="bg-gray-50 px-4 py-2 text-xs text-gray-600 font-medium">
+            ALL CHATS
+          </div>
+        )}
+        {filteredChats.map(chat => (
+          <ChatItem key={chat.id} chat={chat} />
+        ))}
+
+        {/* Empty State */}
+        {filteredChats.length === 0 && filteredPinnedChats.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+            <MessageCircle className="w-16 h-16 mb-4" />
+            <p className="text-lg">No chats yet</p>
+            <p className="text-sm">Start a new conversation</p>
+          </div>
+        )}
+      </div>
+
+      {/* Footer Navigation */}
+      <div className="bg-white border-t border-gray-200 px-2 py-2 flex justify-around items-center">
+        <button 
+          onClick={() => setActiveTab('all')}
+          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${activeTab === 'all' ? 'text-green-600 bg-green-50' : 'text-gray-600'}`}
+        >
+          <MessageCircle className="w-5 h-5" />
+          <span className="text-xs font-medium">All Chats</span>
+        </button>
+        
+        <button 
+          onClick={() => setActiveTab('groups')}
+          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${activeTab === 'groups' ? 'text-green-600 bg-green-50' : 'text-gray-600'}`}
+        >
+          <Users className="w-5 h-5" />
+          <span className="text-xs font-medium">Groups</span>
+        </button>
+        
+        <button 
+          onClick={() => setActiveTab('channels')}
+          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${activeTab === 'channels' ? 'text-green-600 bg-green-50' : 'text-gray-600'}`}
+        >
+          <Radio className="w-5 h-5" />
+          <span className="text-xs font-medium">Channels</span>
+        </button>
+        
+        <button 
+          onClick={() => setActiveTab('saved')}
+          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${activeTab === 'saved' ? 'text-green-600 bg-green-50' : 'text-gray-600'}`}
+        >
+          <Bookmark className="w-5 h-5" />
+          <span className="text-xs font-medium">Saved</span>
+        </button>
+        
+        <button 
+          onClick={() => window.location.href = '/KAPiLa.html'}
+          className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${activeTab === 'kapila' ? 'text-green-600 bg-green-50' : 'text-gray-600'}`}
+        >
+          <Bot className="w-5 h-5" />
+          <span className="text-xs font-medium">KAPiLa</span>
+        </button>
+      </div>
+
+      {/* Floating Action Button */}
+      <button 
+        onClick={() => setShowNewChatMenu(true)}
+        className="fixed bottom-20 right-6 w-14 h-14 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded-full shadow-lg flex items-center justify-center transition-colors z-40"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
+
+      <style jsx>{`
+        @keyframes slide-up {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+        * {
+          -webkit-tap-highlight-color: transparent;
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          user-select: none;
+        }
+        input {
+          -webkit-user-select: text;
+          user-select: text;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default NandigramChat;
