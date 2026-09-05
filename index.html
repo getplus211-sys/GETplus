@@ -1,628 +1,425 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAPiLAlearn - Digital Learning Platform</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CBRT Credit</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    :root {
+      --blue: #1b4f8c;
+      --blue-dark: #123b6d;
+      --bg: #eef3f8;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --border: #d9e1ea;
+      --danger: #d92d20;
+      --success: #16803c;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
-            padding-top: 70px;
-            padding-bottom: 60px;
-            max-width: 480px;
-            margin: 0 auto;
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        /* Header Styles */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            z-index: 1000;
-            height: 70px;
-            max-width: 480px;
-            margin: 0 auto;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(27, 79, 140, 0.14), transparent 32rem),
+        linear-gradient(135deg, #f8fbff 0%, var(--bg) 100%);
+    }
 
-        nav {
-            padding: 0 15px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    .page {
+      width: min(100%, 480px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 28px 18px;
+      display: grid;
+      align-items: center;
+    }
 
-        .logo-section {
-            display: flex;
-            flex-direction: column;
-        }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px;
+      box-shadow: 0 18px 45px rgba(16, 24, 40, 0.12);
+    }
 
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #1976d2;
-            line-height: 1.2;
-        }
+    .brand {
+      text-align: center;
+      margin-bottom: 24px;
+    }
 
-        .tagline {
-            font-size: 10px;
-            color: #666;
-            font-weight: 400;
-        }
+    .logo {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 12px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: rgba(27, 79, 140, 0.1);
+      color: var(--blue);
+      font-size: 30px;
+      font-weight: 800;
+    }
 
-        /* Dropdown Menu */
-        .menu-wrapper {
-            position: relative;
-        }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      color: var(--blue);
+    }
 
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 5px;
-            color: #333;
-        }
+    .sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
 
-        .dropdown-menu {
-            position: absolute;
-            top: 45px;
-            right: 0;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            min-width: 150px;
-            display: none;
-            overflow: hidden;
-        }
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #344054;
+    }
 
-        .dropdown-menu.active {
-            display: block;
-        }
+    input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 13px;
+      font-size: 16px;
+      outline: none;
+    }
 
-        .dropdown-item {
-            display: block;
-            padding: 12px 20px;
-            color: #333;
-            text-decoration: none;
-            font-size: 14px;
-            transition: background 0.2s;
-            border-bottom: 1px solid #f0f0f0;
-        }
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(27, 79, 140, 0.12);
+    }
 
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
+    button {
+      width: 100%;
+      height: 48px;
+      border: 0;
+      border-radius: 8px;
+      margin-top: 16px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
 
-        .dropdown-item:hover {
-            background: #f5f5f5;
-            color: #1976d2;
-        }
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
 
-        /* Main Content */
-        .container {
-            padding: 15px;
-        }
+    .ghost {
+      background: transparent;
+      color: var(--blue);
+      border: 1px solid var(--border);
+    }
 
-        .section {
-            margin-bottom: 25px;
-        }
+    .chips {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 18px 0 8px;
+    }
 
-        .section-title {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
+    .chip {
+      margin: 0;
+      background: #f6f9fc;
+      color: var(--blue-dark);
+      border: 1px solid var(--border);
+    }
 
-        /* Daily Learning Cards - 2 in 1 row */
-        .daily-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 25px;
-        }
+    .balance {
+      text-align: center;
+      padding: 18px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #f8fbff;
+      margin-bottom: 18px;
+    }
 
-        .daily-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+    .balance .label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
 
-        .daily-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+    .balance .value {
+      margin-top: 4px;
+      color: var(--blue);
+      font-size: 46px;
+      font-weight: 900;
+    }
 
-        .daily-card-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 6px;
-        }
+    .center {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
 
-        .daily-card-time {
-            font-size: 12px;
-            color: #666;
-        }
+    .hidden {
+      display: none;
+    }
 
-        /* Exam Cards */
-        .exam-card {
-            background: #fff;
-            border-radius: 15px;
-            padding: 18px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+    .message {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
 
-        .exam-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+    .error {
+      color: var(--danger);
+      background: #fff1f0;
+      border: 1px solid #ffd0cc;
+    }
 
-        .exam-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            flex-shrink: 0;
-        }
-
-        .icon-blue { background: #e3f2fd; }
-        .icon-orange { background: #fff3e0; }
-        .icon-teal { background: #e0f2f1; }
-        .icon-green { background: #e8f5e9; }
-        .icon-purple { background: #f3e5f5; }
-        .icon-pink { background: #fce4ec; }
-        .icon-cyan { background: #e0f7fa; }
-        .icon-lime { background: #f9fbe7; }
-
-        .exam-info {
-            flex: 1;
-        }
-
-        .exam-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #000;
-            margin-bottom: 6px;
-        }
-
-        .exam-subjects {
-            font-size: 13px;
-            color: #666;
-            line-height: 1.4;
-        }
-
-        .subject-badge {
-            background: #e3f2fd;
-            color: #1976d2;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        /* Tools Grid - 2 in 1 row */
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .tool-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px 15px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .tool-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .tool-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .tool-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .coming-soon {
-            font-size: 11px;
-            color: #999;
-            margin-top: 4px;
-        }
-
-        /* Footer Styles */
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #fff;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-            z-index: 1000;
-            height: 60px;
-            max-width: 480px;
-            margin: 0 auto;
-        }
-
-        .footer-content {
-            height: 100%;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 10px;
-        }
-
-        .footer-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            text-decoration: none;
-            color: #666;
-        }
-
-        .footer-item:hover {
-            transform: scale(1.05);
-        }
-
-        .footer-item.active {
-            color: #1976d2;
-        }
-
-        .footer-icon {
-            font-size: 20px;
-        }
-
-        .footer-label {
-            font-size: 10px;
-            font-weight: 500;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.6);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            max-width: 350px;
-            width: 90%;
-            text-align: center;
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            font-size: 26px;
-            cursor: pointer;
-            color: #999;
-            background: none;
-            border: none;
-        }
-
-        .modal-title {
-            font-size: 22px;
-            margin-bottom: 12px;
-            color: #333;
-            font-weight: 700;
-        }
-
-        .contact-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .contact-btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-            text-decoration: none;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .contact-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .call-btn {
-            background: #4CAF50;
-        }
-
-        .whatsapp-btn {
-            background: #25D366;
-        }
-    </style>
+    .success {
+      color: var(--success);
+      background: #ecfdf3;
+      border: 1px solid #abefc6;
+    }
+  </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav>
-            <div class="logo-section">
-                <div class="logo">GETplus</div>
-                <div class="tagline">Digital Learning Platform</div>
-            </div>
-            <div class="menu-wrapper">
-                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-                <div id="dropdownMenu" class="dropdown-menu">
-                    <a href="index.html" class="dropdown-item">Home</a>
-                    <a href="#" class="dropdown-item" onclick="showComingSoon(event)">About Us</a>
-                    <a href="#" class="dropdown-item" onclick="showComingSoon(event)">About Me</a>
-                    <a href="#" class="dropdown-item" onclick="showContact(event)">Contact Us</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+  <main class="page">
+    <section class="card">
+      <div class="brand">
+        <div class="logo">₹</div>
+        <h1>CBRT Credit</h1>
+        <div class="sub">Login and buy credits for your computer exam center</div>
+      </div>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Daily Learning Section -->
-        <div class="section">
-            <h2 class="section-title">📚 Daily Learning</h2>
-            <div class="daily-grid">
-                <div class="daily-card">
-                    <div class="daily-card-title">Everyday Quiz</div>
-                    <div class="daily-card-time">Starting 8:00 PM</div>
-                </div>
-                <div class="daily-card">
-                    <div class="daily-card-title">Everyday Current Affairs</div>
-                    <div class="daily-card-time">Read Everyday at 8:00 AM</div>
-                </div>
-            </div>
+      <div id="loginView">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email" placeholder="operator@example.com">
+
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Password">
+
+        <button id="loginBtn">LOGIN</button>
+      </div>
+
+      <div id="homeView" class="hidden">
+        <div class="center" id="operatorName"></div>
+        <div class="balance">
+          <div class="label">Available Credits</div>
+          <div class="value" id="creditBalance">0</div>
         </div>
 
-        <!-- Exam Corner Section -->
-        <div class="section">
-            <h2 class="section-title">🎓 Exam Corner</h2>
-            
-            <div class="exam-card" onclick="window.location.href='gpsc.html'">
-                <div class="exam-icon icon-blue">📊</div>
-                <div class="exam-info">
-                    <div class="exam-title">GPSC Class 1/2</div>
-                    <div class="exam-subjects">Gujarati, English, Maths, Reasoning, GK, Current Affairs</div>
-                </div>
-                <div class="subject-badge">11 Subjects</div>
-            </div>
-
-            <div class="exam-card" onclick="window.location.href='dysosti.html'">
-                <div class="exam-icon icon-orange">💼</div>
-                <div class="exam-info">
-                    <div class="exam-title">DySO / STI</div>
-                    <div class="exam-subjects">Gujarati, English, Maths, History, Geography, Polity</div>
-                </div>
-                <div class="subject-badge">10 Subjects</div>
-            </div>
-
-            <div class="exam-card" onclick="window.location.href='lrd.html'">
-                <div class="exam-icon icon-teal">🛡️</div>
-                <div class="exam-info">
-                    <div class="exam-title">Constable</div>
-                    <div class="exam-subjects">Gujarati, English, Maths, Reasoning, GK</div>
-                </div>
-                <div class="subject-badge">6 Subjects</div>
-            </div>
-
-            <div class="exam-card" onclick="window.location.href='psi.html'">
-                <div class="exam-icon icon-green">🚗</div>
-                <div class="exam-info">
-                    <div class="exam-title">PSI</div>
-                    <div class="exam-subjects">Gujarati, English, Reasoning, GK, Law, Computer</div>
-                </div>
-                <div class="subject-badge">8 Subjects</div>
-            </div>
-
-            <div class="exam-card" onclick="window.location.href='cce.html'">
-                <div class="exam-icon icon-purple">📖</div>
-                <div class="exam-info">
-                    <div class="exam-title">CCE</div>
-                    <div class="exam-subjects">Gujarati, English, Maths, Reasoning, Computer</div>
-                </div>
-                <div class="subject-badge">7 Subjects</div>
-            </div>
-
-            <div class="exam-card" onclick="window.location.href='talati.html'">
-                <div class="exam-icon icon-pink">📝</div>
-                <div class="exam-info">
-                    <div class="exam-title">Talati</div>
-                    <div class="exam-subjects">Gujarati, English, Maths, GK, Accounts</div>
-                </div>
-                <div class="subject-badge">9 Subjects</div>
-            </div>
-
-            <div class="exam-card" onclick="window.location.href='tet1.html'">
-                <div class="exam-icon icon-cyan">🎓</div>
-                <div class="exam-info">
-                    <div class="exam-title">TET-1</div>
-                    <div class="exam-subjects">Gujarati, English, Child Development, Pedagogy</div>
-                </div>
-                <div class="subject-badge">8 Subjects</div>
-            </div>
-
-            <div class="exam-card" onclick="window.location.href='forest.html'">
-                <div class="exam-icon icon-lime">🌲</div>
-                <div class="exam-info">
-                    <div class="exam-title">Forest Guard</div>
-                    <div class="exam-subjects">Gujarati, English, Maths, GK, Environment</div>
-                </div>
-                <div class="subject-badge">7 Subjects</div>
-            </div>
+        <div class="chips">
+          <button class="chip" data-amount="500">₹500</button>
+          <button class="chip" data-amount="1000">₹1000</button>
+          <button class="chip" data-amount="2000">₹2000</button>
+          <button class="chip" data-amount="5000">₹5000</button>
         </div>
 
-        <!-- Exam Tools Section -->
-        <div class="section">
-            <h2 class="section-title">🛠️ Exam Tools</h2>
-            <div class="tools-grid">
-                <div class="tool-card" onclick="showComingSoon(event)">
-                    <div class="tool-icon">🎥</div>
-                    <div class="tool-title">Video Lecture</div>
-                    <div class="coming-soon">Coming Soon</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-icon">📋</div>
-                    <div class="tool-title">Syllabus</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-icon">📝</div>
-                    <div class="tool-title">Mock Test</div>
-                </div>
-                <div class="tool-card">
-                    <div class="tool-icon">📊</div>
-                    <div class="tool-title">Performance</div>
-                </div>
-            </div>
-        </div>
-    </div>
+        <label for="amount">Amount</label>
+        <input id="amount" type="number" min="1" step="1" value="500">
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <a href="profile.html" class="footer-item">
-                <div class="footer-icon">👤</div>
-                <div class="footer-label">Account</div>
-            </a>
-            <div class="footer-item">
-                <div class="footer-icon">📊</div>
-                <div class="footer-label">Progress</div>
-            </div>
-            <div class="footer-item" onclick="showContact(event)">
-                <div class="footer-icon">📞</div>
-                <div class="footer-label">Contact</div>
-            </div>
-            <div class="footer-item">
-                <div class="footer-icon">🔔</div>
-                <div class="footer-label">Notification</div>
-            </div>
-        </div>
-    </footer>
+        <button id="buyBtn">BUY CREDITS</button>
+        <button id="refreshBtn" class="ghost">REFRESH BALANCE</button>
+        <button id="logoutBtn" class="ghost">LOGOUT</button>
+      </div>
 
-    <!-- Coming Soon Modal -->
-    <div id="comingSoonModal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('comingSoonModal')">&times;</button>
-            <h2 class="modal-title">Coming Soon</h2>
-            <p>This feature will be available soon. Stay tuned!</p>
-        </div>
-    </div>
+      <div id="msg" class="message hidden"></div>
+    </section>
+  </main>
 
-    <!-- Contact Modal -->
-    <div id="contactModal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('contactModal')">&times;</button>
-            <h2 class="modal-title">Contact Us</h2>
-            <p style="margin-bottom: 8px;">Get in touch with us</p>
-            <p style="font-size: 16px; font-weight: 600; color: #1976d2;">+91 6353511804</p>
-            <div class="contact-buttons">
-                <a href="tel:+916353511804" class="contact-btn call-btn">
-                    <span>📞</span>
-                    <span>Call</span>
-                </a>
-                <a href="https://wa.me/916353511804" target="_blank" class="contact-btn whatsapp-btn">
-                    <span>💬</span>
-                    <span>WhatsApp</span>
-                </a>
-            </div>
-        </div>
-    </div>
+  <script>
+    const SUPABASE_URL = "https://arlvoarkbtteywpobkmb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybHZvYXJrYnR0ZXl3cG9ia21iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyOTkxNjYsImV4cCI6MjEwMzg3NTE2Nn0.zzf_TEW6VCOy-Rvdk_JTmWomeSkzaaahcIRl8B-o1Do";
 
-    <script>
-        function toggleMenu() {
-            const menu = document.getElementById('dropdownMenu');
-            menu.classList.toggle('active');
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let session = null;
+    let operator = null;
+
+    const loginView = document.getElementById("loginView");
+    const homeView = document.getElementById("homeView");
+    const msg = document.getElementById("msg");
+    const loginBtn = document.getElementById("loginBtn");
+    const buyBtn = document.getElementById("buyBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    function showMessage(text, type) {
+      msg.textContent = text;
+      msg.className = `message ${type}`;
+      msg.classList.remove("hidden");
+    }
+
+    function clearMessage() {
+      msg.textContent = "";
+      msg.className = "message hidden";
+    }
+
+    function setBusy(isBusy) {
+      loginBtn.disabled = isBusy;
+      buyBtn.disabled = isBusy;
+      refreshBtn.disabled = isBusy;
+    }
+
+    function showHome() {
+      loginView.classList.add("hidden");
+      homeView.classList.remove("hidden");
+      document.getElementById("operatorName").textContent = operator.center_name || operator.email || "";
+      document.getElementById("creditBalance").textContent = operator.credit_balance ?? 0;
+    }
+
+    async function loadOperator() {
+      const userId = session?.user?.id;
+      if (!userId) throw new Error("Login session not found");
+
+      const { data, error } = await client
+        .from("cbrt_operators")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (error) throw error;
+      operator = data;
+      showHome();
+    }
+
+    async function login() {
+      clearMessage();
+      setBusy(true);
+      try {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        session = data.session;
+        await loadOperator();
+      } catch (err) {
+        showMessage(`Login failed: ${err.message || err}`, "error");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function refreshBalance() {
+      clearMessage();
+      setBusy(true);
+      try {
+        await loadOperator();
+        showMessage("Balance refreshed.", "success");
+      } catch (err) {
+        showMessage(`Could not refresh balance: ${err.message || err}`, "error");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function buyCredits() {
+      clearMessage();
+      setBusy(true);
+      try {
+        const amount = Number(document.getElementById("amount").value);
+        if (!Number.isFinite(amount) || amount <= 0) {
+          throw new Error("Enter a valid amount");
         }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const menuWrapper = document.querySelector('.menu-wrapper');
-            const menu = document.getElementById('dropdownMenu');
-            
-            if (!menuWrapper.contains(event.target)) {
-                menu.classList.remove('active');
-            }
+        const { data: currentSession } = await client.auth.getSession();
+        session = currentSession.session;
+        if (!session?.access_token) throw new Error("Please login again");
+
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-razorpay-order`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`,
+            "apikey": SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({
+            operator_id: operator.id,
+            amount_rupees: amount,
+            payment_method: "checkout",
+          }),
         });
 
-        function showComingSoon(event) {
-            event.preventDefault();
-            document.getElementById('dropdownMenu').classList.remove('active');
-            document.getElementById('comingSoonModal').classList.add('active');
+        const order = await res.json();
+        if (!res.ok || order.error) {
+          throw new Error(JSON.stringify(order));
         }
 
-        function showContact(event) {
-            event.preventDefault();
-            document.getElementById('dropdownMenu').classList.remove('active');
-            document.getElementById('contactModal').classList.add('active');
-        }
+        const checkout = new Razorpay({
+          key: order.key_id,
+          amount: order.amount,
+          currency: order.currency || "INR",
+          name: "CBRT Credit",
+          description: "Credit recharge",
+          order_id: order.order_id,
+          prefill: { email: operator.email || "" },
+          notes: {
+            operator_id: operator.id,
+            amount_rupees: String(amount),
+            reference_id: order.reference_id || "",
+            source: "cbrt_credit_website",
+          },
+          theme: { color: "#1B4F8C" },
+          handler: async function (response) {
+            showMessage(`Payment successful. Updating credits...\nPayment ID: ${response.razorpay_payment_id}`, "success");
+            setTimeout(refreshBalance, 2500);
+          },
+          modal: {
+            ondismiss: function () {
+              showMessage("Payment window closed.", "error");
+            },
+          },
+        });
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
+        checkout.open();
+      } catch (err) {
+        showMessage(`Payment could not start: ${err.message || err}`, "error");
+      } finally {
+        setBusy(false);
+      }
+    }
 
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.classList.remove('active');
-            }
-        }
-    </script>
+    async function logout() {
+      await client.auth.signOut();
+      session = null;
+      operator = null;
+      homeView.classList.add("hidden");
+      loginView.classList.remove("hidden");
+      clearMessage();
+    }
+
+    loginBtn.addEventListener("click", login);
+    buyBtn.addEventListener("click", buyCredits);
+    refreshBtn.addEventListener("click", refreshBalance);
+    logoutBtn.addEventListener("click", logout);
+
+    document.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.getElementById("amount").value = chip.dataset.amount;
+      });
+    });
+
+    client.auth.getSession().then(async ({ data }) => {
+      session = data.session;
+      if (!session) return;
+      try {
+        await loadOperator();
+      } catch (_) {
+        await client.auth.signOut();
+      }
+    });
+  </script>
 </body>
 </html>
